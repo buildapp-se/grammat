@@ -166,4 +166,16 @@ assert.strictEqual(recipeAsText(copyRecipe, 4), [
   'https://example.com/recept',
 ].join('\n'), 'kopierat recept är läsbar ren text');
 
-console.log('Alla test OK');
+// Serverns saneringsgräns: en rå PUT (curl, utan klientens normalizeState) får inte
+// lägga aktiv HTML i publika flödet via portions/unit.
+import('./worker/worker.js').then(({ sanitizeIndexed }) => {
+  const hostile = sanitizeIndexed({
+    id: 'x', title: 'x', portions: '<img src=x onerror=alert(1)>', course: 'skräp',
+    ingredients: [{ name: 'salt', unit: '<script>alert(1)</script>' }],
+  });
+  assert.strictEqual(hostile.portions, 4, 'portions tvingas till tal');
+  assert.strictEqual(hostile.ingredients[0].unit, 'g', 'unit tvingas till g/ml');
+  assert.strictEqual(hostile.course, 'huvudratt', 'okänd course normaliseras');
+  assert.strictEqual(sanitizeIndexed({ portions: 6.4, ingredients: [{ unit: 'ml' }] }).portions, 6, 'giltiga portions behålls');
+  console.log('Alla test OK');
+});

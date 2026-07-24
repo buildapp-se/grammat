@@ -96,15 +96,30 @@ async function createFirebaseUser(env, claims) {
 // Skriver om ägarens rader i recipes_index från state-bloben (privata recept hoppas över,
 // de kan aldrig läcka via flöden). saves-tabellen är sanningen för saves_count.
 // ponytail: DELETE+INSERT allt per PUT, diffa först om skrivvolymen börjar kosta.
+// Klienten normaliserar (normalizeState) men en rå PUT mot API:t gör det inte. Fälten
+// nedan renderas hos ALLA besökare via /feed, så typerna tvingas serverside: en sträng
+// i portions/unit blev annars aktiv HTML i andras webbläsare.
+// countUnit är fri text ("klyftor", "burk") och kan inte typas, den escapas vid render.
+export function sanitizeIndexed(r) {
+  return {
+    ...r,
+    course: normalizeCourse(r.course),
+    portions: Number.isFinite(+r.portions) && +r.portions >= 1 ? Math.round(+r.portions) : 4,
+    ingredients: r.ingredients.map(i => ({ ...i, unit: i && i.unit === 'ml' ? 'ml' : 'g' })),
+  };
+}
+
 function reindexStmts(env, ownerId, recipes) {
   const stmts = [env.DB.prepare('DELETE FROM recipes_index WHERE owner_id = ?').bind(ownerId)];
   for (const r of recipes) {
     // r.src = sparad kopia av någon annans recept: originalägarens index har den redan
     if (r.private === true || r.src || !r.id || !r.title) continue;
+    if (!Array.isArray(r.ingredients)) continue;
+    const safe = sanitizeIndexed(r);
     stmts.push(env.DB.prepare(
       `INSERT INTO recipes_index (owner_id, id, title, course, visibility, saves_count, data)
        VALUES (?,?,?,?,'public',(SELECT COUNT(*) FROM saves WHERE owner_id = ? AND recipe_id = ?),?)`
-    ).bind(ownerId, String(r.id), String(r.title), normalizeCourse(r.course), ownerId, String(r.id), JSON.stringify({ ...r, course: normalizeCourse(r.course) })));
+    ).bind(ownerId, String(r.id), String(r.title), normalizeCourse(r.course), ownerId, String(r.id), JSON.stringify(safe)));
   }
   return stmts;
 }

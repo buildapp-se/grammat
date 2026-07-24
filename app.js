@@ -449,7 +449,7 @@ if (typeof document !== 'undefined') (async function () {
     const nutr = nutritionPerPortion(r, nutrients);
     return `<article class="card" data-card="${esc(r.id)}">
       <a class="card-title" href="#/recept/${esc(r.id)}">${esc(r.title)}</a>
-      <div class="card-meta">bas ${r.portions} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}</div>
+      <div class="card-meta">bas ${esc(r.portions)} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}</div>
       <div class="card-row">
         ${sel
           ? `<div class="stepper"><button data-step="${esc(r.id)}|-1" aria-label="Färre portioner">−</button><span>${sel.portions} port</span><button data-step="${esc(r.id)}|1" aria-label="Fler portioner">+</button></div>
@@ -487,7 +487,7 @@ if (typeof document !== 'undefined') (async function () {
       : showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : '';
     return `<article class="card" data-card="${esc(linkId)}">
       <a class="card-title" href="#/recept/${esc(linkId)}">${esc(r.title)}</a>
-      <div class="card-meta">bas ${r.portions} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</div>
+      <div class="card-meta">bas ${esc(r.portions)} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</div>
       <div class="card-row">
         ${mine ? `<button class="btn btn-ghost" data-remove-allas="${esc(key)}">Ta bort ur mina recept</button>` : `<button class="btn" data-add-allas="${esc(key)}">Lägg till i mina recept</button>`}
       </div>
@@ -576,7 +576,7 @@ if (typeof document !== 'undefined') (async function () {
       const k = keyOf(ing.name);
       const isStruck = mine && struckKeys.includes(k);
       const attr = mine ? ` data-ing="${esc(k)}" style="view-transition-name:ing-${i}"` : '';
-      const row = `<tr class="ing-row${isStruck ? ' struck' : ''}"${attr}><td>${isStruck ? '<span class="tick">✓</span>' : ''}${esc(ing.name)}</td><td class="num">${fmtIngredient(ing, f)}</td></tr>`;
+      const row = `<tr class="ing-row${isStruck ? ' struck' : ''}"${attr}><td>${isStruck ? '<span class="tick">✓</span>' : ''}${esc(ing.name)}</td><td class="num">${esc(fmtIngredient(ing, f))}</td></tr>`;
       if (isStruck) { struckRows.push({ row, order: struckKeys.indexOf(k) }); return; }
       if ((ing.group || null) !== lastGroup) { lastGroup = ing.group || null; if (lastGroup) rows += `<tr class="ing-group"><td colspan="2">${esc(lastGroup)}</td></tr>`; }
       rows += row;
@@ -642,11 +642,11 @@ if (typeof document !== 'undefined') (async function () {
       body += `<div class="kvitto-cat">· · · ${esc(CAT_LABELS[cat].toUpperCase())} · · ·</div>`;
       for (const it of byCat[cat].sort((a, b) => a.name.localeCompare(b.name, 'sv'))) {
         const done = checked.has(it.key);
-        const srcs = it.sources.map(s => esc(s.title) + (s.amount != null ? ' ' + fmtNum(s.amount) + ' ' + (s.unit || '') : '')).join(' · ');
+        const srcs = it.sources.map(s => esc(s.title) + (s.amount != null ? ' ' + fmtNum(s.amount) + ' ' + esc(s.unit || '') : '')).join(' · ');
         body += `<div class="kvitto-item${done ? ' done' : ''}">
           <button class="kvitto-check" data-check="${esc(it.key)}" aria-label="Bocka av ${esc(it.name)}">${done ? '×' : ''}</button>
           <details class="kvitto-name"><summary>${esc(it.name)}</summary><div class="kvitto-src">${srcs}</div></details>
-          <span class="kvitto-amount">${fmtItem(it)}</span>
+          <span class="kvitto-amount">${esc(fmtItem(it))}</span>
         </div>`;
       }
     }
