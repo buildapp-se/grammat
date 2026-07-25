@@ -53,3 +53,13 @@ CREATE TABLE IF NOT EXISTS invites (
   used_by INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_invites_group ON invites(group_id);
+
+-- Brute force-broms för legacy PIN-login. Nyckel = "login:<kontonamn>": låset
+-- sitter på kontot, en angripare kan byta IP men inte vilket konto hen vill in i.
+-- Rader är självstädande: ett reset_at i det förflutna nollställs vid nästa
+-- försök, ingen cron behövs.
+CREATE TABLE IF NOT EXISTS login_attempts (
+  key TEXT PRIMARY KEY,
+  fails INTEGER NOT NULL DEFAULT 0,
+  reset_at INTEGER NOT NULL
+);
