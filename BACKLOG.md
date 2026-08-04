@@ -1,7 +1,7 @@
 # Backlog
 
 Kort lista över det som faktiskt är öppet. Den fullständiga historiken och alla
-avklarade punkter står i `TODO.md`, som är den längre arbetsanteckningen.
+avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen.
 
 ## Före lansering
 

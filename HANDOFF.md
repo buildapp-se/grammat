@@ -9,7 +9,7 @@ reviewedAt: 2026-07-25
 
 # Handoff
 
-Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa eller agent). Arkitektur i PROJECT.md, v2-planen i ARKITEKTUR.md, öppna punkter i TODO.md.
+Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa eller agent). Arkitektur i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`, den längre arbetsanteckningen i `docs/TODO.md`. Öppna punkter står i `BACKLOG.md`.
 
 ## Läget just nu
 - **Fas 3 grupper är deployad och prodtestad 2026-07-08 kväll.** Patrik verifierade i prod: skapa grupp, inbjudningslänk, Julia joinade och gruppen bildades. D1-backup togs först: `backups/recept-2026-07-08-203216.sql`, sen kördes `schema.sql` remote (6 tabeller). Funktion: D1-tabeller `groups`, `group_members`, `invites`; Worker-endpoints `GET /friends-feed`, `GET/POST /groups`, `DELETE /groups/:id` (bara skaparen), `POST /groups/:id/invite`, `POST /join/:code`; frontendflik `#/vanner`, inbjudningsroute `#/join/:code`, gruppsektion under Konto med ta bort-knapp och kopiera-ikon vid inbjudningslänken.
@@ -28,10 +28,10 @@ Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa elle
 5. Prodtesta patchen: kopiera-ikonen, ta bort grupp, och att Julia bara ser Patriks egna skapade recept under Vänners recept (efter städningen i punkt 4).
 
 ## Bra att veta
-- **Agentrutin**: D1-export till `backups/` FÖRE riskabla ändringar/D1-migreringar/deploy (kommando i PROJECT.md). Senast 2026-07-08 17:18 (`recept-2026-07-08-171859.sql`).
+- **Agentrutin**: D1-export till `backups/` FÖRE riskabla ändringar/D1-migreringar/deploy (kommando i `docs/PROJECT.md`). Senast 2026-07-08 17:18 (`recept-2026-07-08-171859.sql`).
 - **Deploy/push kräver Patriks godkännande** i det här permission-läget, planera inte in det som eget agentsteg.
 - **Cloudflare-edgecache på frontenden**: orgutveckling.se ligger bakom Cloudflare med `max-age=14400`, app.js kan serveras GAMMAL i upp till 4 h efter push. `index.html` använder därför versionsquery (`app.js?v=...`); höj queryn vid frontend-deploy om purge inte görs. Alternativt purge i Cloudflare-dashboarden (exakt URL: `https://orgutveckling.se/recept/app.js`).
-- **Google-consentskärmen** visar `grammat-78450.firebaseapp.com`: normalt för overifierad OAuth-branding, fixas i lanseringsfasen (se ARKITEKTUR.md risker).
+- **Google-consentskärmen** visar `grammat-78450.firebaseapp.com`: normalt för overifierad OAuth-branding, fixas i lanseringsfasen (se `docs/ARKITEKTUR.md` risker).
 - **Lokal verifiering**: `python -m http.server 8123` i REPO-ROTEN (cwd:t kan stå kvar i worker/ efter wrangler-kommandon) + `cd worker && npx wrangler dev --port 8787` + peka om `const API` i app.js tillfälligt (återställ före commit!). Hård omladdning (ignoreCache) efter app.js-ändringar. Lokal D1 seedas med `npx wrangler d1 execute recept --local --file schema.sql`.
 - **Codex browserläge:** om browsern saknas, kontrollera `agent.browsers.list()`. 2026-07-08 natt fixades Chrome-kopplingen genom Codex Chrome Extension/native host; efter pluginuppdatering behövdes JS-runtime reset så nya pluginvägen `26.623.141536` användes. `iab` var fortfarande inte exponerad, men Chrome-backend fungerade.
 - **PowerShell 5.1**: citattecken i `git commit -m`-here-strings mangalas till pathspecs, undvik `"` eller använd `-F fil`.

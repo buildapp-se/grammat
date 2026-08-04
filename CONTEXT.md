@@ -17,7 +17,7 @@ inte att vara en fullödig matportal.
 - Hela användarens tillstånd sparas som en blob per konto. `recipes_index` är ett
   härlett index för det publika flödet och byggs om vid behov.
 
-Full arkitektur står i `PROJECT.md`, v2-planen i `ARKITEKTUR.md`.
+Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
 
 ## Constraints
 
@@ -39,4 +39,5 @@ Full arkitektur står i `PROJECT.md`, v2-planen i `ARKITEKTUR.md`.
 
 Produktionen är en Worker plus D1-databasen `recept`. Ta alltid D1-export till
 `backups/` före riskabla ändringar, migreringar och deploy. `backups/` är
-git-ignorerad och får aldrig pushas. Öppna punkter står i `TODO.md`.
+git-ignorerad och får aldrig pushas. Den längre arbetsanteckningen med allt
+avklarat står i `docs/TODO.md`.
