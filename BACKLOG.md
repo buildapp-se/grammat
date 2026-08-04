@@ -14,12 +14,17 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 - [x] **Beslut 2026-08-04: lanseringen är för en privat krets.** Moderationspaketet
   (rapportera-knapp, `hidden`-flagga, användarvillkor) krävs alltså inte före
   lansering. Beslutet står i `CONTEXT.md` och gäller tills sajten sprids utåt.
-- [ ] Slutför Google-consentskärmens branding. Deployen till Firebase Hosting är
-  redan gjord (`grammat-78450.web.app` serverar `authhost/public/`, `/__/auth/handler`
-  svarar 200). Kvar: OAuth-branding i Google Cloud Console, custom domain
-  `auth.buildapp.se` i Firebase Console, DNS i Cloudflare, byte av `authDomain` i
-  `index.html` rad 163. Allt kräver webbläsare, firebase-tools har inget domänkommando.
-  Efter bytet måste en riktig Google-inloggning testas.
+- [x] Firebase Hosting-deploy av authhost. Var redan gjord 2026-07-21, upptäckt 2026-08-04.
+- [x] Custom domain `auth.buildapp.se` tillagd i Firebase och CNAME skapad i Cloudflare
+  (DNS only). Firebase svarade "setup successfully" 2026-08-04.
+- [ ] Vänta in certifikatet för `auth.buildapp.se`. Klart när
+  `curl -sI https://auth.buildapp.se/__/auth/handler` ger 200. Var inte klart 2026-08-04.
+- [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
+  agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
+  Måste göras av Patrik som `patz.lofgren@gmail.com`.
+- [ ] Byt `authDomain` i `index.html` rad 163 till `auth.buildapp.se`, först efter att
+  certifikatet är klart och authorized domains är kontrollerade. Testa en riktig
+  Google-inloggning direkt efter. Detaljerad ordning står i `HANDOFF.md` punkt 3.
 - [ ] Rensa legacy-PIN när sista kontot är kopplat till Firebase. Kontrollera med
   `SELECT name FROM users WHERE firebase_uid IS NULL`; systemkontot räknas inte.
   Läget 2026-08-04: julia och hans saknar fortfarande `firebase_uid`.
@@ -28,8 +33,13 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 ## Innehåll
 
-- [ ] Fyll på steg för salsiccia, räkpasta, chili con carne och gazpacho, som
-  saknar tillagningsbeskrivning eftersom källan bara var video eller länk.
+- [x] Fyll på steg för salsiccia, räkpasta, chili con carne och gazpacho. Gjort
+  2026-08-04 som **utkast** skrivna utifrån ingredienslistan, live i `starter.json`
+  och i D1-seeden. Alla 22 startrecept har nu steg.
+- [ ] Rätta utkastsstegen så de stämmer med hur ni faktiskt lagar rätterna, och
+  radera utkastraden längst ner i vart och ett av de fyra recepten. Kör om
+  `node worker/seed-grammat.js > worker/seed-grammat.sql` + execute mot remote
+  efteråt, annars ändras bara den utloggade vyn.
 
 ## Verifiering
 
