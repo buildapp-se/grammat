@@ -11,9 +11,9 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
   Gjort 2026-08-04: `/friends-feed`-frågan mot remote D1 ger ett recept, utan `src`.
 - [ ] Patrik bekräftar samma sak inloggat i webbläsaren. Ska visa exakt ett recept
   från julia ("abc"). Sista steget för att stänga punkten ovan.
-- [ ] **Beslut:** är lanseringen publik eller privat krets? `docs/ARKITEKTUR.md` kräver
-  moderation (rapportera-knapp, `hidden`-flagga, användarvillkor) före lansering utåt.
-  Är svaret publikt är det arbete som ska in här och byggas före lansering.
+- [x] **Beslut 2026-08-04: lanseringen är för en privat krets.** Moderationspaketet
+  (rapportera-knapp, `hidden`-flagga, användarvillkor) krävs alltså inte före
+  lansering. Beslutet står i `CONTEXT.md` och gäller tills sajten sprids utåt.
 - [ ] Slutför Google-consentskärmens branding. Deployen till Firebase Hosting är
   redan gjord (`grammat-78450.web.app` serverar `authhost/public/`, `/__/auth/handler`
   svarar 200). Kvar: OAuth-branding i Google Cloud Console, custom domain

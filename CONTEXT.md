@@ -34,6 +34,11 @@ Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
 - Inga bilder på recept, och blob-modellen behålls i stället för normaliserade tabeller.
 - Servern är förtroendegränsen. Allt som renderas för andra användare saneras
   serverside, inte bara i klienten.
+- **Lanseringen är för en privat krets** (beslut 2026-08-04). Det publika flödet
+  finns kvar, men sajten sprids inte utåt. Därför krävs inte moderationspaketet
+  (rapportera-knapp, `hidden`-flagga, användarvillkor) som `docs/ARKITEKTUR.md`
+  ställer som minimum före lansering utåt. Ändras beslutet till publik spridning
+  blir den moderationen ett krav igen innan sajten marknadsförs.
 
 ## Environments and operations
 

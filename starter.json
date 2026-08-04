@@ -196,7 +196,15 @@
       { "name": "pecorinoost (till servering)", "toTaste": true, "cat": "mejeri" }
     ],
     "steps": [
-
+      "Rosta fänkålsfröna torrt i en het panna tills de doftar. Stöt dem lätt i mortel.",
+      "Skala korven ur skinnet och dela smeten i grova bitar.",
+      "Finhacka gul lök, vitlök och chili. Skär tomaterna i grova bitar.",
+      "Bryn korvbitarna i olivolja tills de fått färg. Ta upp dem ur pannan.",
+      "Fräs lök, vitlök och chili mjukt i samma panna. Rör i fänkålsfröna och låt fräsa med någon minut.",
+      "Häll i vinet och låt det koka in till ungefär hälften.",
+      "Tillsätt tomaterna och korven. Låt puttra tills såsen tjocknar, ca 15 minuter. Salta och peppra.",
+      "Toppa med hackad persilja och riven pecorino vid servering.",
+      "Utkast: stegen ovan är skrivna utifrån ingredienslistan, inte från originalkällan. Rätta dem så de stämmer med hur ni faktiskt lagar rätten, och ta sedan bort den här raden."
     ]
   },
   {
@@ -244,7 +252,14 @@
       { "name": "parmesanost", "amount": 100, "unit": "g", "cat": "mejeri" }
     ],
     "steps": [
-
+      "Koka spagettin al dente i rikligt saltat vatten. Spara en skopa pastavatten innan du häller av.",
+      "Skiva vitlöken tunt, finhacka chilin och halvera minitomaterna.",
+      "Värm olivoljan på medelvärme och låt vitlök och chili dra i oljan utan att ta färg.",
+      "Tillsätt tomaterna och låt dem mjukna några minuter.",
+      "Vänd ner räkorna och låt dem bli varma. De behöver inte koka.",
+      "Blanda i pastan med en skvätt pastavatten så såsen blir sammanhållen. Pressa över citron, salta och peppra.",
+      "Toppa med rucola och riven parmesan vid servering.",
+      "Utkast: stegen ovan är skrivna utifrån ingredienslistan, inte från originalkällan. Rätta dem så de stämmer med hur ni faktiskt lagar rätten, och ta sedan bort den här raden."
     ]
   },
   {
@@ -276,7 +291,15 @@
       { "name": "ris (till servering)", "toTaste": true, "cat": "skafferi" }
     ],
     "steps": [
-
+      "Hacka gul lök, vitlök, chili och paprika.",
+      "Bryn nötfärsen i olivolja i omgångar så att den bryns och inte kokar. Salta och peppra.",
+      "Tillsätt lök, vitlök, chili och paprika och fräs mjukt.",
+      "Rör ner tomatpuré, spiskummin, oregano, timjan och rökt paprikapulver. Fräs någon minut så kryddorna får värme.",
+      "Tillsätt hela tomater, vatten, kakao och bbq-sås. Krossa tomaterna med sleven.",
+      "Låt puttra utan lock i minst 45 minuter, gärna längre, tills såsen tjocknat.",
+      "Vänd ner de avrunna kidneybönorna de sista 10 minuterna så de inte kokar sönder.",
+      "Smaka av med salt och peppar. Servera med ris och hackad koriander.",
+      "Utkast: stegen ovan är skrivna utifrån ingredienslistan, inte från originalkällan. Rätta dem så de stämmer med hur ni faktiskt lagar rätten, och ta sedan bort den här raden."
     ]
   },
   {
@@ -356,7 +379,13 @@
       { "name": "vitt bröd (till krutonger)", "toTaste": true, "cat": "skafferi" }
     ],
     "steps": [
-
+      "Skölj och grovhacka gurka, tomater och båda paprikorna. Spara lite av varje till garnering om du vill.",
+      "Lägg grönsakerna i en bunke med silverlök, vitlök, olivolja och sherryvinäger. Salta och låt stå kallt minst en timme, gärna över natten.",
+      "Mixa allt slätt. Sila genom en finmaskig sil om du vill ha en helt len soppa.",
+      "Smaka av med salt, peppar och en nypa strösocker som balanserar syran.",
+      "Ställ kallt tills soppan är riktigt kall.",
+      "Tärna det vita brödet och rosta i olivolja till krutonger. Toppa vid servering.",
+      "Utkast: stegen ovan är skrivna utifrån ingredienslistan, inte från originalkällan. Rätta dem så de stämmer med hur ni faktiskt lagar rätten, och ta sedan bort den här raden."
     ]
   },
   {
