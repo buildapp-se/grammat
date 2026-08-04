@@ -1,3 +1,12 @@
+---
+schemaVersion: 1
+status: active
+currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering
+nextAction: Städa remote-indexet från sju gamla src-kopior enligt kommandot under Nästa steg, ta D1-backup först, och prodtesta sedan att Vänners recept bara visar skapade recept
+blockers: []
+reviewedAt: 2026-07-25
+---
+
 # Handoff
 
 Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa eller agent). Arkitektur i PROJECT.md, v2-planen i ARKITEKTUR.md, öppna punkter i TODO.md.
