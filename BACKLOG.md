@@ -5,14 +5,26 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 ## Före lansering
 
-- [ ] Städa remote `recipes_index` från sju gamla src-kopior. Kommandot står i
-  `HANDOFF.md` under Nästa steg och kräver uttryckligt godkännande. Ta D1-backup först.
-- [ ] Prodtesta efter städningen att Vänners recept bara visar skapade recept.
-- [ ] Slutför Google-consentskärmens branding. Firebase Hosting-config ligger
-  förberedd i `authhost/` riktad mot `auth.buildapp.se`. Kvar är deploy via CLI,
-  custom domain i Firebase Console, DNS i Cloudflare och byte av `authDomain`.
+- [x] Städa remote `recipes_index` från gamla src-kopior. Gjort 2026-08-04, det var
+  fyra rader (inte sju), alla julias. Backup `backups/recept-2026-08-04-212213.sql`.
+- [x] Verifiera på data- och API-nivå att Vänners recept bara visar skapade recept.
+  Gjort 2026-08-04: `/friends-feed`-frågan mot remote D1 ger ett recept, utan `src`.
+- [ ] Patrik bekräftar samma sak inloggat i webbläsaren. Ska visa exakt ett recept
+  från julia ("abc"). Sista steget för att stänga punkten ovan.
+- [ ] **Beslut:** är lanseringen publik eller privat krets? `docs/ARKITEKTUR.md` kräver
+  moderation (rapportera-knapp, `hidden`-flagga, användarvillkor) före lansering utåt.
+  Är svaret publikt är det arbete som ska in här och byggas före lansering.
+- [ ] Slutför Google-consentskärmens branding. Deployen till Firebase Hosting är
+  redan gjord (`grammat-78450.web.app` serverar `authhost/public/`, `/__/auth/handler`
+  svarar 200). Kvar: OAuth-branding i Google Cloud Console, custom domain
+  `auth.buildapp.se` i Firebase Console, DNS i Cloudflare, byte av `authDomain` i
+  `index.html` rad 163. Allt kräver webbläsare, firebase-tools har inget domänkommando.
+  Efter bytet måste en riktig Google-inloggning testas.
 - [ ] Rensa legacy-PIN när sista kontot är kopplat till Firebase. Kontrollera med
   `SELECT name FROM users WHERE firebase_uid IS NULL`; systemkontot räknas inte.
+  Läget 2026-08-04: julia och hans saknar fortfarande `firebase_uid`.
+- [ ] Julia tar bort testreceptet "abc", det ligger i det publika flödet. Görs i appen
+  av henne, inte med SQL: indexet skrivs tillbaka vid hennes nästa sparning.
 
 ## Innehåll
 
