@@ -27,8 +27,8 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 - [x] `auth.buildapp.se` tillagd i Firebase authorized domains 2026-08-05.
 - [x] Byt `authDomain` till `auth.buildapp.se`. Gjort 2026-08-05 (`ad2e0f3`), verifierat
   mot Googles auth-endpoint före deploy, med gamla domänen som kontrollgrupp.
-- [ ] **Skarpt inloggningstest av bytet.** Enda kvarvarande verifieringen. Revert-rad
-  i `HANDOFF.md` under Läget just nu om det fallerar.
+- [x] Skarpt inloggningstest av bytet. Patrik verifierade i prod 2026-08-05 att
+  Google-inloggningen fungerar med `auth.buildapp.se` som authDomain.
 - [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
   agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
   Måste göras av Patrik som `patz.lofgren@gmail.com`.

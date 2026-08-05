@@ -2,10 +2,9 @@
 schemaVersion: 1
 status: active
 currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering
-nextAction: Testa en riktig Google-inloggning på buildapp.se/grammat/ nu när authDomain är auth.buildapp.se och båda allowlists är satta. Fungerar den, återstår bara OAuth-brandingen (appnamn "Grammat") i Google Cloud Console för att stänga consentpunkten
+nextAction: Gör OAuth-brandingen (appnamn "Grammat", supportmail, ev. logga) på console.cloud.google.com/auth/branding?project=grammat-78450 som inloggad patz.lofgren@gmail.com. Det är sista steget för consentskärmen, som nu visar auth.buildapp.se i stället för firebaseapp.com. Bekräfta samtidigt inloggat att Vänners recept bara visar skapade recept
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
-  - Inloggningstest kräver riktiga inloggningsuppgifter
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
 reviewedAt: 2026-08-04
 ---
@@ -15,7 +14,7 @@ reviewedAt: 2026-08-04
 Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa eller agent). Arkitektur i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`, den längre arbetsanteckningen i `docs/TODO.md`. Öppna punkter står i `BACKLOG.md`.
 
 ## Läget just nu
-- **`authDomain` är `auth.buildapp.se` sedan andra försöket 2026-08-05** (commit `ad2e0f3`). Första försöket (`4fc132e`) gav `Fel 400: redirect_uri_mismatch` och reverterades (`e145d44`); efter att Patrik registrerat båda allowlists gjordes bytet om. **Verifierat före deploy** mot Googles `accounts.google.com/o/oauth2/v2/auth` med det riktiga client-id:t: både gamla domänen (kontrollgrupp) och `auth.buildapp.se` ger inloggningssida i stället för `redirect_uri_mismatch`. Kontrollgruppen är viktig, den visar att probmetoden i sig fungerar. **Kvar: Patriks skarpa inloggningstest.**
+- **`authDomain` är `auth.buildapp.se` och inloggningen är prodtestad och fungerar (Patrik, 2026-08-05).** Punkten är därmed stängd. Andra försöket (commit `ad2e0f3`); första (`4fc132e`) gav `Fel 400: redirect_uri_mismatch` och reverterades (`e145d44`) eftersom handler-URL:en saknades i OAuth-klientens Authorized redirect URIs. Före andra deployen förkontrollerades bytet mot Googles `accounts.google.com/o/oauth2/v2/auth` med det riktiga client-id:t: både gamla domänen (kontrollgrupp) och `auth.buildapp.se` gav inloggningssida i stället för mismatch. Kontrollgruppen var poängen, den visar att probmetoden mäter rätt sak.
 - **De två allowlists som krävs, båda satta 2026-08-05:** `https://auth.buildapp.se/__/auth/handler` under Authorized redirect URIs på OAuth-klienten `266950913438-cvl3in8ropsic8hp6sf07e466df3i63j` i Google Cloud Console, och `auth.buildapp.se` under Firebase → Authentication → Settings → Authorized domains (bekräftad via publika API:t). Google varnar att klientändringar kan ta 5 minuter till några timmar att slå igenom.
 - **Revert om inloggningen ändå fallerar:** sätt `authDomain: 'grammat-78450.firebaseapp.com'` på rad 163 i `index.html` och pusha. Ute efter ca 30 s, `index.html` cachas bara 10 minuter.
 - **Rotorsaken, och den viktiga distinktionen inför nästa försök:** Google-inloggningen går via en **OAuth 2.0-klient** (autoskapad av Firebase) i Google Cloud Console → APIs & Services → Credentials. Den klienten har en egen strikt allowlist, **Authorized redirect URIs**, som bara innehåller `https://grammat-78450.firebaseapp.com/__/auth/handler`. När `authDomain` byts skickas i stället `https://auth.buildapp.se/__/auth/handler` som `redirect_uri`, och då vägrar Google. Det här är **en annan lista** än Firebase authorized domains under Authentication → Settings. Agenten kontrollerade den senare före bytet och den var inte problemet. Båda listorna behöver den nya domänen.
