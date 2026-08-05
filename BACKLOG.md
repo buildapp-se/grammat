@@ -21,12 +21,14 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
   (DNS only). Firebase svarade "setup successfully" 2026-08-04.
 - [x] Certifikatet för `auth.buildapp.se`. Klart 2026-08-05, handlern svarar 200 över
   HTTPS. Delat Firebase-certifikat, vår domän ligger i SAN-listan.
+- [x] Byt `authDomain` till `auth.buildapp.se`. Gjort och live 2026-08-05 (`4fc132e`).
+- [ ] **Testa en riktig Google-inloggning.** Enda kvarvarande verifiering av bytet
+  ovan. Revert-raden står i `HANDOFF.md` under Läget just nu.
+- [ ] Lägg till `auth.buildapp.se` i Firebase authorized domains. Saknas i listan
+  2026-08-05. Bör inte behövas eftersom `buildapp.se` valideras, men billig försäkring.
 - [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
   agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
   Måste göras av Patrik som `patz.lofgren@gmail.com`.
-- [ ] Byt `authDomain` i `index.html` rad 163 till `auth.buildapp.se`, först efter att
-  certifikatet är klart och authorized domains är kontrollerade. Testa en riktig
-  Google-inloggning direkt efter. Detaljerad ordning står i `HANDOFF.md` punkt 3.
 - [ ] Rensa legacy-PIN när sista kontot är kopplat till Firebase. Kontrollera med
   `SELECT name FROM users WHERE firebase_uid IS NULL`; systemkontot räknas inte.
   Läget 2026-08-04: julia och hans saknar fortfarande `firebase_uid`.
