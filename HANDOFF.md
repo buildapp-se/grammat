@@ -2,11 +2,10 @@
 schemaVersion: 1
 status: active
 currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering
-nextAction: Testa en riktig Google-inloggning på buildapp.se/grammat/ nu när authDomain är auth.buildapp.se. Fungerar den inte, lägg till auth.buildapp.se i Firebase authorized domains, och håller det inte heller, reverta raden enligt Läget just nu. Gör sedan OAuth-brandingen i Google Cloud Console
+nextAction: Lägg till https://auth.buildapp.se/__/auth/handler under Authorized redirect URIs på OAuth-klienten i Google Cloud Console, och auth.buildapp.se i Firebase authorized domains. Byt först därefter authDomain igen och testa inloggningen. Inloggningen fungerar just nu, authDomain är reverterad
 blockers:
-  - OAuth-branding kräver lösenordsinloggning i Google Cloud Console, en agent kan inte göra det steget
-  - auth.buildapp.se saknas i authorized domains, agenten kunde inte lägga till det (fel Google-konto i webbläsaren)
-  - Inloggningstestet efter authDomain-bytet kräver riktiga inloggningsuppgifter
+  - Allt som återstår för consentbrandingen kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra de stegen
+  - Inloggningstest efter authDomain-bytet kräver riktiga inloggningsuppgifter
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
 reviewedAt: 2026-08-04
 ---
@@ -16,9 +15,14 @@ reviewedAt: 2026-08-04
 Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa eller agent). Arkitektur i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`, den längre arbetsanteckningen i `docs/TODO.md`. Öppna punkter står i `BACKLOG.md`.
 
 ## Läget just nu
-- **`authDomain` är bytt till `auth.buildapp.se` och live 2026-08-05** (commit `4fc132e`). Verifierat att `buildapp.se/grammat/` serverar den nya konfigurationen. Bara den raden ändrades, ingen versionsquery höjdes eftersom `app.js` är oförändrad och `index.html` bara har `max-age=600`. **Ett riktigt Google-inloggningstest återstår, det kunde agenten inte göra.**
-- **VARNING, kontrollera detta först om inloggningen fallerar:** `auth.buildapp.se` ligger **inte** i Firebase authorized domains. Listan hämtad 2026-08-05 via den publika nyckeln (`GET https://identitytoolkit.googleapis.com/v1/projects?key=<apiKey>`) innehåller bara `localhost`, `grammat-78450.firebaseapp.com`, `grammat-78450.web.app` och `buildapp.se`. Inloggningen bör ändå fungera, eftersom det är appens ursprung (`buildapp.se`) som valideras mot listan och det ligger kvar, men lägg till `auth.buildapp.se` under Authentication → Settings → Authorized domains som billig försäkring. Agenten kunde inte göra det: webbläsaren har bara ABF-kontot inloggat, inte `patz.lofgren@gmail.com`.
-- **Revert om inloggningen är trasig:** sätt tillbaka `authDomain: 'grammat-78450.firebaseapp.com'` på rad 163 i `index.html` och pusha. Tar en minut, GH Pages ligger ute efter ca 30 s och `index.html` cachas bara i 10 minuter.
+- **`authDomain`-bytet testades i prod 2026-08-05, fallerade och är reverterat** (bytt i `4fc132e`, reverterat i `e145d44`). Patriks Google-inloggning gav **`Fel 400: redirect_uri_mismatch`** med `redirect_uri=https://auth.buildapp.se/__/auth/handler`. Inloggningen fungerar igen efter reverten.
+- **Rotorsaken, och den viktiga distinktionen inför nästa försök:** Google-inloggningen går via en **OAuth 2.0-klient** (autoskapad av Firebase) i Google Cloud Console → APIs & Services → Credentials. Den klienten har en egen strikt allowlist, **Authorized redirect URIs**, som bara innehåller `https://grammat-78450.firebaseapp.com/__/auth/handler`. När `authDomain` byts skickas i stället `https://auth.buildapp.se/__/auth/handler` som `redirect_uri`, och då vägrar Google. Det här är **en annan lista** än Firebase authorized domains under Authentication → Settings. Agenten kontrollerade den senare före bytet och den var inte problemet. Båda listorna behöver den nya domänen.
+- **Så här görs nästa försök, i den här ordningen:**
+  1. Google Cloud Console → APIs & Services → Credentials → webbklienten för `grammat-78450` → lägg till `https://auth.buildapp.se/__/auth/handler` under Authorized redirect URIs. Kräver inloggning som `patz.lofgren@gmail.com`.
+  2. Lägg till `auth.buildapp.se` under Authentication → Settings → Authorized domains i Firebase.
+  3. Byt `authDomain` till `auth.buildapp.se` på rad 163 i `index.html` (kommentaren där varnar för exakt det här) och pusha.
+  4. Testa en riktig Google-inloggning direkt. Ändringar i OAuth-klienten kan ta några minuter innan de slår igenom hos Google.
+  5. Fallerar det igen: reverta raden till `grammat-78450.firebaseapp.com` och pusha. GH Pages ligger ute efter ca 30 s, `index.html` cachas bara i 10 minuter.
 - **Certifikatet för `auth.buildapp.se` är klart 2026-08-05.** `https://auth.buildapp.se/__/auth/handler` ger 200 och serverar den riktiga Firebase-handlern (laddar `handler.js` och `experiments.js`), roten serverar authhost-placeholdern. Certifikatet är utfärdat av Google Trust Services 2026-08-04 21:29 UTC och går ut 2026-11-02. OBS att certifikatets CN är en **främmande domän** (`yellowdogbread.com`): Firebase Hosting använder delade certifikat och vår domän ligger i SAN-listan (`DNS:auth.buildapp.se` verifierad). Det ser skumt ut men är normalt, och `curl` utan `-k` godkände värdnamnet, vilket är det faktiska beviset. **Därmed är steg 3a avklarat och authDomain-bytet är tekniskt möjligt.** Det som fortfarande saknas före bytet är OAuth-brandingen och ett riktigt inloggningstest.
 - **Utkastsstegen är UI-verifierade i prod 2026-08-05.** Utloggad vy på `buildapp.se/grammat/`: gazpacho och salsiccia öppnade via Allas recept renderar stegen korrekt under "Gör så här" som numrerad lista, svenska tecken intakta, näringsraden med decimalkomma, och utkastraden syns som sista steget. Inga konsolfel eller varningar vid full sidladdning. Notera att utkastraden är stylad exakt som ett vanligt steg, den skiljer sig bara genom att texten börjar med "Utkast:".
 - **Custom domain `auth.buildapp.se` är uppsatt 2026-08-04, certifikatet mintas.** Firebase Console (konto `patz.lofgren@gmail.com`, ligger på `u/1` i webbläsaren) → Hosting → Add custom domain. Quick setup gav EN post: `CNAME auth.buildapp.se → grammat-78450.web.app`. Posten är skapad i Cloudflare på zonen `buildapp.se` som **DNS only** (grå molnet), vilket är nödvändigt: proxad post gör att Firebase aldrig kan validera eller minta certifikatet. Firebase svarade "Custom domain setup successfully", status står nu på "Minting certificate". DNS är verifierad utifrån: `auth.buildapp.se` är CNAME till `grammat-78450.web.app` och löser till 199.36.158.100. **HTTPS svarar inte än** (curl-kod 000), certifikatet var inte klart när sessionen avslutades. Firebase anger upp till 24 h.
@@ -39,13 +43,12 @@ Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa elle
 
 ## Nästa steg
 1. Patrik bekräftar inloggat i prod att Vänners recept bara visar skapade recept. Efter städningen ska fliken visa exakt ett recept från julia ("abc"). Samtidigt går det att pricka av resten av det inloggade prodtestet: andra ägare i Allas-fliken, spara/ta bort, hemlig-toggle, kopiera-ikonen och ta bort grupp.
-2. **Produktbeslut som styr scopet:** `docs/ARKITEKTUR.md` listar moderation (rapportera-knapp, `hidden`-flagga i indexet, användarvillkor) som minimum före lansering **utåt**, men det står inte i BACKLOG. Avgör om lanseringen är publik eller fortsatt privat krets. Är den publik tillkommer den moderationen som riktigt arbete före lansering.
-3. Consentbrandingen, i den här ordningen. Custom domain och DNS är redan klara (se Läget just nu), kvar är:
-   a. ~~Vänta in certifikatet.~~ **Klart 2026-08-05**, handlern svarar 200 över HTTPS.
-   b. OAuth-branding i Google Cloud Console (`console.cloud.google.com/auth/branding?project=grammat-78450`): appnamn "Grammat", supportmail, ev. logga. **Kräver att du är inloggad som `patz.lofgren@gmail.com`**, konsolen hoppade till ABF-kontot och krävde lösenord när agenten försökte.
-   c. Kontrollera att `buildapp.se` (och `auth.buildapp.se`) ligger under Authentication → Settings → Authorized domains i Firebase, annars vägrar inloggningen efter bytet.
-   d. Byt `authDomain: 'grammat-78450.firebaseapp.com'` till `'auth.buildapp.se'` i `index.html` rad 163 och höj versionsqueryn för app.js.
-   e. Testa en riktig Google-inloggning direkt efter deployen. Går den inte, återställ `authDomain` och pusha igen: ingen kan logga in så länge den är fel.
+2. Consentbrandingen. Infrastrukturen är klar (custom domain, DNS, certifikat), och authDomain-bytet är testat och reverterat. Kvar, i den här ordningen, allt i webbläsare som `patz.lofgren@gmail.com`:
+   a. **Google Cloud Console → APIs & Services → Credentials → webbklienten för `grammat-78450` → Authorized redirect URIs → lägg till `https://auth.buildapp.se/__/auth/handler`.** Det var den här som saknades och gav `400 redirect_uri_mismatch` 2026-08-05.
+   b. Firebase → Authentication → Settings → Authorized domains → lägg till `auth.buildapp.se`. Annan lista, båda behövs.
+   c. OAuth-branding på `console.cloud.google.com/auth/branding?project=grammat-78450`: appnamn "Grammat", supportmail, ev. logga. Konsolen hoppade till ABF-kontot och krävde lösenord när agenten försökte.
+   d. Byt `authDomain` till `'auth.buildapp.se'` på rad 163 i `index.html` och pusha. Ingen versionsquery behöver höjas, `app.js` är oförändrad och `index.html` cachas bara 10 minuter.
+   e. Testa en riktig Google-inloggning direkt. Ändringar i OAuth-klienten kan dröja några minuter hos Google. Fallerar det: reverta raden och pusha.
 4. Julia loggar in på delade kontot: Patrik trycker "Skapa lösenord" under Konto (syns när kontot saknar lösenordsinloggning), sen loggar hon in med samma e-post + lösenordet. Först när julia och hans har `firebase_uid` kan legacy-PIN rensas.
 5. Mobilverifieringen i butik (checklista i git-historiken för HANDOFF, förmiddagens version) står kvar.
 6. Städa bort testrecepten ur det publika flödet före lansering: `julia|abc`, `patrik|testrecept` och `hans|gazpacho` (den sistnämnda saknar steg och dubblerar starter-receptet). Det är deras egen data, så det görs i appen av respektive ägare, inte med SQL: en `DELETE` mot indexet skrivs tillbaka vid nästa `PUT /state`.

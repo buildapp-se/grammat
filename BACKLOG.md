@@ -21,11 +21,14 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
   (DNS only). Firebase svarade "setup successfully" 2026-08-04.
 - [x] Certifikatet för `auth.buildapp.se`. Klart 2026-08-05, handlern svarar 200 över
   HTTPS. Delat Firebase-certifikat, vår domän ligger i SAN-listan.
-- [x] Byt `authDomain` till `auth.buildapp.se`. Gjort och live 2026-08-05 (`4fc132e`).
-- [ ] **Testa en riktig Google-inloggning.** Enda kvarvarande verifiering av bytet
-  ovan. Revert-raden står i `HANDOFF.md` under Läget just nu.
-- [ ] Lägg till `auth.buildapp.se` i Firebase authorized domains. Saknas i listan
-  2026-08-05. Bör inte behövas eftersom `buildapp.se` valideras, men billig försäkring.
+- [ ] **Lägg till `https://auth.buildapp.se/__/auth/handler` under Authorized redirect
+  URIs** på OAuth 2.0-klienten i Google Cloud Console → APIs & Services → Credentials.
+  Det här fällde försöket 2026-08-05: bytet gav `400 redirect_uri_mismatch` och
+  reverterades. Notera att detta är en **annan lista** än Firebase authorized domains.
+- [ ] Lägg till `auth.buildapp.se` i Firebase authorized domains (Authentication →
+  Settings). Saknades 2026-08-05.
+- [ ] Byt `authDomain` till `auth.buildapp.se` igen, **först** efter de två punkterna
+  ovan, och testa en riktig Google-inloggning direkt. Ordning i `HANDOFF.md`.
 - [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
   agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
   Måste göras av Patrik som `patz.lofgren@gmail.com`.

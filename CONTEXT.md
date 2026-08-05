@@ -46,3 +46,11 @@ Produktionen är en Worker plus D1-databasen `recept`. Ta alltid D1-export till
 `backups/` före riskabla ändringar, migreringar och deploy. `backups/` är
 git-ignorerad och får aldrig pushas. Den längre arbetsanteckningen med allt
 avklarat står i `docs/TODO.md`.
+
+`auth.buildapp.se` finns sedan 2026-08-04 som custom domain på projektets Firebase
+Hosting (CNAME till `grammat-78450.web.app`, DNS only i Cloudflare, giltigt certifikat).
+Den är avsedd som framtida `authDomain` men används inte än. Att byta `authDomain`
+kräver att den nya domänens handler-URL står i **två skilda allowlists**: Authorized
+redirect URIs på OAuth 2.0-klienten i Google Cloud Console, och authorized domains i
+Firebase Auth. Saknas den första svarar Google `400 redirect_uri_mismatch` och ingen
+kan logga in.
