@@ -21,14 +21,14 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
   (DNS only). Firebase svarade "setup successfully" 2026-08-04.
 - [x] Certifikatet för `auth.buildapp.se`. Klart 2026-08-05, handlern svarar 200 över
   HTTPS. Delat Firebase-certifikat, vår domän ligger i SAN-listan.
-- [ ] **Lägg till `https://auth.buildapp.se/__/auth/handler` under Authorized redirect
-  URIs** på OAuth 2.0-klienten i Google Cloud Console → APIs & Services → Credentials.
-  Det här fällde försöket 2026-08-05: bytet gav `400 redirect_uri_mismatch` och
-  reverterades. Notera att detta är en **annan lista** än Firebase authorized domains.
-- [ ] Lägg till `auth.buildapp.se` i Firebase authorized domains (Authentication →
-  Settings). Saknades 2026-08-05.
-- [ ] Byt `authDomain` till `auth.buildapp.se` igen, **först** efter de två punkterna
-  ovan, och testa en riktig Google-inloggning direkt. Ordning i `HANDOFF.md`.
+- [x] `https://auth.buildapp.se/__/auth/handler` tillagd under Authorized redirect URIs
+  på OAuth-klienten i Google Cloud Console. Det här fällde första försöket 2026-08-05
+  (`400 redirect_uri_mismatch`). Annan lista än Firebase authorized domains, båda krävs.
+- [x] `auth.buildapp.se` tillagd i Firebase authorized domains 2026-08-05.
+- [x] Byt `authDomain` till `auth.buildapp.se`. Gjort 2026-08-05 (`ad2e0f3`), verifierat
+  mot Googles auth-endpoint före deploy, med gamla domänen som kontrollgrupp.
+- [ ] **Skarpt inloggningstest av bytet.** Enda kvarvarande verifieringen. Revert-rad
+  i `HANDOFF.md` under Läget just nu om det fallerar.
 - [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
   agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
   Måste göras av Patrik som `patz.lofgren@gmail.com`.
