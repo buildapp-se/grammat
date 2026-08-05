@@ -11,14 +11,16 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
   Gjort 2026-08-04: `/friends-feed`-frågan mot remote D1 ger ett recept, utan `src`.
 - [ ] Patrik bekräftar samma sak inloggat i webbläsaren. Ska visa exakt ett recept
   från julia ("abc"). Sista steget för att stänga punkten ovan.
+- [x] UI-verifiera utkastsstegen utloggat i prod. Gjort 2026-08-05: gazpacho och
+  salsiccia renderar stegen korrekt, inga konsolfel.
 - [x] **Beslut 2026-08-04: lanseringen är för en privat krets.** Moderationspaketet
   (rapportera-knapp, `hidden`-flagga, användarvillkor) krävs alltså inte före
   lansering. Beslutet står i `CONTEXT.md` och gäller tills sajten sprids utåt.
 - [x] Firebase Hosting-deploy av authhost. Var redan gjord 2026-07-21, upptäckt 2026-08-04.
 - [x] Custom domain `auth.buildapp.se` tillagd i Firebase och CNAME skapad i Cloudflare
   (DNS only). Firebase svarade "setup successfully" 2026-08-04.
-- [ ] Vänta in certifikatet för `auth.buildapp.se`. Klart när
-  `curl -sI https://auth.buildapp.se/__/auth/handler` ger 200. Var inte klart 2026-08-04.
+- [x] Certifikatet för `auth.buildapp.se`. Klart 2026-08-05, handlern svarar 200 över
+  HTTPS. Delat Firebase-certifikat, vår domän ligger i SAN-listan.
 - [ ] OAuth-branding i Google Cloud Console (appnamn "Grammat" m.m.). **Blockerad för
   agent:** konsolen kräver lösenordsinloggning och hoppade till fel Google-konto.
   Måste göras av Patrik som `patz.lofgren@gmail.com`.
