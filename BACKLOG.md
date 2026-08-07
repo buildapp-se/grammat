@@ -57,3 +57,4 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 - [ ] Service worker för offline, bara om täckningen i butiken visar sig vara dålig.
 - [ ] Fler recept ur `recept 2.mht`. Pausad på begäran.
+- [ ] Lägg till funktion för en timer med snygg design som sätter igång vibration och ljud när tiden har gått ut. Denna ska läggas in om det finns delar i receptet som specar någon slags tid. Annars ska det finnas redo som liten knapp eller bara där på ett snyggt och enkelt sätt.
