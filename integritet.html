@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integritetspolicy | Grammat</title>
+<meta name="description" content="Hur Grammat behandlar personuppgifter: konton, recept, delning, lokal lagring och vilka rättigheter du har.">
+<link rel="canonical" href="https://buildapp.se/grammat/integritet.html">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Grammat">
+<meta property="og:title" content="Integritetspolicy | Grammat">
+<meta property="og:description" content="Hur Grammat behandlar personuppgifter: konton, recept, delning, lokal lagring och vilka rättigheter du har.">
+<meta property="og:url" content="https://buildapp.se/grammat/integritet.html">
+<meta property="og:image" content="https://buildapp.se/grammat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:locale" content="sv_SE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Integritetspolicy | Grammat">
+<meta name="twitter:description" content="Hur Grammat behandlar personuppgifter: konton, recept, delning, lokal lagring och vilka rättigheter du har.">
+<meta name="twitter:image" content="https://buildapp.se/grammat/og.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=Spline+Sans+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --papper:#EAEDDF; --ink:#20281A; --ink2:#5C5A4E; --lin:#CDD3BC;
+  --lingon:#9E2B3E; --gron:#2E6B43; --kvitto:#FBFAF2;
+  --font-display:'Bricolage Grotesque',sans-serif;
+  --font-body:'Schibsted Grotesk',sans-serif;
+  --font-mono:'Spline Sans Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--papper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 4rem}
+
+header.brand{padding:1.5rem 0 .5rem}
+.wordmark{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,7vw,2.6rem);line-height:1.02;letter-spacing:-.03em;display:inline-block;color:var(--ink);text-decoration:none}
+.wordmark em{font-style:normal;color:var(--lingon)}
+.tagline{font-family:var(--font-mono);font-size:.72rem;color:var(--ink2);letter-spacing:.08em;text-transform:uppercase;margin-top:.35rem}
+.back{display:inline-block;margin-top:.9rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--lin)}
+.back:hover{color:var(--lingon);border-color:var(--lingon)}
+
+/* Policyn ligger på ett kvitto, samma yta som recepten. */
+.card{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:clamp(1.1rem,4vw,1.75rem);margin-top:1.5rem}
+h1{font-family:var(--font-display);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;line-height:1.1}
+.meta{font-family:var(--font-mono);font-size:.72rem;color:var(--ink2);letter-spacing:.08em;text-transform:uppercase;margin-top:.5rem}
+h2{font-family:var(--font-display);font-weight:700;font-size:1.1rem;letter-spacing:-.01em;line-height:1.2;
+  margin-top:2rem;padding-top:.9rem;border-top:1px dashed var(--lin)}
+h3{font-size:.95rem;font-weight:700;margin-top:1.2rem}
+p{margin-top:.7rem;color:var(--ink2);font-size:.95rem}
+p.lede{color:var(--ink);font-size:1.02rem;margin-top:1rem}
+ul{margin-top:.7rem;list-style:none}
+li{position:relative;padding:.45rem 0 .45rem 1.3rem;border-bottom:1px dashed var(--lin);color:var(--ink2);font-size:.95rem}
+li::before{content:'·';position:absolute;left:.3rem;font-family:var(--font-mono);font-weight:600;color:var(--lingon)}
+strong{color:var(--ink);font-weight:700}
+code{font-family:var(--font-mono);font-size:.85em;background:var(--papper);border:1px solid var(--lin);border-radius:4px;padding:.1em .35em}
+.card a{color:var(--lingon)}
+
+footer{margin-top:1.5rem;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+footer a{color:inherit;text-decoration:none;border-bottom:1px solid var(--lin)}
+footer a:hover{color:var(--lingon);border-color:var(--lingon)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="brand">
+    <a class="wordmark" href="./">gram<em>mat</em>.</a>
+    <div class="tagline">recept &amp; inköpslista &middot; allt i gram</div>
+    <a class="back" href="./">&larr; Tillbaka till appen</a>
+  </header>
+
+  <article class="card">
+    <h1>Integritetspolicy</h1>
+    <p class="meta">Senast uppdaterad 27 augusti 2026 &middot; Version 1.0</p>
+
+    <p class="lede">Grammat är ett gratis hobbyprojekt utan annonser, beteendespårning eller försäljning av personuppgifter. Du kan använda appen helt utan konto. Skapar du ett konto sparas dina recept i molnet så att de följer med mellan enheter.</p>
+
+    <h2>Vem ansvarar för uppgifterna?</h2>
+    <p>Personuppgiftsansvarig är <strong>Patrik Löfgren</strong>, Umeå, Sverige. Kontakta <a href="mailto:kontakt@orgutveckling.se">kontakt@orgutveckling.se</a> för frågor eller för att använda dina rättigheter.</p>
+
+    <h2>Vilka uppgifter behandlas?</h2>
+
+    <h3>Utan konto</h3>
+    <p>Recept, inköpslista och inställningar sparas bara lokalt i din webbläsare. Grammat tar inte emot dem så länge du är utloggad. Cloudflare behandlar tekniska uppgifter som IP-adress, tidpunkt, efterfrågad adress och webbläsarinformation när sidan levereras och skyddas.</p>
+
+    <h3>Med konto</h3>
+    <p>Firebase Authentication behandlar din e-postadress, inloggningsleverantör, tekniska identifierare, IP-adress och webbläsarinformation. Grammat lagrar ett Firebase-UID tillsammans med dina recept, din inköpslista, dina sparade recept från andra och dina inställningar i Cloudflare D1. Grammat tar aldrig emot ditt lösenord.</p>
+    <p>En äldre inloggning med användarnamn och PIN-kod finns kvar under avveckling. För de kontona lagras användarnamnet och en hashad PIN-kod, aldrig PIN-koden i klartext.</p>
+
+    <h3>Delning med andra</h3>
+    <p>Recept du lägger upp visas under Allas recept om du inte markerar dem som hemliga. Går du med i en grupp ser de andra medlemmarna gruppens innehåll. Publicera inget du inte vill att andra användare ska se, och skriv inga personuppgifter i receptens namn eller texter.</p>
+
+    <h3>Tredjeparter i webbläsaren</h3>
+    <ul>
+      <li><strong>Google Fonts</strong> levererar appens typsnitt.</li>
+      <li><strong>Googles CDN</strong> (<code>gstatic.com</code>) levererar Firebase-koden som sköter inloggningen.</li>
+    </ul>
+    <p>I båda fallen går din IP-adress till Google när webbläsaren hämtar filerna.</p>
+
+    <h3>AI-importen</h3>
+    <p>Funktionen "Klistra in från AI" skickar ingenting någonstans. Du kopierar en färdig prompt, klistrar in den i den AI-tjänst du själv väljer och klistrar tillbaka svaret. Grammat har ingen koppling till någon AI-leverantör, och det du gör i din AI-tjänst omfattas av deras villkor, inte den här policyn.</p>
+
+    <p>Ingen profilering och inget automatiserat beslutsfattande med rättsliga eller liknande betydande effekter sker.</p>
+
+    <h2>Varför och med vilken rättslig grund?</h2>
+    <ul>
+      <li><strong>Appfunktioner och lokal lagring:</strong> för att tillhandahålla funktionerna du uttryckligen använder.</li>
+      <li><strong>Konto, synk och delning:</strong> för att fullgöra den kostnadsfria tjänst du begär när du skapar eller använder ett konto.</li>
+      <li><strong>Säkerhet och teknisk drift:</strong> berättigat intresse av att förebygga missbruk, felsöka och hålla tjänsten säker.</li>
+      <li><strong>Support:</strong> för att besvara din begäran.</li>
+    </ul>
+
+    <h2>Cookies och lagring på din enhet</h2>
+    <p>Grammat använder inga annonserings- eller analyscookies och laddar ingen klientbaserad analystjänst. Appen använder:</p>
+    <ul>
+      <li><code>localStorage</code> för appens state och för att minnas att du är inloggad.</li>
+      <li>Firebase-lagring i webbläsaren först när du använder kontofunktionen.</li>
+    </ul>
+    <p>Lagringen är nödvändig för funktioner du själv begär och aktiveras därför utan samtyckesbanner. Du tar bort den genom att rensa webbplatsdata för buildapp.se i webbläsaren. Om icke nödvändig mätning eller annonsering införs senare uppdateras den här sidan, och samtycke hämtas in, innan tekniken aktiveras.</p>
+
+    <h2>Lagringstid och radering</h2>
+    <ul>
+      <li>Lokal data finns kvar tills du rensar webbplatsdata.</li>
+      <li>Synkad data sparas tills du begär att kontot raderas. Hör av dig till kontaktadressen ovan, radering sker manuellt.</li>
+      <li>Firebase uppger att autentiseringsdata tas bort från aktiva system och backupsystem inom upp till 180 dagar efter radering. Loggade IP-adresser kan sparas i några veckor.</li>
+      <li>Supportmejl raderas normalt senast 12 månader efter att ärendet avslutats.</li>
+    </ul>
+
+    <h2>Leverantörer och överföring utanför EU/EES</h2>
+    <p>Cloudflare tillhandahåller hosting, trafikskydd, Worker-API och D1-databasen. Google tillhandahåller Firebase Authentication och typsnitten. Firebase Authentication behandlar data i USA. Cloudflare kan behandla data globalt och den nuvarande D1-databasen har inte en låst EU-jurisdiktion. För dessa överföringar tillämpas leverantörernas dataskyddsvillkor och godkända överföringsmekanismer, exempelvis Data Privacy Framework och standardavtalsklausuler där de är tillämpliga.</p>
+
+    <h2>Dina rättigheter</h2>
+    <p>Du kan begära tillgång, rättelse, radering, begränsning eller dataportabilitet, och invända mot behandling som grundas på berättigat intresse. Begäran hanteras manuellt via kontaktadressen ovan, och vi kan behöva kontrollera att den gäller ditt konto. Du har också rätt att klaga hos <a href="https://www.imy.se/" rel="external noopener" target="_blank">Integritetsskyddsmyndigheten (IMY)</a>.</p>
+
+    <h2>Användarvillkor</h2>
+    <ul>
+      <li>Grammat tillhandahålls kostnadsfritt i befintligt skick och kan ändras eller avslutas.</li>
+      <li>Recepten är informationsmaterial. Kontrollera ingredienser, allergier och mängder själv.</li>
+      <li>Försök inte störa tjänsten, komma åt andras konton eller använda den olagligt.</li>
+      <li>Publicerade receptkällor tillhör sina respektive ägare.</li>
+    </ul>
+
+    <h2>Ändringar</h2>
+    <p>Väsentliga ändringar publiceras här med nytt datum. Om ett nytt ändamål kräver samtycke hämtas det in innan behandlingen börjar.</p>
+  </article>
+
+  <footer>
+    <span><a href="./">Till appen</a></span>
+    <span><a href="https://buildapp.se/">buildapp.se</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

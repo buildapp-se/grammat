@@ -42,6 +42,9 @@ body{font-family:var(--font-body);background:var(--papper);color:var(--ink);line
 a{color:inherit}
 button{font:inherit;cursor:pointer}
 .wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 6rem}
+.site-foot{margin-top:2rem;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.site-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--lin)}
+.site-foot a:hover{color:var(--lingon);border-color:var(--lingon)}
 header.brand{padding:1.5rem 0 .5rem}
 .wordmark{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,7vw,2.6rem);line-height:1.02;letter-spacing:-.03em;display:inline-block;color:var(--ink);text-decoration:none}
 .wordmark em{font-style:normal;color:var(--lingon)}
@@ -152,6 +155,7 @@ textarea{width:100%}
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
+  <footer class="site-foot"><a href="integritet.html">Integritetspolicy</a></footer>
 </div>
 <script type="module">
 // Firebase Auth (endast identitet, all data ligger i D1). ESM direkt från CDN, ingen byggkedja.
