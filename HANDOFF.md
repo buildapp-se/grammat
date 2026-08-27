@@ -15,6 +15,14 @@ Senast uppdaterad: 2026-07-08 (natt). Läget för nästa session (människa elle
 
 ## Läget just nu
 
+**2026-08-27, kväll: Web Analytics på zonen, integritet.html version 1.1.**
+
+- Cloudflare-zonen `buildapp.se` injicerar nu `beacon.min.js` (Web Analytics,
+  cookiefri) i all HTML, även `/grammat/`. Policyn nämner det under "Utan konto",
+  som rättslig grund, och cookieavsnittet säger inte längre "ingen klientbaserad
+  analystjänst". Bara HTML ändrad, ingen versionsquery att höja. Pushat till main
+  på Patriks uttryckliga begäran i sessionen.
+
 **2026-08-27: integritetspolicy, appen saknade informationsplikt.**
 
 - Ny `integritet.html` i appens kvittodesign (papper, lingon, Bricolage och

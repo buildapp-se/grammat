@@ -77,7 +77,7 @@ footer a:hover{color:var(--lingon);border-color:var(--lingon)}
 
   <article class="card">
     <h1>Integritetspolicy</h1>
-    <p class="meta">Senast uppdaterad 27 augusti 2026 &middot; Version 1.0</p>
+    <p class="meta">Senast uppdaterad 27 augusti 2026 &middot; Version 1.1</p>
 
     <p class="lede">Grammat är ett gratis hobbyprojekt utan annonser, beteendespårning eller försäljning av personuppgifter. Du kan använda appen helt utan konto. Skapar du ett konto sparas dina recept i molnet så att de följer med mellan enheter.</p>
 
@@ -87,7 +87,7 @@ footer a:hover{color:var(--lingon);border-color:var(--lingon)}
     <h2>Vilka uppgifter behandlas?</h2>
 
     <h3>Utan konto</h3>
-    <p>Recept, inköpslista och inställningar sparas bara lokalt i din webbläsare. Grammat tar inte emot dem så länge du är utloggad. Cloudflare behandlar tekniska uppgifter som IP-adress, tidpunkt, efterfrågad adress och webbläsarinformation när sidan levereras och skyddas.</p>
+    <p>Recept, inköpslista och inställningar sparas bara lokalt i din webbläsare. Grammat tar inte emot dem så länge du är utloggad. Cloudflare behandlar tekniska uppgifter som IP-adress, tidpunkt, efterfrågad adress och webbläsarinformation när sidan levereras och skyddas. Cloudflare Web Analytics ger dessutom aggregerad besöksstatistik (sida, land, webbläsare, hänvisande sida, laddningstid) via ett skript, <code>beacon.min.js</code> från <code>static.cloudflareinsights.com</code>, som Cloudflare lägger in i sidan. Det sätter inga cookies, skapar ingen enhetsprofil och sparar inte din IP-adress.</p>
 
     <h3>Med konto</h3>
     <p>Firebase Authentication behandlar din e-postadress, inloggningsleverantör, tekniska identifierare, IP-adress och webbläsarinformation. Grammat lagrar ett Firebase-UID tillsammans med dina recept, din inköpslista, dina sparade recept från andra och dina inställningar i Cloudflare D1. Grammat tar aldrig emot ditt lösenord.</p>
@@ -113,11 +113,12 @@ footer a:hover{color:var(--lingon);border-color:var(--lingon)}
       <li><strong>Appfunktioner och lokal lagring:</strong> för att tillhandahålla funktionerna du uttryckligen använder.</li>
       <li><strong>Konto, synk och delning:</strong> för att fullgöra den kostnadsfria tjänst du begär när du skapar eller använder ett konto.</li>
       <li><strong>Säkerhet och teknisk drift:</strong> berättigat intresse av att förebygga missbruk, felsöka och hålla tjänsten säker.</li>
+      <li><strong>Besöksstatistik:</strong> berättigat intresse av att veta vilka sidor som används och hur snabbt de laddar. Statistiken är aggregerad och kan inte kopplas till dig.</li>
       <li><strong>Support:</strong> för att besvara din begäran.</li>
     </ul>
 
     <h2>Cookies och lagring på din enhet</h2>
-    <p>Grammat använder inga annonserings- eller analyscookies och laddar ingen klientbaserad analystjänst. Appen använder:</p>
+    <p>Grammat använder inga annonserings- eller analyscookies. Besöksstatistiken från Cloudflare Web Analytics lagrar ingenting på din enhet och använder ingen identifierare som följer dig mellan besök. Appen använder:</p>
     <ul>
       <li><code>localStorage</code> för appens state och för att minnas att du är inloggad.</li>
       <li>Firebase-lagring i webbläsaren först när du använder kontofunktionen.</li>
