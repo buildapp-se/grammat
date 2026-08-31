@@ -2,3 +2,14 @@ worker/.wrangler/
 node_modules/
 backups/
 .wrangler/
+
+# graft: lokal grafcache, regenererbar, committas inte (kor `graft build`).
+graft/
+
+# repowise: lokalt index, regenererbart, committas inte (kor `repowise update`).
+.repowise/
+
+# AGENTS.md innehaller bara repowise autogenererade distill-avsnitt har, inga
+# egna instruktioner, och halls darfor lokalt. Skriver du riktiga instruktioner:
+# ta bort raden nedan forst, annars hamnar de aldrig i git.
+AGENTS.md
