@@ -610,10 +610,20 @@ if (typeof document !== 'undefined') (async function () {
       rows += row;
     });
     rows += struckRows.sort((a, b) => b.order - a.order).map(x => x.row).join('');
+    // Nyckeln knyter en timer till sitt steg i det här receptet, så nedräkningen kan
+    // ritas på raden den hör till i stället för i en klump högst upp.
+    const stepKey = (i, minutes) => `${id}|${i}|${minutes}`;
     const steps = r.steps.length
-      ? '<ol class="steps">' + r.steps.map(s => `<li>${esc(s)}${stepTimers(s).map(t => ` <button class="timer-btn" type="button" data-timer="${t.minutes}" data-timer-label="${esc(t.label)}" aria-label="Starta timer ${esc(t.label)}">⏱ ${esc(t.label)}</button>`).join('')}</li>`).join('') + '</ol>'
+      ? '<ol class="steps">' + r.steps.map((s, i) => `<li>${esc(s)}${stepTimers(s).map(t => {
+          const running = timers.find(x => x.key === stepKey(i, t.minutes));
+          return running
+            ? ' ' + timerChip(running)
+            : ` <button class="timer-btn" type="button" data-timer="${t.minutes}" data-timer-label="${esc(t.label)}" data-timer-key="${esc(stepKey(i, t.minutes))}" aria-label="Starta timer ${esc(t.label)}">⏱ ${esc(t.label)}</button>`;
+        }).join('')}</li>`).join('') + '</ol>'
       : '<p class="empty">Inga steg nedskrivna.</p>';
-    const timerForm = `<form id="timerForm" class="timer-form"><input id="timerMin" type="number" min="1" max="1440" inputmode="numeric" placeholder="minuter" aria-label="Minuter" required><button class="btn btn-ghost" type="submit">⏱ Starta timer</button></form>`;
+    // Fältet börjar på receptets första tid, det är nästan alltid den man vill ha.
+    const firstMinutes = r.steps.map(stepTimers).find(t => t.length)?.[0].minutes || '';
+    const timerForm = `<form id="timerForm" class="timer-form"><input id="timerMin" type="number" min="1" max="1440" inputmode="numeric" value="${esc(firstMinutes)}" placeholder="minuter" aria-label="Minuter" required><button class="btn btn-ghost" type="submit">⏱ Starta timer</button></form>`;
     const nutr = nutritionPerPortion(r, nutrients);
     const nutrLine = `<p class="hint">Per portion: ${fmtNum(nutr.kcal)} kcal · ${fmtNum(nutr.protein)} g protein · ${fmtNum(nutr.carbs)} g kolhydrater · ${fmtNum(nutr.fat)} g fett${nutr.missing.length ? ' · ofullständigt, saknar data för ' + nutr.missing.map(esc).join(', ') : ''} (källa: <a href="https://soknaringsinnehall.livsmedelsverket.se/" rel="noopener">Livsmedelsverket</a> m.fl.)</p>`;
     const portionBar = mine
@@ -898,28 +908,47 @@ if (typeof document !== 'undefined') (async function () {
     const s = Math.max(0, Math.ceil(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
     return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
   }
-  function timerBar() {
-    if (!timers.length) return '';
-    return '<div class="timers">' + timers.map(t => `<div class="timer${t.done ? ' done' : ''}" data-timer-id="${t.id}"><span>${esc(t.label)}</span> <strong class="timer-left">${t.done ? 'Klar!' : fmtLeft(t.end - Date.now())}</strong> <button type="button" data-timer-stop="${t.id}" aria-label="Ta bort timer">✕</button></div>`).join('') + '</div>';
+  function timerChip(t) {
+    return `<span class="timer${t.done ? ' done' : ''}" data-timer-id="${t.id}"><span>${esc(t.label)}</span> <strong class="timer-left">${t.done ? 'Klar!' : fmtLeft(t.end - Date.now())}</strong> <button type="button" data-timer-stop="${t.id}" aria-label="Ta bort timer">✕</button></span>`;
   }
-  function startTimer(minutes, label) {
+  function timerBar() {
+    const loose = timers.filter(t => !t.key); // stegens timers ritas vid sitt steg
+    if (!loose.length) return '';
+    return '<div class="timers">' + loose.map(timerChip).join('') + '</div>';
+  }
+  function startTimer(minutes, label, key) {
     // AudioContext måste skapas i ett användartryck, annars vägrar mobilen spela ljud senare.
-    try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) { /* inget ljud, vibration räcker */ }
-    timers.push({ id: Date.now() + Math.random(), end: Date.now() + minutes * 60000, label, done: false });
+    // iPhone dessutom: utan audioSession.type = 'playback' är sidan helt tyst så fort
+    // ringklockan står på ljudlöst, vilket den oftast gör. Finns från iOS 17.
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const r = audioCtx.resume();
+      if (r && r.catch) r.catch(() => {}); // avvisat löfte får inte bli ett obehandlat fel
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    } catch (e) { /* inget ljud, den röda brickan syns ändå */ }
+    timers.push({ id: Date.now() + Math.random(), end: Date.now() + minutes * 60000, label, done: false, key: key || null });
     render();
   }
   function alarm() {
+    // Safari saknar vibrate helt, en iPhone får alltså bara ljudet och den röda brickan.
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 700]);
     if (!audioCtx) return;
-    for (let i = 0; i < 3; i++) {
-      const t0 = audioCtx.currentTime + i * 0.5, o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.connect(g); g.connect(audioCtx.destination);
-      o.frequency.value = 880;
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(0.4, t0 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
-      o.start(t0); o.stop(t0 + 0.45);
-    }
+    const tones = () => {
+      for (let i = 0; i < 3; i++) {
+        const t0 = audioCtx.currentTime + i * 0.5, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.4, t0 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+        o.start(t0); o.stop(t0 + 0.45);
+      }
+    };
+    // Har fliken varit i bakgrunden är kontexten suspenderad, och då blir larmet tyst.
+    // Gamla webkitAudioContext returnerar inget löfte från resume, därav kontrollen.
+    const resumed = audioCtx.state === 'suspended' ? audioCtx.resume() : null;
+    if (resumed && resumed.then) resumed.then(tones).catch(() => {});
+    else tones();
   }
   setInterval(() => {
     const now = Date.now();
@@ -1006,7 +1035,7 @@ if (typeof document !== 'undefined') (async function () {
       nq.focus();
       nq.setSelectionRange(nq.value.length, nq.value.length);
     };
-    view.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => startTimer(Number(b.dataset.timer), b.dataset.timerLabel));
+    view.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => startTimer(Number(b.dataset.timer), b.dataset.timerLabel, b.dataset.timerKey));
     view.querySelectorAll('[data-timer-stop]').forEach(b => b.onclick = () => {
       const i = timers.findIndex(t => String(t.id) === b.dataset.timerStop);
       if (i >= 0) timers.splice(i, 1);

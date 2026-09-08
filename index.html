@@ -72,7 +72,8 @@ h2{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin:1.6r
 .timer-form{display:flex;gap:.6rem;align-items:center;margin-top:1rem}
 .timer-form input{width:8rem}
 .timers{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
-.timer{display:flex;align-items:center;gap:.5rem;background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:.35rem .7rem;font-family:var(--font-mono);font-size:.9rem}
+.timer{display:inline-flex;align-items:center;gap:.5rem;background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:.15rem .55rem;font-family:var(--font-mono);font-size:.85rem;vertical-align:middle;white-space:nowrap}
+.timers .timer{padding:.35rem .7rem;font-size:.9rem}
 .timer.done{background:var(--lingon);color:#fff;border-color:var(--lingon)}
 .timer button{background:none;border:none;color:inherit;font-size:1rem;padding:0 .2rem}
 .cards{display:grid;gap:.9rem}
@@ -188,6 +189,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=sok-timer-20260908"></script>
+<script src="app.js?v=timer-steg-20260908"></script>
 </body>
 </html>
