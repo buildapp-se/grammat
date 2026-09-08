@@ -21,7 +21,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=Spline+Sans+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=Spline+Sans+Mono:wght@400;600&family=Roboto:wght@500&display=swap">
 <style>
 :root{
   --papper:#EAEDDF;      /* blekt örtgrönt papper */
@@ -62,6 +62,19 @@ h2{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin:1.6r
 .btn:focus-visible,.kvitto-check:focus-visible,.stepper button:focus-visible{outline:3px solid var(--gron);outline-offset:2px}
 .btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
 .btn-danger{background:transparent;color:var(--lingon);border-color:var(--lingon)}
+/* Google-knappen följer developers.google.com/identity/branding-guidelines (ljust tema): vit, 1 px #747775, färgad G-logga, 12 px före loggan, 10 px efter. */
+.gsi{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 12px;background:#fff;color:#1f1f1f;border:1px solid #747775;border-radius:20px;font-family:Roboto,var(--font-body);font-weight:500;font-size:14px;line-height:20px;letter-spacing:.25px}
+.gsi:hover{background:#f6f6f6}
+.gsi-logo{width:20px;height:20px;flex:none}
+.search{margin:-.2rem 0 1.2rem}
+.search input{width:100%}
+.timer-btn{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:999px;padding:.05em .6em;font-size:.8rem;white-space:nowrap;vertical-align:middle}
+.timer-form{display:flex;gap:.6rem;align-items:center;margin-top:1rem}
+.timer-form input{width:8rem}
+.timers{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
+.timer{display:flex;align-items:center;gap:.5rem;background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:.35rem .7rem;font-family:var(--font-mono);font-size:.9rem}
+.timer.done{background:var(--lingon);color:#fff;border-color:var(--lingon)}
+.timer button{background:none;border:none;color:inherit;font-size:1rem;padding:0 .2rem}
 .cards{display:grid;gap:.9rem}
 .card{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:1rem 1.1rem;display:flex;flex-direction:column}
 .card[data-card]{cursor:pointer}
@@ -175,6 +188,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=steps-20260804"></script>
+<script src="app.js?v=sok-timer-20260908"></script>
 </body>
 </html>

@@ -210,6 +210,25 @@ function makeBackup(state) {
 
 // Allas recept: plockar bort recept som redan finns i startpaketet, taggar kvarvarande
 // med ägarnamn ENDAST när samma id förekommer hos fler än en ägare (disambiguering).
+// Sök: titel eller ingrediensnamn innehåller frasen, skiftlägesokänsligt.
+function matchesQuery(r, q) {
+  q = String(q || '').trim().toLowerCase();
+  if (!q) return true;
+  return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q));
+}
+
+// Tider i ett stegs text ("koka 20 min", "vila 1 tim") -> [{ label, minutes }].
+// ponytail: intervall som "10-15 min" ger övre gränsen, sekunder ignoreras.
+function stepTimers(text) {
+  const out = [];
+  for (const m of String(text).matchAll(/(\d+(?:[,.]\d+)?)\s*(minuter|minut|min|timmar|timme|tim|h)\b/gi)) {
+    const n = Number(m[1].replace(',', '.'));
+    const minutes = /^(tim|h)/i.test(m[2]) ? n * 60 : n;
+    if (minutes > 0 && minutes <= 24 * 60 && !out.some(t => t.minutes === minutes)) out.push({ label: m[0].trim(), minutes });
+  }
+  return out;
+}
+
 function dedupeAllas(allasList, starterIds) {
   const starterSet = new Set(starterIds);
   const others = allasList.filter(r => !starterSet.has(r.id));
@@ -304,7 +323,7 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas }; }
+if (typeof module !== 'undefined') { module.exports = { CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -367,6 +386,9 @@ if (typeof document !== 'undefined') (async function () {
 
   // ---------- vyer ----------
   function selFor(id) { return state.selections.find(s => s.id === id); }
+  let query = ''; // sökfras, delas av Mina/Allas/Vänner och överlever omrendering
+  const searchBox = () => `<p class="search"><input type="search" id="q" value="${esc(query)}" placeholder="Sök recept eller ingrediens" aria-label="Sök recept" autocomplete="off"></p>`;
+  const noMatch = () => `<p class="empty">Inget recept matchar "${esc(query.trim())}".</p>`;
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   // recept kan visas/öppnas innan de finns i egna state.recipes (Allas recept-fliken)
   function publicRowKey(r) { return Number.isInteger(r.ownerId) ? r.ownerId + '|' + r.id : 'starter|' + r.id; }
@@ -462,12 +484,14 @@ if (typeof document !== 'undefined') (async function () {
 
   function viewCatalog() {
     const byCourse = {};
-    for (const r of state.recipes) (byCourse[r.course] = byCourse[r.course] || []).push(r);
+    const hits = state.recipes.filter(r => matchesQuery(r, query));
+    for (const r of hits) (byCourse[r.course] = byCourse[r.course] || []).push(r);
     const sections = COURSES.filter(c => byCourse[c]).map(c => `
       <h2>${esc(COURSE_LABELS[c])}</h2>
       <div class="cards">${byCourse[c].map(recipeCard).join('')}</div>`).join('');
     return `<div class="view-head"><h1>Mina recept</h1><span><a class="btn btn-ghost" href="#/nytt">+ Nytt recept</a> <a class="btn btn-ghost" href="#/importera">Klistra in från AI</a></span></div>
-      ${state.recipes.length ? sections : '<p class="empty">Inga recept än. Lägg till ditt första med "Nytt recept".</p>'}`;
+      ${state.recipes.length ? searchBox() : ''}
+      ${!state.recipes.length ? '<p class="empty">Inga recept än. Lägg till ditt första med "Nytt recept".</p>' : hits.length ? sections : noMatch()}`;
   }
 
   function mineForPublic(r) {
@@ -497,6 +521,8 @@ if (typeof document !== 'undefined') (async function () {
 
   function publicRecipeSections(list, showOwner = true) {
       const byCourse = {};
+      list = list.filter(r => matchesQuery(r, query));
+      if (!list.length && query.trim()) return noMatch();
       for (const r of list) {
         const course = normalizeCourse(r.course);
         (byCourse[course] = byCourse[course] || []).push({ ...r, course });
@@ -522,6 +548,7 @@ if (typeof document !== 'undefined') (async function () {
     }
 
     return `<div class="view-head"><h1>Allas recept</h1></div>
+      ${searchBox()}
       ${publicRecipeSections(starterRows)}
       ${othersHtml}`;
   }
@@ -535,7 +562,7 @@ if (typeof document !== 'undefined') (async function () {
         ${friendLoadError ? '<p class="warn">Kunde inte ladda v\u00e4nners recept just nu.</p>' : '<p class="hint">Laddar recept fr\u00e5n dina grupper ...</p>'}`;
     }
     return `<div class="view-head"><h1>V\u00e4nners recept</h1><a class="btn btn-ghost" href="#/konto">Grupper</a></div>
-      ${friendList.length ? publicRecipeSections(friendList) : '<p class="empty">Inga recept fr\u00e5n grupper \u00e4n. Skapa en grupp under Konto och bjud in n\u00e5gon.</p>'}`;
+      ${friendList.length ? searchBox() + publicRecipeSections(friendList) : '<p class="empty">Inga recept fr\u00e5n grupper \u00e4n. Skapa en grupp under Konto och bjud in n\u00e5gon.</p>'}`;
   }
 
   function viewJoin(code) {
@@ -584,8 +611,9 @@ if (typeof document !== 'undefined') (async function () {
     });
     rows += struckRows.sort((a, b) => b.order - a.order).map(x => x.row).join('');
     const steps = r.steps.length
-      ? '<ol class="steps">' + r.steps.map(s => `<li>${esc(s)}</li>`).join('') + '</ol>'
+      ? '<ol class="steps">' + r.steps.map(s => `<li>${esc(s)}${stepTimers(s).map(t => ` <button class="timer-btn" type="button" data-timer="${t.minutes}" data-timer-label="${esc(t.label)}" aria-label="Starta timer ${esc(t.label)}">⏱ ${esc(t.label)}</button>`).join('')}</li>`).join('') + '</ol>'
       : '<p class="empty">Inga steg nedskrivna.</p>';
+    const timerForm = `<form id="timerForm" class="timer-form"><input id="timerMin" type="number" min="1" max="1440" inputmode="numeric" placeholder="minuter" aria-label="Minuter" required><button class="btn btn-ghost" type="submit">⏱ Starta timer</button></form>`;
     const nutr = nutritionPerPortion(r, nutrients);
     const nutrLine = `<p class="hint">Per portion: ${fmtNum(nutr.kcal)} kcal · ${fmtNum(nutr.protein)} g protein · ${fmtNum(nutr.carbs)} g kolhydrater · ${fmtNum(nutr.fat)} g fett${nutr.missing.length ? ' · ofullständigt, saknar data för ' + nutr.missing.map(esc).join(', ') : ''} (källa: <a href="https://soknaringsinnehall.livsmedelsverket.se/" rel="noopener">Livsmedelsverket</a> m.fl.)</p>`;
     const portionBar = mine
@@ -603,12 +631,14 @@ if (typeof document !== 'undefined') (async function () {
     return `<div class="view-head"><h1>${esc(r.title)}</h1>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Redigera</a>` : ''}</div>
       <p class="hint">${esc(COURSE_LABELS[r.course])}</p>
       ${portionBar}
+      ${timerBar()}
       ${nutrLine}
       <h2>Ingredienser</h2>
       ${mine ? '<p class="hint">Tryck på en rad när du har varan hemma eller redan lagt den i grytan, den stryks och hoppar ur inköpslistan.</p>' : ''}
       <table class="ing-table"><tbody>${rows}</tbody></table>
       <h2>Gör så här</h2>
       ${steps}
+      ${timerForm}
       ${r.source ? `<p class="source"><a href="${esc(r.source)}" rel="noopener">Källa</a></p>` : ''}
       ${actionBar}`;
   }
@@ -789,7 +819,7 @@ if (typeof document !== 'undefined') (async function () {
       </p>
       <p id="backupError" class="warn" hidden></p>`;
     const loginForms = `
-      <p><button class="btn" id="googleLogin" type="button">Fortsätt med Google</button></p>
+      <p><button class="gsi" id="googleLogin" type="button"><svg class="gsi-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Fortsätt med Google</button></p>
       <form id="emailForm">
         <label>E-post <input type="email" id="authEmail" autocomplete="username" required></label>
         <label>Lösenord <input type="password" id="authPw" minlength="6" maxlength="64" autocomplete="current-password" required></label>
@@ -859,6 +889,49 @@ if (typeof document !== 'undefined') (async function () {
       ${backup}`;
   }
 
+  // ---------- timer ----------
+  // Timers lever i minnet, inte i state: de ska inte synkas eller överleva omladdning.
+  // ponytail: i bakgrundsflik kan larmet dröja och vibration uteblir, Notification API om det behövs.
+  const timers = [];
+  let audioCtx = null;
+  function fmtLeft(ms) {
+    const s = Math.max(0, Math.ceil(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
+  }
+  function timerBar() {
+    if (!timers.length) return '';
+    return '<div class="timers">' + timers.map(t => `<div class="timer${t.done ? ' done' : ''}" data-timer-id="${t.id}"><span>${esc(t.label)}</span> <strong class="timer-left">${t.done ? 'Klar!' : fmtLeft(t.end - Date.now())}</strong> <button type="button" data-timer-stop="${t.id}" aria-label="Ta bort timer">✕</button></div>`).join('') + '</div>';
+  }
+  function startTimer(minutes, label) {
+    // AudioContext måste skapas i ett användartryck, annars vägrar mobilen spela ljud senare.
+    try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) { /* inget ljud, vibration räcker */ }
+    timers.push({ id: Date.now() + Math.random(), end: Date.now() + minutes * 60000, label, done: false });
+    render();
+  }
+  function alarm() {
+    if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 700]);
+    if (!audioCtx) return;
+    for (let i = 0; i < 3; i++) {
+      const t0 = audioCtx.currentTime + i * 0.5, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.4, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+      o.start(t0); o.stop(t0 + 0.45);
+    }
+  }
+  setInterval(() => {
+    const now = Date.now();
+    for (const t of timers) {
+      if (!t.done && now >= t.end) { t.done = true; alarm(); }
+      const el = document.querySelector(`[data-timer-id="${t.id}"]`);
+      if (!el) continue;
+      el.classList.toggle('done', t.done);
+      el.querySelector('.timer-left').textContent = t.done ? 'Klar!' : fmtLeft(t.end - now);
+    }
+  }, 1000);
+
   // ---------- render + händelser ----------
   // Skärmen hålls vaken medan ett recept är uppe (man står och lagar mat).
   let wakeLock = null; // promise för aktivt/väntande lås
@@ -924,6 +997,27 @@ if (typeof document !== 'undefined') (async function () {
 
   function bind() {
     const view = $('#view');
+
+    const q = $('#q');
+    if (q) q.oninput = () => {
+      query = q.value;
+      render(); // hela vyn ritas om, fokus och markör återställs så tangentbordet inte tappas
+      const nq = $('#q');
+      nq.focus();
+      nq.setSelectionRange(nq.value.length, nq.value.length);
+    };
+    view.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => startTimer(Number(b.dataset.timer), b.dataset.timerLabel));
+    view.querySelectorAll('[data-timer-stop]').forEach(b => b.onclick = () => {
+      const i = timers.findIndex(t => String(t.id) === b.dataset.timerStop);
+      if (i >= 0) timers.splice(i, 1);
+      render();
+    });
+    const timerForm = $('#timerForm');
+    if (timerForm) timerForm.onsubmit = e => {
+      e.preventDefault();
+      const min = Number($('#timerMin').value);
+      if (min > 0) startTimer(min, min + ' min');
+    };
 
     view.querySelectorAll('[data-select]').forEach(b => b.onclick = () => {
       const r = state.recipes.find(x => x.id === b.dataset.select);

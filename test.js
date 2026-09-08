@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, dedupeAllas } = require('./app.js');
+const { aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -177,5 +177,19 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.strictEqual(hostile.ingredients[0].unit, 'g', 'unit tvingas till g/ml');
   assert.strictEqual(hostile.course, 'huvudratt', 'okänd course normaliseras');
   assert.strictEqual(sanitizeIndexed({ portions: 6.4, ingredients: [{ unit: 'ml' }] }).portions, 6, 'giltiga portions behålls');
+// 12. Sök: titel eller ingrediens, skiftlägesokänsligt, tom fras matchar allt
+assert.ok(matchesQuery(recipes[0], ''), 'tom sökning matchar');
+assert.strictEqual(recipes.filter(r => matchesQuery(r, 'VITLÖK')).length >= 2, true, 'ingrediens-sök hittar minst köttfärssås och kebab');
+assert.ok(recipes.some(r => r.id === 'veg-lasagne' && matchesQuery(r, 'lasagne')), 'titel-sök');
+assert.ok(!matchesQuery(recipes[0], 'xyzzy'), 'ingen träff');
+
+// 13. Timer ur stegtext: min och tim, intervall ger övre gränsen, dubbletter bort, sekunder ignoreras
+assert.deepStrictEqual(stepTimers('Koka i 20 min, rör om'), [{ label: '20 min', minutes: 20 }]);
+assert.deepStrictEqual(stepTimers('Låt vila 1 tim i kylen'), [{ label: '1 tim', minutes: 60 }]);
+assert.deepStrictEqual(stepTimers('Sjud 10-15 minuter').map(t => t.minutes), [15]);
+assert.deepStrictEqual(stepTimers('Stek 2 min per sida, 2 min till').length, 1, 'dubblett bort');
+assert.deepStrictEqual(stepTimers('Vispa 30 sek'), [], 'sekunder ignoreras');
+assert.deepStrictEqual(stepTimers('Servera med 200 g ris'), [], 'gram är ingen tid');
+
   console.log('Alla test OK');
 });
