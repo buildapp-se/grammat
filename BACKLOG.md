@@ -27,8 +27,13 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 ## Verifiering
 
-- [ ] Timer på riktig telefon (byggd 2026-09-08): ljud och vibration vid noll, med
-  skärmen på. Headless Chrome kan inte testa det.
+- [x] iPhone-fixen verifierad och committad 2026-09-08. `navigator.audioSession.type =
+  'playback'` sätts vid start (annars är Safari helt tyst när ringklockan står på
+  ljudlöst) och `alarm()` väcker en suspenderad AudioContext före tonerna. Chrome saknar
+  `audioSession`, koden hoppar över den utan fel, och timern larmar som förut.
+  Vibration går inte att rädda, Safari saknar `navigator.vibrate` helt.
+- [ ] Timer på riktig telefon (byggd 2026-09-08): ljud vid noll, med skärmen på, och
+  med telefonen på ljudlöst. Headless Chrome kan inte testa det.
 - [ ] Riktig mobilverifiering i butik: logga in, wake lock, bocka ingredienser,
   ladda om mitt i och kontrollera synk på andra enheten.
 

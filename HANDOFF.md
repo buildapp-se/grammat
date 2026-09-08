@@ -2,7 +2,7 @@
 schemaVersion: 1
 status: active
 currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering i privat krets
-nextAction: Patrik gör OAuth-brandingen på console.cloud.google.com/auth/branding?project=grammat-78450 (som patz.lofgren@gmail.com) och testar sök, timerljud och vibration på telefonen mot buildapp.se/grammat/ (pushat 2026-09-08)
+nextAction: Testa timern på telefonen mot buildapp.se/grammat/, särskilt med iPhone på ljudlöst: starta timern från ett steg och kontrollera att ljudet hörs vid noll. Prova sökfältet med tangentbordet uppe
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
@@ -10,6 +10,26 @@ reviewedAt: 2026-09-08
 ---
 
 # Handoff
+
+## Läget just nu, tillägg samma kväll
+
+**2026-09-08 kväll: timern larmar på iPhone, och nedräkningen sitter vid sitt steg.**
+
+- **Ljudet på iPhone.** Safari är helt tyst så fort ringklockan står på ljudlöst, om
+  sidan inte sätter `navigator.audioSession.type = 'playback'`. Det görs nu i samma
+  knapptryck som skapar `AudioContext` (iOS 17+). `alarm()` väcker dessutom en
+  suspenderad kontext innan tonerna spelas, annars blir larmet tyst efter en stund i
+  bakgrunden. Chrome saknar `audioSession`, koden hoppar över den utan fel.
+  **Vibration går inte att rädda:** Safari har ingen `navigator.vibrate` alls, en
+  iPhone får ljudet och den röda brickan.
+- **Nedräkningen ritas i steget** den startades från, i stället för i en klump under
+  portionsraden. Varje steg-timer får en nyckel `receptId|stegindex|minuter`, och medan
+  den går ersätter chippet knappen på raden. Stoppar man den kommer knappen tillbaka.
+  Timers startade i det fria fältet saknar nyckel och ligger kvar i toppraden.
+- **Minutfältet är förifyllt** med receptets första tid, i stället för att vara tomt.
+- Versionsquery `app.js?v=timer-steg-20260908`. `node test.js` grönt, verifierat i
+  Chrome: fältet visar 20 för köttfärssåsen, chippet hamnar på rätt rad, egen timer
+  hamnar i toppraden, stopp återställer knappen, larmet går till "Klar!".
 
 Läget för nästa session (människa eller agent). Arkitektur i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`, historiken i `docs/TODO.md`. Öppna punkter står i `BACKLOG.md`.
 
