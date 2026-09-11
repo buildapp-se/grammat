@@ -131,6 +131,10 @@ h2{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin:1.6r
 .action-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem}
 .extra-form input{flex:1}
 .backup-actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.friend-list{list-style:none;padding:0;margin:0}
+.friend-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.7rem 0;border-bottom:1px solid var(--ink2)}
+.friend-row>a{overflow-wrap:anywhere}
+.friend-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .backup-file input{position:absolute;inline-size:1px;block-size:1px;opacity:0;pointer-events:none}
 input,select,textarea{font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-radius:8px;padding:.45em .7em}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gron);outline-offset:1px}
@@ -162,7 +166,7 @@ textarea{width:100%}
     <div class="tagline">recept &amp; inköpslista · allt i gram</div>
     <nav class="nav" aria-label="Huvudmeny">
       <a href="#/" data-match="#/">Mina recept</a>
-      <a href="#/lista" data-match="#/lista">Lista<span id="navListCount"></span></a>
+      <a href="#/lista" data-match="#/lista">Handla<span id="navListCount"></span></a>
       <a href="#/vanner" data-match="#/vanner">V&auml;nner</a>
       <a href="#/allas" data-match="#/allas">Allas recept</a>
       <a href="#/konto" data-match="#/konto" id="navUser">konto</a>
@@ -189,6 +193,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=timer-steg-20260908"></script>
+<script src="app.js?v=recept-konto-20260911"></script>
 </body>
 </html>

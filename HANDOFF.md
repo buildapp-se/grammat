@@ -2,14 +2,43 @@
 schemaVersion: 1
 status: active
 currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering i privat krets
-nextAction: Testa timern på telefonen mot buildapp.se/grammat/, särskilt med iPhone på ljudlöst: starta timern från ett steg och kontrollera att ljudet hörs vid noll. Prova sökfältet med tangentbordet uppe
+nextAction: Invänta uttryckligt godkännande av lokal D1-export, ta backup, applicera 0001_friendships.sql, publicera Worker och pusha frontend. Se sessionen 2026-09-11 nedan
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-09-08
+  - Automatisk godkännandegranskning nekade D1-exporten 2026-09-11 eftersom den innehåller privata konto- och receptuppgifter. Inget har publicerats
+reviewedAt: 2026-09-11
 ---
 
 # Handoff
+
+## 2026-09-11: lokalt verifierat, ännu inte publicerat
+
+Användarens beställning: rätta egna recept i Allas, flytta Logga ut direkt under
+identiteten, ta bort namn/PIN-formulären från inloggning och Konto, förklara
+JSON-backupen, döp Lista till Handla och ersätt grupper med ömsesidiga vänförfrågningar.
+Allt är implementerat. Befintliga PIN-sessioner och serverns återställningsmöjlighet
+finns kvar; användaren accepterar manuell hjälp för pappa vid behov.
+
+Vänskapens beslut och datamodell finns i `docs/adr/0001-vanner.md`. Inga gamla
+grupper omvandlas automatiskt till vänner. Inga produktionskonton har använts för
+tester och inga riktiga vänförfrågningar har skickats.
+
+Verifierat: `node --check app.js`, `node test.js`, `node test-friends.cjs`,
+`node test-ui.cjs`, samt `npx --yes wrangler@4.108.0 deploy --dry-run`.
+DOM-testet använder jsdom 29.1.1 i ignorerade `backups/test-deps`; installationen
+står i testfilen. Verklig webbläsare och visuell mobil-QA saknas, CUA gav tom
+webbläsarlista även efter återinitialisering.
+
+**Publiceringsgrind:** D1-export till `backups/recept-before-friends-20260911.sql`
+nekades av automatisk godkännandegranskning. Filen är inte en verifierad backup.
+Be om uttryckligt tillstånd till den privata lokala exporten innan nytt försök.
+Sedan, från `worker/`: export, `npx --yes wrangler@4.108.0 d1 migrations apply recept --remote`,
+`npx --yes wrangler@4.108.0 deploy`, därefter git push och live-verifiering.
+Frontend kräver nya Worker-API:t, så pusha den sist. Versionsquery är
+`app.js?v=recept-konto-20260911`. Uppdatera status här och ADR efter publicering.
+
+Tidigare driftanteckningar nedan beskriver den publicerade versionen före denna ändring.
 
 ## Läget just nu, tillägg samma kväll
 

@@ -401,6 +401,10 @@ if (typeof document !== 'undefined') (async function () {
     return allPublicRows().find(x => publicRowKey(x) === id) || allPublicRows().find(x => x.id === id);
   }
   function findRecipe(id) { return state.recipes.find(x => x.id === id) || starter.find(x => x.id === id) || findPublicRecipe(id); }
+  function localRecipeId(id) {
+    const own = allPublicRows().find(r => publicRowKey(r) === id && authName && r.owner === authName);
+    return own && state.recipes.some(r => r.id === own.id) ? own.id : id;
+  }
 
   let allasList = null; // null = ej hämtad än
   let allasLoading = false;
@@ -408,17 +412,28 @@ if (typeof document !== 'undefined') (async function () {
   let friendList = null;
   let friendLoading = false;
   let friendLoadError = false;
-  let groupsList = null;
-  let groupsLoading = false;
-  let groupsLoadError = false;
-  const inviteLinks = {};
+  let connections = null;
+  let connectionsLoading = false;
+  let connectionsError = false;
+  let connectionsVersion = 0;
+  let friendNotice = '';
+  let friendErrorMessage = '';
+  let friendNameDraft = '';
+  let friendsBusy = false;
   let userProfiles = {};
   function resetRemoteCaches() {
     allasList = null;
     friendList = null;
-    groupsList = null;
+    connections = null;
+    connectionsVersion++;
+    connectionsLoading = false;
+    friendLoading = false;
+    friendLoadError = false;
     userProfiles = {};
-    for (const k of Object.keys(inviteLinks)) delete inviteLinks[k];
+    friendNotice = '';
+    friendErrorMessage = '';
+    friendNameDraft = '';
+    connectionsError = false;
   }
   function loadAllas() {
     if (allasList !== null || allasLoading) return;
@@ -451,20 +466,32 @@ if (typeof document !== 'undefined') (async function () {
     if (!loggedIn() || friendList !== null || friendLoading) return;
     friendLoading = true;
     friendLoadError = false;
+    const version = connectionsVersion;
     api('/friends-feed')
-      .then(list => { friendList = list.map(r => ({ ...r, course: normalizeCourse(r.course), _ownerLabel: r.owner || '' })); render(); })
-      .catch(() => { friendLoadError = true; render(); })
-      .finally(() => { friendLoading = false; });
+      .then(list => { if (version === connectionsVersion) friendList = list.map(r => ({ ...r, course: normalizeCourse(r.course), _ownerLabel: r.owner || '' })); })
+      .catch(() => { if (version === connectionsVersion) friendLoadError = true; })
+      .finally(() => { if (version === connectionsVersion) { friendLoading = false; render(); } });
   }
 
-  function loadGroups() {
-    if (!loggedIn() || groupsList !== null || groupsLoading) return;
-    groupsLoading = true;
-    groupsLoadError = false;
-    api('/groups')
-      .then(list => { groupsList = list; render(); })
-      .catch(() => { groupsLoadError = true; render(); })
-      .finally(() => { groupsLoading = false; });
+  function loadConnections() {
+    if (!loggedIn() || connections !== null || connectionsLoading || connectionsError) return;
+    connectionsLoading = true;
+    const version = connectionsVersion;
+    api('/friends')
+      .then(data => { if (version === connectionsVersion) connections = data; })
+      .catch(() => { if (version === connectionsVersion) connectionsError = true; })
+      .finally(() => { if (version === connectionsVersion) { connectionsLoading = false; render(); } });
+  }
+
+  function refreshFriends() {
+    connectionsVersion++;
+    connectionsLoading = false;
+    friendLoading = false;
+    connections = null;
+    connectionsError = false;
+    friendList = null;
+    friendLoadError = false;
+    render();
   }
 
   function recipeCard(r) {
@@ -503,6 +530,10 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   function publicRecipeCard(r, showOwner = true) {
+    if (authName && r.owner === authName) {
+      const own = state.recipes.find(x => x.id === r.id);
+      if (own) return recipeCard(own);
+    }
     const mine = mineForPublic(r);
     const nutr = nutritionPerPortion(r, nutrients);
     const key = publicRowKey(r);
@@ -542,7 +573,7 @@ if (typeof document !== 'undefined') (async function () {
     } else {
       const sys = allasList.filter(r => r.owner === 'grammat');
       if (sys.length) starterRows = sys;
-      const withLabels = dedupeAllas(allasList.filter(r => r.owner !== 'grammat'), starterRows.map(r => r.id));
+      const withLabels = dedupeAllas(allasList.filter(r => r.owner !== 'grammat' && r.owner !== authName), starterRows.map(r => r.id));
       starterRows = starterRows.concat(withLabels);
       othersHtml = '';
     }
@@ -554,25 +585,19 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   function viewFriends() {
-    if (!loggedIn()) return `<div class="view-head"><h1>V\u00e4nners recept</h1></div>
-      <p class="hint">Logga in f\u00f6r att se recept fr\u00e5n dina grupper.</p>`;
-    if (friendList === null) {
-      loadFriends();
-      return `<div class="view-head"><h1>V\u00e4nners recept</h1><a class="btn btn-ghost" href="#/konto">Grupper</a></div>
-        ${friendLoadError ? '<p class="warn">Kunde inte ladda v\u00e4nners recept just nu.</p>' : '<p class="hint">Laddar recept fr\u00e5n dina grupper ...</p>'}`;
-    }
-    return `<div class="view-head"><h1>V\u00e4nners recept</h1><a class="btn btn-ghost" href="#/konto">Grupper</a></div>
-      ${friendList.length ? searchBox() + publicRecipeSections(friendList) : '<p class="empty">Inga recept fr\u00e5n grupper \u00e4n. Skapa en grupp under Konto och bjud in n\u00e5gon.</p>'}`;
+    const head = '<div class="view-head"><h1>Vänner</h1>' + (loggedIn() ? '<button class="btn btn-ghost" id="refreshFriends" type="button">Uppdatera</button>' : '') + '</div>';
+    if (!loggedIn()) return head + '<p>Logga in för att lägga till vänner och se deras recept.</p><p><a class="btn" href="#/konto">Logga in</a></p>';
+    loadConnections();
+    if (friendList === null && !friendLoadError) loadFriends();
+    const recipes = friendLoadError ? '<p class="warn">Kunde inte ladda vänners recept. Försök med Uppdatera.</p>'
+      : friendList === null ? '<p class="hint">Laddar recept …</p>'
+      : friendList.length ? searchBox() + publicRecipeSections(friendList)
+      : '<p class="empty">Inga recept att visa ännu. Här visas dina vänners offentliga recept när ni har accepterat vänförfrågan.</p>';
+    return head + viewFriendsBlock() + '<h2>Vänners recept</h2>' + recipes;
   }
 
-  function viewJoin(code) {
-    if (!loggedIn()) return `<div class="view-head"><h1>G\u00e5 med i grupp</h1></div>
-      <p>Logga in eller skapa konto f\u00f6rst. \u00d6ppna sedan inbjudningsl\u00e4nken igen.</p>
-      <p><a class="btn" href="#/konto">Till Konto</a></p>`;
-    return `<div class="view-head"><h1>G\u00e5 med i grupp</h1></div>
-      <p>Du har en gruppinbjudan.</p>
-      <p id="joinError" class="warn" hidden></p>
-      <p><button class="btn" data-join-code="${esc(code)}">G\u00e5 med</button></p>`;
+  function viewJoin() {
+    return '<h1>Grupper har blivit vänner</h1><p>Den gamla gruppinbjudan används inte längre. Skicka en vänförfrågan med personens kontonamn i stället.</p><p><a class="btn" href="#/vanner">Till Vänner</a></p>';
   }
 
   function viewUserProfile(ownerId) {
@@ -589,6 +614,7 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   function viewRecipe(id) {
+    id = localRecipeId(id);
     const r = findRecipe(id);
     if (!r) return '<p class="empty">Receptet finns inte.</p>';
     const mine = state.recipes.some(x => x.id === id);
@@ -637,7 +663,7 @@ if (typeof document !== 'undefined') (async function () {
         <button class="btn btn-ghost" data-share="${esc(id)}">Kopiera recept</button>
         <button class="btn btn-danger" data-delete="${esc(id)}">Ta bort recept</button>
       </p>`
-      : `<p class="action-row"><button class="btn" data-add-allas="${esc(id)}">Lägg till i mina recept</button> <button class="btn btn-ghost" data-share="${esc(id)}">Kopiera recept</button></p>`;
+      : `<p class="action-row">${mineForPublic(r) || (authName && r.owner === authName) ? '<span class="hint">Finns i mina recept</span>' : `<button class="btn" data-add-allas="${esc(id)}">Lägg till i mina recept</button>`} <button class="btn btn-ghost" data-share="${esc(id)}">Kopiera recept</button></p>`;
     return `<div class="view-head"><h1>${esc(r.title)}</h1>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Redigera</a>` : ''}</div>
       <p class="hint">${esc(COURSE_LABELS[r.course])}</p>
       ${portionBar}
@@ -705,7 +731,7 @@ if (typeof document !== 'undefined') (async function () {
     const total = items.length + state.extras.length;
     const doneCount = state.checked.length;
     const recipesLine = state.selections.map(s => { const r = state.recipes.find(x => x.id === s.id); return r ? esc(r.title) + ' × ' + s.portions : ''; }).filter(Boolean).join('<br>');
-    return `<div class="view-head"><h1>Att köpa</h1></div>
+    return `<div class="view-head"><h1>Handla</h1></div>
       ${total === 0 ? '<p class="empty">Listan är tom. Lägg recept i listan under Recept.</p>' : `
       <div class="kvitto">
         <div class="kvitto-head">GRAMMAT<br>${new Date().toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
@@ -788,41 +814,36 @@ if (typeof document !== 'undefined') (async function () {
     return (e && m[e.code]) || (e && e.message) || 'Något gick fel.';
   }
 
-  function viewGroupsBlock() {
-    if (!loggedIn()) return '';
-    if (groupsList === null) loadGroups();
-    const status = groupsLoadError
-      ? '<p class="warn">Kunde inte ladda grupper just nu.</p>'
-      : groupsList === null ? '<p class="hint">Laddar grupper ...</p>' : '';
-    const groups = (groupsList || []).map(g => {
-      const members = (g.members || []).map(m => esc(m.name)).join(', ');
-      const invite = inviteLinks[g.id]
-        ? `<p><input type="text" readonly value="${esc(inviteLinks[g.id])}"> <button class="btn btn-ghost" type="button" data-copy-invite="${esc(g.id)}" title="Kopiera l\u00e4nken" aria-label="Kopiera l\u00e4nken">\u2398</button></p>`
-        : '';
-      return `<article class="card">
-        <div class="card-title">${esc(g.name)}</div>
-        <div class="card-meta">${members ? 'med ' + members : 'inga medlemmar \u00e4n'}</div>
-        <div class="card-row">
-          ${g.canInvite ? `<button class="btn btn-ghost" data-invite-group="${esc(g.id)}">Skapa inbjudningsl\u00e4nk</button>
-          <button class="btn btn-ghost" data-delete-group="${esc(g.id)}">Ta bort grupp</button>` : ''}
-        </div>
-        ${invite}
-      </article>`;
+  function viewFriendsBlock() {
+    const rows = (list, kind) => list.map(f => {
+      const actions = kind === 'incoming'
+        ? '<button class="btn" data-accept-friend="' + f.id + '">Acceptera</button> <button class="btn btn-ghost" data-cancel-friend="' + f.id + '">Neka</button>'
+        : kind === 'outgoing' ? '<span class="hint">Väntar på svar</span> <button class="btn btn-ghost" data-cancel-friend="' + f.id + '">Återkalla</button>'
+        : '<button class="btn btn-ghost" data-remove-friend="' + f.userId + '" data-friend-name="' + esc(f.name) + '">Ta bort vän</button>';
+      return '<li class="friend-row"><a href="#/anvandare/' + f.userId + '">' + esc(f.name) + '</a><span class="friend-actions">' + actions + '</span></li>';
     }).join('');
-    return `<h2>Grupper</h2>
-      <p class="hint">Gruppmedlemmar ser varandras offentliga recept under V\u00e4nners recept.</p>
-      <form id="groupForm" class="extra-form">
-        <input type="text" id="groupName" maxlength="40" placeholder="Gruppnamn" required>
-        <button class="btn btn-ghost" type="submit">Skapa grupp</button>
+    const section = (title, list, kind) => list.length ? '<h3>' + title + '</h3><ul class="friend-list">' + rows(list, kind) + '</ul>' : '';
+    const status = connectionsError ? '<p class="warn">Kunde inte ladda vänner. Försök med Uppdatera.</p>'
+      : connections === null ? '<p class="hint">Laddar vänner …</p>' : '';
+    return `<section aria-label="Hantera vänner">
+      <p>Lägg till varandra med kontonamnet. När mottagaren accepterar ser ni varandras offentliga recept här. Hemliga recept visas aldrig.</p>
+      <p class="hint">Ditt kontonamn: <strong>${esc(authName || '')}</strong></p>
+      <form id="friendForm">
+        <label for="friendName">Vännens kontonamn</label>
+        <div class="extra-form"><input id="friendName" type="text" minlength="2" maxlength="20" required autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(friendNameDraft)}" aria-describedby="friendNameHint"><button class="btn" type="submit">Skicka förfrågan</button></div>
+        <p id="friendNameHint" class="hint">Personen hittar sitt exakta kontonamn under Konto.</p>
       </form>
-      <p id="groupError" class="warn" hidden></p>
+      <p id="friendError" class="warn" role="alert" ${friendErrorMessage ? '' : 'hidden'}>${esc(friendErrorMessage)}</p>
+      <p role="status">${esc(friendNotice)}</p>
       ${status}
-      ${groups ? `<div class="cards">${groups}</div>` : ''}`;
+      ${connections ? section('Förfrågningar till dig', connections.incoming, 'incoming') + section('Skickade förfrågningar', connections.outgoing, 'outgoing') + section('Dina vänner', connections.friends, 'friends') : ''}
+    </section>`;
   }
 
   function viewAccount() {
     const backup = `<h2>Backup</h2>
-      <p>Backupen innehåller alla recept, valda recept, egna rader och avbockningar.</p>
+      <p>Backupen innehåller dina recept, valda recept, egna rader och avbockningar. Kontot och dina vänskaper ingår inte.</p>
+      <p class="hint">När du trycker på ”Ladda ner backup” sparas en JSON-fil på din enhet, med namn som grammat-backup-2026-09-11.json. Spara filen på ett säkert ställe. Välj ”Återställ från backup” och samma fil för att läsa in den igen. Då ersätts dina nuvarande recept och din inköpslista.</p>
       <p class="backup-actions">
         <button class="btn" id="exportBackup" type="button">Ladda ner backup</button>
         <label class="btn btn-ghost backup-file">Återställ från backup <input type="file" id="importBackup" accept="application/json,.json"></label>
@@ -844,6 +865,7 @@ if (typeof document !== 'undefined') (async function () {
       const ways = [hasGoogle ? 'Google' : '', hasPw ? 'e-post & lösenord' : ''].filter(Boolean).join(' · ');
       return `<div class="view-head"><h1>Konto</h1></div>
         <p>Inloggad som <strong>${esc(authName || fbUser.email || '')}</strong>${fbUser.email ? ' · ' + esc(fbUser.email) : ''}. Recept och inköpslista synkas mellan dina enheter.</p>
+        <p><button class="btn btn-ghost" id="logout">Logga ut</button></p>
         ${syncError ? '<p class="warn">Kunde inte nå servern, ändringar sparas lokalt och synkas när det går igen.</p>' : ''}
         <h2>Namn</h2>
         <form id="nameForm">
@@ -861,41 +883,24 @@ if (typeof document !== 'undefined') (async function () {
           <p id="pwError" class="warn" hidden></p>
           <p><button class="btn btn-ghost" type="submit">Spara lösenord</button></p>
         </form>`}
-        <details class="prompt-box"><summary>Har du ett gammalt konto med namn + PIN? Hämta hit det.</summary>
-          <form id="linkForm">
-            <label>Namn <input type="text" id="linkName" maxlength="20" required></label>
-            <label>PIN-kod <input type="password" id="linkPin" inputmode="numeric" minlength="4" maxlength="64" required></label>
-            <p id="linkError" class="warn" hidden></p>
-            <p><button class="btn btn-ghost" type="submit">Koppla gamla kontot</button></p>
-          </form>
-        </details>
-        ${viewGroupsBlock()}
+        <p><a class="btn btn-ghost" href="#/vanner">Hantera vänner och förfrågningar</a></p>
         ${backup}
-        <p class="action-row"><button class="btn btn-ghost" id="logout">Logga ut</button> <button class="btn btn-danger" id="deleteAccount" type="button">Radera kontot</button></p>`;
+        <p class="action-row"><button class="btn btn-danger" id="deleteAccount" type="button">Radera kontot</button></p>`;
     }
     if (legacy) {
       return `<div class="view-head"><h1>Konto</h1></div>
         <p>Inloggad som <strong>${esc(legacy.name)}</strong> med gamla PIN-inloggningen.</p>
+        <p><button class="btn btn-ghost" id="logout">Logga ut</button></p>
         ${syncError ? '<p class="warn">Kunde inte nå servern, ändringar sparas lokalt och synkas när det går igen.</p>' : ''}
         <h2>Byt till nya inloggningen</h2>
         <p class="hint">PIN-inloggningen fasas ut. Logga in med Google eller skapa konto med e-post, så följer dina recept med automatiskt och du kan återställa lösenordet själv.</p>
         ${loginForms}
-        ${viewGroupsBlock()}
-        ${backup}
-        <p><button class="btn btn-ghost" id="logout">Logga ut</button></p>`;
+        <p><a class="btn btn-ghost" href="#/vanner">Hantera vänner och förfrågningar</a></p>
+        ${backup}`;
     }
     return `<div class="view-head"><h1>Konto</h1></div>
       <p>Utan konto sparas allt bara i den här webbläsaren. Logga in för att nå recepten och listan från mobilen i butiken.</p>
       ${loginForms}
-      <details class="prompt-box"><summary>Gammalt konto med namn + PIN?</summary>
-        <p class="hint">Logga in en sista gång här, byt sedan till nya inloggningen under Konto.</p>
-        <form id="authForm">
-          <label>Namn <input type="text" id="authName" autocomplete="username" maxlength="20" required></label>
-          <label>PIN-kod <input type="password" id="authPin" inputmode="numeric" autocomplete="current-password" minlength="4" maxlength="64" required></label>
-          <p id="authOldError" class="warn" hidden></p>
-          <p><button class="btn btn-ghost" type="submit">Logga in</button></p>
-        </form>
-      </details>
       ${backup}`;
   }
 
@@ -989,7 +994,7 @@ if (typeof document !== 'undefined') (async function () {
       let active;
       const recipeMatch = h.match(/^#\/recept\/(.+)$/);
       if (recipeMatch) {
-        const id = decodeURIComponent(recipeMatch[1]);
+        const id = localRecipeId(decodeURIComponent(recipeMatch[1]));
         const mine = state.recipes.some(x => x.id === id);
         active = mine ? m === '#/' : (friendList || []).some(x => publicRowKey(x) === id) ? m === '#/vanner' : m === '#/allas';
       } else {
@@ -1064,7 +1069,7 @@ if (typeof document !== 'undefined') (async function () {
       save();
     });
     view.querySelectorAll('[data-ing]').forEach(row => row.onclick = () => {
-      const id = decodeURIComponent(location.hash.replace('#/recept/', ''));
+      const id = localRecipeId(decodeURIComponent(location.hash.replace('#/recept/', '')));
       const k = row.dataset.ing;
       const cur = state.struck[id] || [];
       const next = cur.includes(k) ? cur.filter(x => x !== k) : [...cur, k];
@@ -1082,8 +1087,8 @@ if (typeof document !== 'undefined') (async function () {
       save();
     });
     view.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => {
-      const id = location.hash.replace('#/recept/', '');
-      const r = state.recipes.find(x => x.id === decodeURIComponent(id));
+      const id = localRecipeId(decodeURIComponent(location.hash.replace('#/recept/', '')));
+      const r = state.recipes.find(x => x.id === id);
       const sel = selFor(r.id);
       if (sel) { sel.portions = Math.max(1, sel.portions + Number(b.dataset.rstep)); save(); }
       else { // inte i listan än: ändra bara förhandsvisningen
@@ -1110,7 +1115,7 @@ if (typeof document !== 'undefined') (async function () {
       const id = b.dataset.addAllas;
       // feed-raden först: den bär ownerId som starter.json saknar
       const r = allPublicRows().find(x => publicRowKey(x) === id) || starter.find(x => 'starter|' + x.id === id || x.id === id);
-      if (!r) return;
+      if (!r || mineForPublic(r) || (authName && r.owner === authName)) return;
       const copy = JSON.parse(JSON.stringify(r));
       delete copy.owner; delete copy.ownerId; delete copy.saves; delete copy._ownerLabel; delete copy._idCollision;
       if (state.recipes.some(x => x.id === copy.id)) copy.id = slugify(copy.title, state.recipes.map(x => x.id));
@@ -1235,56 +1240,39 @@ if (typeof document !== 'undefined') (async function () {
 
     // ---- inloggning (Firebase + legacy) ----
     const showErr = (el, msg) => { el.textContent = msg; el.hidden = false; };
-    const joinBtn = view.querySelector('[data-join-code]');
-    if (joinBtn) joinBtn.onclick = async () => {
-      const errEl = $('#joinError');
+    const refreshButton = $('#refreshFriends');
+    if (refreshButton) refreshButton.onclick = refreshFriends;
+    const friendInput = $('#friendName');
+    if (friendInput) friendInput.oninput = () => { friendNameDraft = friendInput.value; };
+    const friendAction = async (path, method, notice, body) => {
+      if (friendsBusy) return;
+      friendsBusy = true;
+      friendErrorMessage = '';
+      const errEl = $('#friendError');
       errEl.hidden = true;
+      view.querySelectorAll('#friendForm button, [data-accept-friend], [data-cancel-friend], [data-remove-friend]').forEach(b => { b.disabled = true; });
       try {
-        await api('/join/' + encodeURIComponent(joinBtn.dataset.joinCode), { method: 'POST' });
-        groupsList = null;
-        friendList = null;
-        location.hash = '#/vanner';
-        render();
-      } catch (err) { showErr(errEl, err.message); }
+        await api(path, { method, ...(body ? { body: JSON.stringify(body) } : {}) });
+        friendNotice = notice;
+        if (body) friendNameDraft = '';
+        refreshFriends();
+      } catch (err) { friendErrorMessage = err.message; render(); }
+      finally {
+        friendsBusy = false;
+        view.querySelectorAll('#friendForm button, [data-accept-friend], [data-cancel-friend], [data-remove-friend]').forEach(b => { b.disabled = false; });
+      }
     };
-    const groupForm = $('#groupForm');
-    if (groupForm) groupForm.onsubmit = async e => {
+    const friendForm = $('#friendForm');
+    if (friendForm) friendForm.onsubmit = e => {
       e.preventDefault();
-      const errEl = $('#groupError');
-      errEl.hidden = true;
-      try {
-        await api('/groups', { method: 'POST', body: JSON.stringify({ name: $('#groupName').value }) });
-        groupsList = null;
-        friendList = null;
-        render();
-      } catch (err) { showErr(errEl, err.message); }
+      void friendAction('/friend-requests', 'POST', 'Vänförfrågan skickad.', { name: friendNameDraft });
     };
-    view.querySelectorAll('[data-invite-group]').forEach(b => b.onclick = async () => {
-      const errEl = $('#groupError');
-      errEl.hidden = true;
-      try {
-        const data = await api('/groups/' + encodeURIComponent(b.dataset.inviteGroup) + '/invite', { method: 'POST' });
-        inviteLinks[b.dataset.inviteGroup] = location.origin + location.pathname + '#/join/' + data.code;
-        render();
-      } catch (err) { showErr(errEl, err.message); }
-    });
-    view.querySelectorAll('[data-copy-invite]').forEach(b => b.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(inviteLinks[b.dataset.copyInvite]);
-        b.textContent = '✓';
-        setTimeout(() => { b.textContent = '⎘'; }, 1500);
-      } catch (e) { b.previousElementSibling.select(); }
-    });
-    view.querySelectorAll('[data-delete-group]').forEach(b => b.onclick = async () => {
-      if (!confirm('Ta bort gruppen för alla medlemmar?')) return;
-      const errEl = $('#groupError');
-      errEl.hidden = true;
-      try {
-        await api('/groups/' + encodeURIComponent(b.dataset.deleteGroup), { method: 'DELETE' });
-        groupsList = null;
-        friendList = null;
-        render();
-      } catch (err) { showErr(errEl, err.message); }
+    view.querySelectorAll('[data-accept-friend]').forEach(b => b.onclick = () => friendAction('/friend-requests/' + b.dataset.acceptFriend + '/accept', 'POST', 'Ni är nu vänner.'));
+    view.querySelectorAll('[data-cancel-friend]').forEach(b => b.onclick = () => friendAction('/friend-requests/' + b.dataset.cancelFriend, 'DELETE', b.textContent === 'Neka' ? 'Förfrågan nekad.' : 'Förfrågan återkallad.'));
+    view.querySelectorAll('[data-remove-friend]').forEach(b => b.onclick = () => {
+      if (confirm('Ta bort ' + b.dataset.friendName + ' som vän? Recept du redan sparat finns kvar i Mina recept.')) {
+        void friendAction('/friends/' + b.dataset.removeFriend, 'DELETE', 'Vännen har tagits bort.');
+      }
     });
     const googleLogin = $('#googleLogin');
     if (googleLogin) googleLogin.onclick = async () => {
@@ -1339,36 +1327,6 @@ if (typeof document !== 'undefined') (async function () {
     if (linkGoogle) linkGoogle.onclick = async () => {
       try { await fb.linkWithPopup(fbUser, new fb.GoogleAuthProvider()); render(); }
       catch (e) { alert(fbErr(e)); }
-    };
-    const linkForm = $('#linkForm');
-    if (linkForm) linkForm.onsubmit = async e => {
-      e.preventDefault();
-      const errEl = $('#linkError');
-      errEl.hidden = true;
-      try {
-        const data = await api('/login', { method: 'POST', body: JSON.stringify({ name: $('#linkName').value, pin: $('#linkPin').value }) });
-        await api('/link', { method: 'POST', body: JSON.stringify({ legacyToken: data.token }) });
-        resetRemoteCaches();
-        await pullState();
-        render();
-      } catch (err) { showErr(errEl, err.message); }
-    };
-    const authForm = $('#authForm');
-    if (authForm) authForm.onsubmit = async e => {
-      e.preventDefault();
-      const errEl = $('#authOldError');
-      errEl.hidden = true;
-      try {
-        const data = await api('/login', { method: 'POST', body: JSON.stringify({ name: $('#authName').value, pin: $('#authPin').value }) });
-        legacy = { name: data.name, token: data.token };
-        authName = data.name;
-        localStorage.setItem('auth', JSON.stringify(legacy));
-        localStorage.setItem('authName', data.name);
-        resetRemoteCaches();
-        await pullState();
-        location.hash = '#/';
-        render();
-      } catch (err) { showErr(errEl, err.message); }
     };
     const logout = $('#logout');
     if (logout) logout.onclick = async () => {
@@ -1450,7 +1408,12 @@ if (typeof document !== 'undefined') (async function () {
     });
   }
 
-  window.addEventListener('hashchange', render);
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#/vanner') refreshFriends(); else render();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && location.hash === '#/vanner' && loggedIn()) refreshFriends();
+  });
   if (legacy) await pullState(); // gammal inloggning funkar som förut, utan Firebase
   render();
   if (window.fb) initFirebase(); else window.addEventListener('fb-ready', initFirebase, { once: true });
