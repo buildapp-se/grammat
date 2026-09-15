@@ -53,3 +53,10 @@ certifikat), prodtestad med riktig Google-inloggning. Byte av `authDomain` kräv
 den nya domänens handler-URL står i **två skilda allowlists**: Authorized redirect URIs
 på OAuth 2.0-klienten i Google Cloud Console, och authorized domains i Firebase Auth.
 Saknas den första svarar Google `400 redirect_uri_mismatch` och ingen kan logga in.
+
+## Audits
+
+Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; conventions in elwyn-dash `docs/security.md`.
+
+- OWASP Top 10: 2026-07-25, stored XSS and auth fixed, see security repo
+- Headers: 2026-08-04, 0 of 6 on buildapp.se/grammat (GitHub Pages)
