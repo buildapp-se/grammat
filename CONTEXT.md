@@ -60,4 +60,4 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 
 - OWASP Top 10: 2026-07-25, stored XSS and auth fixed, see security repo
 - Headers: 2026-08-04, fail, 0 of 6 on buildapp.se/grammat (GitHub Pages)
-- Search Console: 2026-09-15, fail, unknown to Google, index.html sets noindex so kept out of sitemap
+- Search Console: 2026-09-15, warn, unknown to Google, noindex removed and added to submitted sitemap

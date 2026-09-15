@@ -71,7 +71,7 @@ PWA-manifest + ikoner finns. Appspåret = (1) service worker + offline med cache
 - Vanilla JS behålls. Flikar: Mina recept, Vänners recept, Alla recept, Lista, Konto.
 - Publika/vänner-flikarna hämtar paginerade API-svar i stället för allt-i-state.
 - GH Pages → Cloudflare Pages är rimligt men inte nödvändigt, gör det när något skaver.
-- Egen domän (grammat.se?) + bort med noindex innan lansering utåt, orgutveckling.se/recept är fel adress för främlingar. Beslut 2026-07-08: bygg kvar på /recept och flytta VID traktion, bytet är billigt (Firebase: lägg till domän i authorized domains; sessioner: alla loggar in en gång till; API:t redan på egen subdomän; redirect-regel för gamla länkar). Förutsätter två regler under bygget: relativa sökvägar och aldrig hårdkodad origin (länkar byggs med `location.origin`).
+- Egen domän (grammat.se?) innan lansering utåt (noindex togs bort 2026-09-15), orgutveckling.se/recept är fel adress för främlingar. Beslut 2026-07-08: bygg kvar på /recept och flytta VID traktion, bytet är billigt (Firebase: lägg till domän i authorized domains; sessioner: alla loggar in en gång till; API:t redan på egen subdomän; redirect-regel för gamla länkar). Förutsätter två regler under bygget: relativa sökvägar och aldrig hårdkodad origin (länkar byggs med `location.origin`).
 
 ### V10. Engelska sen
 UI-strängar extraheras till strängtabell FÖRST när engelskan är beslutad (YAGNI nu). Recepten är användardata, översätts inte.
