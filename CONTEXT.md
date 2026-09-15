@@ -59,4 +59,4 @@ Saknas den första svarar Google `400 redirect_uri_mismatch` och ingen kan logga
 Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; conventions in elwyn-dash `docs/security.md`.
 
 - OWASP Top 10: 2026-07-25, stored XSS and auth fixed, see security repo
-- Headers: 2026-08-04, 0 of 6 on buildapp.se/grammat (GitHub Pages)
+- Headers: 2026-08-04, fail, 0 of 6 on buildapp.se/grammat (GitHub Pages)
