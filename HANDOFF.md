@@ -12,6 +12,25 @@ reviewedAt: 2026-09-16
 
 # Handoff
 
+## 2026-09-16: kontonamnet ur mejlen borta i koden, workern inte deployad
+
+Extern granskning av policytexter: `createFirebaseUser` tog mejlens lokaldel som
+publikt kontonamn när Google-namn saknades. Nu bara Google-namnet, annars `kock`
+med siffra; namnet byts under Inställningar (`PUT /name`). Policyn 1.3 säger det,
+plus GitHub Pages som webbhotell och Firebase-koden från Googles CDN. Commit
+`2b9f3ed`, pushad, policyn verifierad live.
+
+**Workern är inte deployad**: `npx wrangler deploy` stoppades av
+godkännandegranskningen. Ändringen ligger i samma `worker.js` som vänskapskoden,
+så den går ut med publiceringsgrinden nedan (export, migration, deploy), inte
+före. Konton som redan skapats med mejlens lokaldel som namn rättas inte
+automatiskt; ägaren avgör om de ska ses över för hand.
+
+**Fynd:** live `index.html` serverar redan `app.js?v=recept-konto-20260911`
+(frontend med vänner) medan `recept-api` senast ändrades 2026-07-25. Grinden
+nedan sa "pusha frontend sist", men den är ute. Vänfunktionerna i klienten
+talar alltså mot ett API som saknar dem tills deployen görs.
+
 ## 2026-09-11: lokalt verifierat, ännu inte publicerat
 
 Användarens beställning: rätta egna recept i Allas, flytta Logga ut direkt under
