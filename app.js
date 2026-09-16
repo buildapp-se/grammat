@@ -7,6 +7,7 @@ const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
 const COURSE_LABELS = { forratt: 'Förrätt', huvudratt: 'Huvudrätt', efterratt: 'Efterrätt', dryck: 'Drycker', sas: 'Såser & röror' };
 
 function keyOf(name) { return name.toLowerCase().trim(); }
+function ingLabel(n) { return n === 1 ? '1 ingrediens' : n + ' ingredienser'; }
 function normalizeCourse(course) { return COURSES.includes(course) ? course : 'huvudratt'; }
 
 // Summerar valda recept (skalade till valda portioner) till inköpsrader.
@@ -323,7 +324,7 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { ingLabel, CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -383,6 +384,46 @@ if (typeof document !== 'undefined') (async function () {
       syncError = true;
     }
   }
+
+  // ---------- toast och sheet ----------
+  // Toast längst ner ovanför naven. onTimeout körs när den försvinner av sig själv (inte vid Ångra),
+  // så en destruktiv åtgärd kan vänta med skrivningen tills ångra-fönstret gått ut.
+  let toastTimer = null;
+  let toastOnTimeout = null;
+  function hideToast(byAction) {
+    clearTimeout(toastTimer);
+    const pending = toastOnTimeout;
+    toastOnTimeout = null;
+    $('#toast').hidden = true;
+    if (!byAction && pending) pending();
+  }
+  function toast(text, opts = {}) {
+    if (toastOnTimeout) hideToast(false); // föregående ångra-fönster stängs: dess skrivning görs nu
+    const el = $('#toast');
+    const action = !opts.action ? '' : opts.href
+      ? `<a class="toast-action" href="${esc(opts.href)}">${esc(opts.action)}</a>`
+      : `<button class="toast-action" type="button">${esc(opts.action)}</button>`;
+    el.innerHTML = `<span class="toast-text">${esc(text)}</span>${action}`;
+    el.hidden = false;
+    const act = el.querySelector('.toast-action');
+    if (act) act.onclick = () => { hideToast(true); if (opts.onAction) opts.onAction(); };
+    toastOnTimeout = opts.onTimeout || null;
+    toastTimer = setTimeout(() => hideToast(false), opts.ms || 4000);
+  }
+  function openSheet(html, title) {
+    const sh = $('#sheet');
+    sh.querySelector('.sheet-panel').innerHTML = (title ? `<div class="sheet-title">${esc(title)}</div>` : '') + html;
+    sh.hidden = false;
+    sh.querySelector('.sheet-back').onclick = closeSheet;
+    sh.querySelectorAll('[data-close]').forEach(b => { b.onclick = closeSheet; });
+    sh.querySelectorAll('a.sheet-item').forEach(a => a.addEventListener('click', closeSheet));
+    const first = sh.querySelector('button, a, input, select');
+    if (first) first.focus();
+    return sh.querySelector('.sheet-panel');
+  }
+  function closeSheet() { $('#sheet').hidden = true; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+  const sheetItem = (label, attrs, sub) => `<button class="sheet-item" type="button" ${attrs}>${esc(label)}${sub ? ` <small>${esc(sub)}</small>` : ''}</button>`;
 
   // ---------- vyer ----------
   function selFor(id) { return state.selections.find(s => s.id === id); }
@@ -494,31 +535,34 @@ if (typeof document !== 'undefined') (async function () {
     render();
   }
 
+  // Hela kortet öppnar receptet, knappen i hörnet lägger i/tar ur listan. Kortet byter aldrig höjd.
   function recipeCard(r) {
     const sel = selFor(r.id);
     const nutr = nutritionPerPortion(r, nutrients);
-    return `<article class="card" data-card="${esc(r.id)}">
-      <a class="card-title" href="#/recept/${esc(r.id)}">${esc(r.title)}</a>
-      <div class="card-meta">bas ${esc(r.portions)} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}</div>
-      <div class="card-row">
-        ${sel
-          ? `<div class="stepper"><button data-step="${esc(r.id)}|-1" aria-label="Färre portioner">−</button><span>${sel.portions} port</span><button data-step="${esc(r.id)}|1" aria-label="Fler portioner">+</button></div>
-             <button class="btn btn-ghost" data-unselect="${esc(r.id)}">Ta bort ur listan</button>`
-          : `<button class="btn" data-select="${esc(r.id)}">Lägg i listan</button>`}
-      </div>
+    const portions = sel ? sel.portions : r.portions;
+    return `<article class="card rcard">
+      <a class="rcard-link" href="#/recept/${esc(r.id)}"><span class="card-title">${esc(r.title)}</span><span class="card-meta">${portions} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}</span></a>
+      <button type="button" class="rcard-btn${sel ? ' is-on' : ''}" data-toggle-list="${esc(r.id)}" aria-pressed="${sel ? 'true' : 'false'}" aria-label="${sel ? 'Ta bort ur listan' : 'Lägg i listan'}: ${esc(r.title)}">${sel ? '✓' : '+'}</button>
     </article>`;
   }
 
   function viewCatalog() {
-    const byCourse = {};
     const hits = state.recipes.filter(r => matchesQuery(r, query));
-    for (const r of hits) (byCourse[r.course] = byCourse[r.course] || []).push(r);
-    const sections = COURSES.filter(c => byCourse[c]).map(c => `
+    const inList = hits.filter(r => selFor(r.id));
+    const byCourse = {};
+    for (const r of hits) if (!selFor(r.id)) (byCourse[r.course] = byCourse[r.course] || []).push(r);
+    const sections = (inList.length ? `<h2>I listan</h2><div class="cards">${inList.map(recipeCard).join('')}</div>` : '')
+      + COURSES.filter(c => byCourse[c]).map(c => `
       <h2>${esc(COURSE_LABELS[c])}</h2>
       <div class="cards">${byCourse[c].map(recipeCard).join('')}</div>`).join('');
-    return `<div class="view-head"><h1>Mina recept</h1><span><a class="btn btn-ghost" href="#/nytt">+ Nytt recept</a> <a class="btn btn-ghost" href="#/importera">Klistra in från AI</a></span></div>
+    const empty = `<div class="empty-state">
+      <div class="empty-title">Inga recept ännu</div>
+      <p>Skriv ditt första recept eller spara ett från Allas recept.</p>
+      <p class="action-row"><a class="btn btn-ink" href="#/nytt">Skriv ett recept</a><a class="btn btn-ghost" href="#/allas">Allas recept</a></p>
+    </div>`;
+    return `<div class="view-head"><h1>Mina recept</h1></div>
       ${state.recipes.length ? searchBox() : ''}
-      ${!state.recipes.length ? '<p class="empty">Inga recept än. Lägg till ditt första med "Nytt recept".</p>' : hits.length ? sections : noMatch()}`;
+      ${!state.recipes.length ? empty : hits.length ? sections : noMatch()}`;
   }
 
   function mineForPublic(r) {
@@ -543,7 +587,7 @@ if (typeof document !== 'undefined') (async function () {
       : showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : '';
     return `<article class="card" data-card="${esc(linkId)}">
       <a class="card-title" href="#/recept/${esc(linkId)}">${esc(r.title)}</a>
-      <div class="card-meta">bas ${esc(r.portions)} port · ${r.ingredients.length} ingredienser${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</div>
+      <div class="card-meta">${esc(r.portions)} port · ${ingLabel(r.ingredients.length)}${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</div>
       <div class="card-row">
         ${mine ? `<button class="btn btn-ghost" data-remove-allas="${esc(key)}">Ta bort ur mina recept</button>` : `<button class="btn" data-add-allas="${esc(key)}">Lägg till i mina recept</button>`}
       </div>
@@ -761,7 +805,7 @@ if (typeof document !== 'undefined') (async function () {
     return `<div class="view-head"><h1>${r ? 'Redigera recept' : 'Nytt recept'}</h1></div>
       <form id="edForm" data-id="${r ? esc(r.id) : ''}">
         <label>Namn <input type="text" id="edTitle" value="${r ? esc(r.title) : ''}" maxlength="80" required></label>
-        <label>Basportioner <input type="number" id="edPortions" value="${r ? r.portions : 4}" min="1" max="99" required></label>
+        <label>Portioner <input type="number" id="edPortions" value="${r ? r.portions : 4}" min="1" max="99" required></label>
         <label>Kategori <select id="edCourse">${COURSES.map(c => `<option value="${c}"${(r ? r.course : 'huvudratt') === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select></label>
         <label>Källa (länk, valfritt) <input type="url" id="edSource" value="${r ? esc(r.source || '') : ''}"></label>
         <label><input type="checkbox" id="edPrivate"${r && r.private ? ' checked' : ''}> Hemligt recept, visas inte för andra under Allas recept</label>
@@ -1097,11 +1141,22 @@ if (typeof document !== 'undefined') (async function () {
       if (e.target.closest('.card-row, a, button')) return; // knappraden är död zon
       location.hash = '#/recept/' + encodeURIComponent(c.dataset.card);
     });
-    view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
-      const [id, d] = b.dataset.step.split('|');
+    view.querySelectorAll('[data-toggle-list]').forEach(b => b.onclick = e => {
+      e.preventDefault(); e.stopPropagation(); // kortet runt knappen är en länk
+      const id = b.dataset.toggleList;
+      const r = state.recipes.find(x => x.id === id);
       const sel = selFor(id);
-      sel.portions = Math.max(1, sel.portions + Number(d));
-      save();
+      if (sel) {
+        const struck = state.struck[id];
+        state.selections = state.selections.filter(s => s.id !== id);
+        delete state.struck[id];
+        save();
+        toast('Borttagen ur listan', { action: 'Ångra', onAction: () => { state.selections.push(sel); if (struck) state.struck[id] = struck; save(); } });
+      } else {
+        state.selections.push({ id, portions: r.portions });
+        save();
+        toast(`${r.title} i listan · ${r.portions} port`, { action: 'Visa listan', href: '#/lista' });
+      }
     });
     view.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => {
       const id = localRecipeId(decodeURIComponent(location.hash.replace('#/recept/', '')));
@@ -1425,7 +1480,14 @@ if (typeof document !== 'undefined') (async function () {
     });
   }
 
+  $('#headNew').onclick = e => {
+    e.preventDefault();
+    openSheet(`<a class="sheet-item" href="#/nytt">Skriv själv</a>
+      <a class="sheet-item" href="#/importera">Klistra in text <small>t.ex. från ChatGPT</small></a>
+      <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Nytt recept');
+  };
   window.addEventListener('hashchange', () => {
+    closeSheet();
     if (location.hash === '#/vanner') refreshFriends(); else render();
   });
   document.addEventListener('visibilitychange', () => {

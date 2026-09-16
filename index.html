@@ -92,6 +92,36 @@ h3{font-size:1rem;font-weight:600;margin:1.2rem 0 .4rem}
 .card-title:hover{color:var(--accent)}
 .card-meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin:.25rem 0 .7rem}
 .card-row{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:auto;padding-top:.9rem}
+/* receptkortet: hela kortet är länken (utsträckt via ::after), knappen ligger ovanpå. Höjden ändras aldrig. */
+.rcard{position:relative;flex-direction:row;align-items:center;gap:12px;padding:16px;min-height:72px}
+.rcard-link{flex:1;min-width:0;text-decoration:none;color:inherit}
+.rcard-link::after{content:'';position:absolute;inset:0;border-radius:14px}
+.rcard-link .card-title{display:block}
+.rcard-link .card-meta{display:block;margin:4px 0 0}
+.rcard-btn{position:relative;z-index:1;flex:none;width:var(--tap);height:var(--tap);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card);color:var(--ink);font-size:22px;line-height:1}
+.rcard-btn.is-on{background:var(--ok);border-color:var(--ok);color:var(--card);font-size:16px}
+.empty-state{margin:1.4rem 0}
+.empty-title{font-family:var(--serif);font-size:22px;line-height:1.2;margin-bottom:.4rem}
+.empty-state p{color:var(--muted)}
+/* toast ovanför naven */
+.toast{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--card);border-radius:var(--r);padding:8px 8px 8px 16px;font-size:15px;box-shadow:0 6px 24px rgba(27,26,21,.25)}
+.toast-text{flex:1;min-width:0;padding:6px 0}
+.toast-action{background:none;border:none;color:var(--card);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 10px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;border-radius:8px}
+/* sheet: liten meny nerifrån på mobil, dialog i mitten på större skärm */
+.sheet{position:fixed;inset:0;z-index:30}
+.sheet-back{position:absolute;inset:0;background:rgba(27,26,21,.45)}
+.sheet-panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:20px 20px 0 0;padding:12px 12px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto}
+.sheet-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:8px 12px 10px}
+.sheet-item{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 12px;border:none;border-radius:var(--r);background:none;color:var(--ink);font-size:17px;font-weight:600;text-align:left;text-decoration:none}
+.sheet-item:hover{background:var(--bg)}
+.sheet-item.is-danger{color:var(--accent)}
+.sheet-item small{font-weight:400;font-size:14px;color:var(--muted)}
+.sheet-cancel{width:100%;margin-top:6px}
+.sheet-panel form{padding:4px 12px 0}
+@media(min-width:700px){
+  .toast{left:auto;right:24px;bottom:24px;max-width:420px}
+  .sheet-panel{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:400px;border-radius:16px;padding-bottom:16px}
+}
 .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card)}
 .stepper button{width:var(--tap);height:var(--tap);background:none;border:none;font-size:20px;color:var(--ink)}
 .stepper span{font-family:var(--mono);font-size:15px;padding:0 6px;white-space:nowrap;text-align:center}
@@ -185,6 +215,8 @@ textarea{width:100%;font-size:16px;line-height:1.5}
   <main id="view" aria-live="polite"></main>
   <footer class="site-foot"><a href="integritet.html">Integritetspolicy</a></footer>
 </div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="sheet" class="sheet" hidden><div class="sheet-back"></div><div class="sheet-panel" role="dialog" aria-modal="true"></div></div>
 <script type="module">
 // Firebase Auth (endast identitet, all data ligger i D1). ESM direkt från CDN, ingen byggkedja.
 // Laddar den inte (offline/blockerad) kör appen vidare utloggad mot lokal state.
@@ -203,6 +235,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=ap2-20260916"></script>
+<script src="app.js?v=ap3-20260916"></script>
 </body>
 </html>
