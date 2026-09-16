@@ -75,10 +75,10 @@ async function verifyFirebaseToken(token) {
   }
 }
 
-// Första Firebase-inloggningen: skapa D1-rad. Namn från Google-displayName eller mejlens lokaldel,
-// unikgörs med siffersuffix. pin_hash '' = kan inte PIN-loggas; token slumpas men lämnar aldrig servern.
+// Första Firebase-inloggningen: skapa D1-rad. Namn från Google-displayName, aldrig från mejlen
+// (lokaldelen blev publikt kontonamn fram till 2026-09-16), unikgörs med siffersuffix. pin_hash '' = kan inte PIN-loggas; token slumpas men lämnar aldrig servern.
 async function createFirebaseUser(env, claims) {
-  let base = String(claims.name || (claims.email || '').split('@')[0] || '')
+  let base = String(claims.name || '')
     .toLowerCase().replace(/[^a-zåäö0-9_-]+/g, '').slice(0, 16);
   if (base.length < 2) base = 'kock';
   for (let i = 0; i < 100; i++) {
