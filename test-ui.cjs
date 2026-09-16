@@ -37,7 +37,7 @@ async function until(check, label) {
     };
     w.fb = {auth:{},onAuthStateChanged(auth, cb) { authCallback=cb; void cb(user ? {email:'test@example.invalid',providerData:[{providerId:'password'}],getIdToken:async()=> 'test-only-session-' + user} : null); },signOut:async()=>authCallback(null)};
     await w.eval(fs.readFileSync('app.js','utf8'));
-    await until(() => w.document.querySelector('#navUser').textContent === (user === 1 ? 'alice' : user === 2 ? 'bob' : 'konto'), 'login');
+    await until(() => w.document.querySelector('#navUser').dataset.name === (user === 1 ? 'alice' : user === 2 ? 'bob' : ''), 'login');
     return w;
   }
   const text = w => w.document.querySelector('#view').textContent;
@@ -71,7 +71,7 @@ async function until(check, label) {
   const reader = new alice.FileReader();
   const backupText = await new Promise(resolve => {reader.onload=()=>resolve(reader.result);reader.readAsText(blob);});
   assert.equal(JSON.parse(backupText).state.recipes[0].title,'Alice pasta');
-  assert.equal(alice.document.querySelector('[data-match="#/lista"]').textContent,'Handla');
+  assert.equal(alice.document.querySelector('[data-match="#/lista"]').textContent.trim(),'Lista');
   await navigate(alice, '#/lista', '.extra-form');
   assert.equal(alice.document.querySelector('h1').textContent,'Handla');
 

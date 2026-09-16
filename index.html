@@ -41,18 +41,24 @@ body{font-family:var(--sans);font-size:17px;background:var(--bg);color:var(--ink
 a{color:inherit}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 6rem}
+.wrap{max-width:640px;margin:0 auto;padding:.75rem 1.25rem 88px}
 .site-foot{margin-top:2rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
 .site-foot a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);display:inline-flex;align-items:center;min-height:var(--tap)}
 .site-foot a:hover{color:var(--accent);border-color:var(--accent)}
-header.brand{padding:1.5rem 0 .5rem}
-.wordmark{font-family:var(--sans);font-weight:800;font-size:clamp(1.6rem,6vw,2.2rem);line-height:1.02;letter-spacing:-.03em;display:inline-flex;align-items:center;min-height:var(--tap);color:var(--ink);text-decoration:none}
+header.brand{padding:.4rem 0 0}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:var(--tap)}
+.wordmark{font-family:var(--sans);font-weight:800;font-size:20px;line-height:1;letter-spacing:-.02em;display:inline-flex;align-items:center;min-height:var(--tap);color:var(--ink);text-decoration:none}
 .wordmark em{font-style:normal;color:var(--accent)}
-.tagline{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:.35rem}
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);display:flex;justify-content:center;gap:0;z-index:10;padding-bottom:env(safe-area-inset-bottom)}
-.nav a{flex:1;max-width:214px;text-align:center;padding:.9rem .5rem;color:rgba(251,250,244,.6);text-decoration:none;font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-top:3px solid transparent}
-.nav a.active{border-top-color:var(--ok);color:#fff;font-weight:700;background:rgba(255,255,255,.07)}
-.nav a:focus-visible{outline:2px solid var(--card);outline-offset:-4px}
+.tagline{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.1rem}
+.head-actions{display:flex;align-items:center;gap:8px}
+.head-new{padding:0 14px}
+.head-user{display:inline-flex;align-items:center;justify-content:center;min-width:var(--tap);height:var(--tap);padding:0 12px;border-radius:var(--r);background:var(--ink);color:var(--card);font-family:var(--mono);font-size:14px;text-decoration:none}
+.head-user.is-guest{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);font-family:var(--sans);font-weight:600;padding:0 14px}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--card);border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.nav a{height:52px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;color:#3A372F;text-decoration:none;white-space:nowrap;border-radius:var(--r)}
+.nav a.active{background:var(--ink);color:var(--card)}
+.nav-badge{background:var(--accent);color:var(--card);border-radius:999px;font-family:var(--mono);font-weight:400;font-size:11px;line-height:1.4;padding:1px 7px}
+.nav a:focus-visible{outline-offset:-3px}
 main{padding-top:1rem}
 .view-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:1.2rem 0 1rem;flex-wrap:wrap}
 h1{font-family:var(--serif);font-weight:500;font-size:30px;letter-spacing:-.01em;line-height:1.15;text-wrap:pretty}
@@ -144,11 +150,10 @@ textarea{width:100%;font-size:16px;line-height:1.5}
 .ed-row input,.ed-row select{padding:.35em .5em;font-size:15px;min-width:0}
 .ed-remove{background:none;border:none;font-size:1.1rem;color:var(--muted);min-width:var(--tap);min-height:var(--tap)}
 @media(max-width:560px){.ed-row{grid-template-columns:1fr 4rem 3.2rem 2.75rem;grid-auto-rows:auto}.ed-row .ed-count,.ed-row .ed-cat{grid-column:span 2}}
-@media(min-width:720px){
+@media(min-width:700px){
   .wrap{padding-bottom:3rem}
-  .nav{position:static;background:transparent;justify-content:flex-start;gap:1.6rem;margin-top:.8rem}
-  .nav a{flex:0 0 auto;color:var(--muted);padding:.2rem 0;border-top:none;border-bottom:3px solid transparent}
-  .nav a.active{border-bottom-color:var(--accent);color:var(--ink);font-weight:700;background:none}
+  .nav{position:static;display:flex;justify-content:flex-start;gap:6px;background:transparent;border-top:none;padding:0;margin-top:.8rem}
+  .nav a{height:var(--tap);padding:0 16px}
   .cards{grid-template-columns:1fr 1fr}
 }
 @media(min-width:1000px){
@@ -161,14 +166,19 @@ textarea{width:100%;font-size:16px;line-height:1.5}
 <body>
 <div class="wrap">
   <header class="brand">
-    <a class="wordmark" href="#/">gram<em>mat</em>.</a>
-    <div class="tagline">recept &amp; inköpslista · allt i gram</div>
+    <div class="brand-row">
+      <a class="wordmark" href="#/">gram<em>mat</em>.</a>
+      <div class="head-actions">
+        <a class="btn btn-ghost head-new" id="headNew" href="#/nytt" hidden>+ Nytt</a>
+        <a class="head-user" id="navUser" href="#/konto" data-name="">Logga in</a>
+      </div>
+    </div>
+    <div class="tagline" id="tagline">recept &amp; inköpslista · allt i gram</div>
     <nav class="nav" aria-label="Huvudmeny">
-      <a href="#/" data-match="#/">Mina recept</a>
-      <a href="#/lista" data-match="#/lista">Handla<span id="navListCount"></span></a>
+      <a href="#/" data-match="#/">Recept</a>
+      <a href="#/lista" data-match="#/lista">Lista<span class="nav-badge" id="navListCount" hidden></span></a>
       <a href="#/vanner" data-match="#/vanner">V&auml;nner</a>
-      <a href="#/allas" data-match="#/allas">Allas recept</a>
-      <a href="#/konto" data-match="#/konto" id="navUser">konto</a>
+      <a href="#/allas" data-match="#/allas">Allas</a>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
@@ -192,6 +202,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=timer-20260916"></script>
+<script src="app.js?v=ap2-20260916"></script>
 </body>
 </html>

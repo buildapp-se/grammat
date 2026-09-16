@@ -984,11 +984,27 @@ if (typeof document !== 'undefined') (async function () {
   }
   document.addEventListener('visibilitychange', syncWakeLock);
 
+  // De fyra flikarna. Senaste flik sparas så att appen öppnar där man var, i butiken alltså listan.
+  const TABS = ['#/', '#/lista', '#/vanner', '#/allas'];
+  function rememberRoute(h) {
+    if (!TABS.includes(h)) return;
+    try { localStorage.setItem('grammat:lastRoute', h); } catch (e) { /* privat läge */ }
+  }
+
   function renderNav() {
     const n = state.selections.length;
-    $('#navListCount').textContent = n ? ' (' + n + ')' : '';
-    $('#navUser').textContent = loggedIn() && authName ? authName : 'konto';
+    const badge = $('#navListCount');
+    badge.textContent = n || '';
+    badge.hidden = !n;
     const h = location.hash || '#/';
+    const user = $('#navUser');
+    const name = loggedIn() ? (authName || '') : '';
+    user.dataset.name = name;
+    user.classList.toggle('is-guest', !loggedIn());
+    user.textContent = loggedIn() ? (name || 'k').slice(0, 1).toUpperCase() : 'Logga in';
+    user.setAttribute('aria-label', loggedIn() ? 'Konto: ' + (name || fbUser?.email || '') : 'Logga in');
+    $('#tagline').hidden = !(h === '#/' && !loggedIn());
+    $('#headNew').hidden = h !== '#/';
     document.querySelectorAll('.nav a').forEach(a => {
       const m = a.dataset.match;
       let active;
@@ -1027,6 +1043,7 @@ if (typeof document !== 'undefined') (async function () {
     renderNav();
     bind();
     syncWakeLock();
+    rememberRoute(h);
   }
 
   function bind() {
@@ -1415,6 +1432,10 @@ if (typeof document !== 'undefined') (async function () {
     if (!document.hidden && location.hash === '#/vanner' && loggedIn()) refreshFriends();
   });
   if (legacy) await pullState(); // gammal inloggning funkar som förut, utan Firebase
+  if (!location.hash) { // öppnad utan adress: tillbaka till fliken man lämnade
+    const last = localStorage.getItem('grammat:lastRoute');
+    if (last && TABS.includes(last) && last !== '#/') location.replace(last);
+  }
   render();
   if (window.fb) initFirebase(); else window.addEventListener('fb-ready', initFirebase, { once: true });
 })();
