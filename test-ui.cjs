@@ -53,7 +53,7 @@ async function until(check, label) {
   await navigate(alice, '#/recept/1%7Cpasta', '[data-rstep]');
   assert.ok(!alice.document.querySelector('[data-add-allas]'), 'public own link cannot add a duplicate');
   alice.document.querySelector('[data-rstep="1"]').click();
-  assert.ok(text(alice).includes('3 portioner'), 'own composite URL supports portion controls');
+  assert.ok(text(alice).includes('3 port'), 'own composite URL supports portion controls');
   alice.document.querySelector('[data-ing]').click();
   await until(() => JSON.parse(alice.localStorage.getItem('state')).struck.pasta?.length === 1, 'ingredient uses local recipe id');
   await navigate(alice, '#/konto', '#logout');
@@ -94,7 +94,7 @@ async function until(check, label) {
   add.click(); add.click();
   assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes.length,2,'double click saves only once');
   assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes[1].src.owner,2,'same slug retains correct provenance');
-  await navigate(alice,'#/recept/2%7Cpasta','[data-share]');
+  await navigate(alice,'#/recept/2%7Cpasta','.rv-top');
   assert.ok(!alice.document.querySelector('[data-add-allas]'),'saved public detail cannot add twice');
   await navigate(alice,'#/vanner','#friendForm');
   await until(()=>alice.document.querySelector('[data-remove-friend]'),'friend ready');

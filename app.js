@@ -230,6 +230,20 @@ function stepTimers(text) {
   return out;
 }
 
+// Ingredienser som nämns i ett steg: hela namnet först, annars ett ord ur namnet (minst tre
+// tecken, med ordgräns framför så "lök" träffar "löken" men inte "vitlöken"). Parenteser och
+// småord hoppas över. Tomt svar betyder att köksläget inte visar någon ruta för steget.
+const STEP_STOP = new Set(['och', 'eller', 'till', 'med', 'utan', 'fryst', 'färsk', 'färska', 'hackad', 'riven', 'tärnad', 'skivad', 'stor', 'liten', 'små', 'gul', 'röd', 'grön', 'vit']);
+function stepIngredients(stepText, ingredients) {
+  const text = String(stepText).toLowerCase();
+  const bound = w => new RegExp('(^|[^a-zåäöé])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return ingredients.filter(ing => {
+    const name = ing.name.toLowerCase().replace(/\(.*?\)/g, ' ').trim();
+    if (name && bound(name).test(text)) return true;
+    return name.split(/[\s,]+/).some(w => w.length >= 3 && !STEP_STOP.has(w) && bound(w).test(text));
+  });
+}
+
 function dedupeAllas(allasList, starterIds) {
   const starterSet = new Set(starterIds);
   const others = allasList.filter(r => !starterSet.has(r.id));
@@ -324,7 +338,7 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { ingLabel, CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -453,6 +467,9 @@ if (typeof document !== 'undefined') (async function () {
   const searchBox = () => `<p class="search"><input type="search" id="q" value="${esc(query)}" placeholder="Sök recept eller ingrediens" aria-label="Sök recept" autocomplete="off"></p>`;
   const noMatch = () => `<p class="empty">Inget recept matchar "${esc(query.trim())}".</p>`;
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
+  const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
+  let lastTab = '#/'; // fliken man kom ifrån, ger receptvyns tillbaka-knapp sitt namn
+  const BACK_LABELS = { '#/': 'Mina recept', '#/lista': 'Lista', '#/vanner': 'Vänner', '#/allas': 'Allas recept' };
   // recept kan visas/öppnas innan de finns i egna state.recipes (Allas recept-fliken)
   function publicRowKey(r) { return Number.isInteger(r.ownerId) ? r.ownerId + '|' + r.id : 'starter|' + r.id; }
   function allPublicRows() {
@@ -679,14 +696,35 @@ if (typeof document !== 'undefined') (async function () {
       ${recipes.length ? publicRecipeSections(recipes, false) : '<p class="empty">Inga offentliga recept än.</p>'}`;
   }
 
+  // Stegen med timerchips. En timer som redan går ritas som nedräkning på sin plats, i både
+  // listvyn och köksläget (samma nyckel receptId|stegindex|minuter).
+  function stepHtml(id, i, text) {
+    const stepKey = minutes => `${id}|${i}|${minutes}`;
+    return esc(text) + stepTimers(text).map(t => {
+      const running = timers.find(x => x.key === stepKey(t.minutes));
+      return running
+        ? ' ' + timerChip(running)
+        : ` <button class="timer-btn" type="button" data-timer="${t.minutes}" data-timer-label="${esc(t.label)}" data-timer-key="${esc(stepKey(t.minutes))}" aria-label="Starta timer ${esc(t.label)}">${esc(t.label)}</button>`;
+    }).join('');
+  }
+  function ownerLabel(r, mine) {
+    if (mine) return authName || '';
+    return r._ownerLabel || r.owner || '';
+  }
+  function portionsFor(r, id) {
+    const sel = state.recipes.some(x => x.id === id) ? selFor(id) : null;
+    return sel ? sel.portions : (previewPortions[id] || r.portions);
+  }
+
   function viewRecipe(id) {
     id = localRecipeId(id);
     const r = findRecipe(id);
     if (!r) return '<p class="empty">Receptet finns inte.</p>';
     const mine = state.recipes.some(x => x.id === id);
     const sel = mine ? selFor(id) : null;
-    const portions = sel ? sel.portions : (previewPortions[id] || r.portions);
+    const portions = portionsFor(r, id);
     const f = portions / r.portions;
+    const from = (history.state && history.state.from) || lastTab;
     // Bockade rader (har hemma/redan i grytan) samlas längst ner, senast bockad överst,
     // och utesluts ur inköpslistan.
     const struckKeys = state.struck[id] || [];
@@ -702,47 +740,74 @@ if (typeof document !== 'undefined') (async function () {
       rows += row;
     });
     rows += struckRows.sort((a, b) => b.order - a.order).map(x => x.row).join('');
-    // Nyckeln knyter en timer till sitt steg i det här receptet, så nedräkningen kan
-    // ritas på raden den hör till i stället för i en klump högst upp.
-    const stepKey = (i, minutes) => `${id}|${i}|${minutes}`;
     const steps = r.steps.length
-      ? '<ol class="steps">' + r.steps.map((s, i) => `<li>${esc(s)}${stepTimers(s).map(t => {
-          const running = timers.find(x => x.key === stepKey(i, t.minutes));
-          return running
-            ? ' ' + timerChip(running)
-            : ` <button class="timer-btn" type="button" data-timer="${t.minutes}" data-timer-label="${esc(t.label)}" data-timer-key="${esc(stepKey(i, t.minutes))}" aria-label="Starta timer ${esc(t.label)}">⏱ ${esc(t.label)}</button>`;
-        }).join('')}</li>`).join('') + '</ol>'
+      ? '<ol class="steps">' + r.steps.map((t, i) => `<li>${stepHtml(id, i, t)}</li>`).join('') + '</ol>'
       : '<p class="empty">Inga steg nedskrivna.</p>';
-    // Fältet börjar på receptets första tid, det är nästan alltid den man vill ha.
-    const firstMinutes = r.steps.map(stepTimers).find(t => t.length)?.[0].minutes || '';
-    const timerForm = `<form id="timerForm" class="timer-form"><input id="timerMin" type="number" min="1" max="1440" inputmode="numeric" value="${esc(firstMinutes)}" placeholder="minuter" aria-label="Minuter" required><button class="btn btn-ghost" type="submit">⏱ Starta timer</button></form>`;
     const nutr = nutritionPerPortion(r, nutrients);
     const nutrLine = `<p class="hint">Per portion: ${fmtNum(nutr.kcal)} kcal · ${fmtNum(nutr.protein)} g protein · ${fmtNum(nutr.carbs)} g kolhydrater · ${fmtNum(nutr.fat)} g fett${nutr.missing.length ? ' · ofullständigt, saknar data för ' + nutr.missing.map(esc).join(', ') : ''} (källa: <a href="https://soknaringsinnehall.livsmedelsverket.se/" rel="noopener">Livsmedelsverket</a> m.fl.)</p>`;
-    const portionBar = mine
-      ? `<div class="portion-bar">
-        <div class="stepper"><button data-rstep="-1" aria-label="Färre portioner">−</button><span>${portions} portioner</span><button data-rstep="1" aria-label="Fler portioner">+</button></div>
-        ${sel ? `<button class="btn btn-ghost" data-unselect="${esc(id)}">Ta bort ur listan</button>` : `<button class="btn" data-select-p="${esc(id)}|${portions}">Lägg i listan</button>`}
-      </div>`
-      : '';
-    const actionBar = mine
-      ? `<p class="action-row">
-        <button class="btn btn-ghost" data-share="${esc(id)}">Kopiera recept</button>
-        <button class="btn btn-danger" data-delete="${esc(id)}">Ta bort recept</button>
-      </p>`
-      : `<p class="action-row">${mineForPublic(r) || (authName && r.owner === authName) ? '<span class="hint">Finns i mina recept</span>' : `<button class="btn" data-add-allas="${esc(id)}">Lägg till i mina recept</button>`} <button class="btn btn-ghost" data-share="${esc(id)}">Kopiera recept</button></p>`;
-    return `<div class="view-head"><h1>${esc(r.title)}</h1>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Redigera</a>` : ''}</div>
-      <p class="hint">${esc(COURSE_LABELS[r.course])}</p>
-      ${portionBar}
+    const owner = ownerLabel(r, mine);
+    const saved = mine || mineForPublic(r) || (authName && r.owner === authName);
+    const listBtn = mine
+      ? (sel
+        ? `<button class="btn btn-ghost is-on" type="button" data-toggle-list="${esc(id)}" aria-pressed="true">I listan ✓</button>`
+        : `<button class="btn btn-ghost" type="button" data-toggle-list="${esc(id)}" data-portions="${portions}" aria-pressed="false">+ Lägg i listan</button>`)
+      : saved
+        ? '<span class="btn btn-ghost is-on" aria-disabled="true">Finns i mina ✓</span>'
+        : `<button class="btn btn-ghost" type="button" data-add-allas="${esc(id)}">Spara till mina</button>`;
+    const cookBtn = r.steps.length ? `<a class="btn btn-ink" href="#/recept/${esc(id)}/laga/1">Laga steg för steg</a>` : '';
+    return `<div class="rv-top"><a class="btn btn-ghost" href="${esc(from)}">‹ ${esc(BACK_LABELS[from] || 'Tillbaka')}</a>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Ändra</a>` : ''}</div>
+      <div class="rv-kicker">${esc(COURSE_LABELS[r.course])}${owner ? ' · ' + esc(owner) : ''}${r.private ? ' · Hemligt' : ''}</div>
+      <h1 class="rv-title">${esc(r.title)}</h1>
+      <div class="rv-portions">
+        <div class="stepper"><button type="button" data-rstep="-1" aria-label="Färre portioner">−</button><span>${portions} port</span><button type="button" data-rstep="1" aria-label="Fler portioner">+</button></div>
+        <div class="meta">${nutr.kcal ? fmtNum(nutr.kcal) + ' kcal/port · ' : ''}${ingLabel(r.ingredients.length)}</div>
+      </div>
+      <div class="rv-actions">${listBtn}${cookBtn}</div>
+      <div class="card rv-card">
+        <div class="label">Ingredienser</div>
+        ${mine ? '<p class="hint">Tryck på en rad när du har varan hemma eller redan lagt den i grytan, den stryks och hoppar ur inköpslistan.</p>' : ''}
+        <table class="ing-table"><tbody>${rows}</tbody></table>
+      </div>
       ${nutrLine}
-      <h2>Ingredienser</h2>
-      ${mine ? '<p class="hint">Tryck på en rad när du har varan hemma eller redan lagt den i grytan, den stryks och hoppar ur inköpslistan.</p>' : ''}
-      <table class="ing-table"><tbody>${rows}</tbody></table>
-      <h2>Gör så här</h2>
-      ${steps}
-      ${timerBar()}
-      ${timerForm}
-      ${r.source ? `<p class="source"><a href="${esc(r.source)}" rel="noopener">Källa</a></p>` : ''}
-      ${actionBar}`;
+      <div class="rv-steps">
+        <div class="label">Gör så här</div>
+        ${steps}
+        ${r.steps.some(t => stepTimers(t).length) ? '<p class="hint">Tryck på en tid för att starta en timer. Den räknar ner på plats och ringer när den är klar.</p>' : ''}
+      </div>
+      ${r.source ? `<p class="source"><a href="${esc(r.source)}" rel="noopener">Källa</a></p>` : ''}`;
+  }
+
+  // Köksläget: ett steg per skärm, 24 px text, ingredienserna som nämns i steget skalade
+  // till valda portioner. Svep byter steg, wake lock håller skärmen tänd.
+  function viewCook(id, n) {
+    id = localRecipeId(id);
+    const r = findRecipe(id);
+    if (!r || !r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
+    const total = r.steps.length;
+    n = Math.min(Math.max(1, n), total);
+    const portions = portionsFor(r, id);
+    const f = portions / r.portions;
+    const ings = stepIngredients(r.steps[n - 1], r.ingredients);
+    const base = `#/recept/${esc(id)}`;
+    return `<div class="cook" id="cook" data-n="${n}" data-total="${total}">
+      <div class="cook-top">
+        <a class="btn btn-ghost" href="${base}">Stäng</a>
+        <span class="rv-kicker" id="wakeNote">${wakeActive ? 'Skärmen hålls tänd' : ''}</span>
+        <button class="btn btn-ghost cook-portions" type="button" id="cookPortions">${portions} port</button>
+      </div>
+      <div class="cook-title">${esc(r.title)}</div>
+      <div class="progress" aria-label="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
+      ${ings.length ? `<div class="cook-ings"><div class="label">Till det här steget</div>${ings.map(ing => `<div><span>${esc(ing.name)}</span><span class="qty">${esc(fmtIngredient(ing, f))}</span></div>`).join('')}</div>` : ''}
+      <div class="cook-step">
+        <div class="cook-stepno">STEG ${n}</div>
+        <p class="cook-text">${stepHtml(id, n - 1, r.steps[n - 1])}</p>
+        ${stepTimers(r.steps[n - 1]).length ? '<p class="hint">Tryck på en tid för att starta timern.</p>' : ''}
+      </div>
+      <div class="cook-nav">
+        <a class="btn btn-ghost" href="${base}/laga/${n - 1}"${n === 1 ? ' aria-disabled="true"' : ''}>Föregående</a>
+        ${n < total ? `<a class="btn btn-ink" href="${base}/laga/${n + 1}">Nästa steg</a>` : `<a class="btn btn-ink" href="${base}">Klart</a>`}
+      </div>
+    </div>`;
   }
 
   function listAsText() {
@@ -984,12 +1049,7 @@ if (typeof document !== 'undefined') (async function () {
     return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
   }
   function timerChip(t) {
-    return `<span class="timer${t.done ? ' done' : ''}" data-timer-id="${t.id}"><span>${esc(t.label)}</span> <strong class="timer-left">${t.done ? 'Klar!' : fmtLeft(t.end - Date.now())}</strong> <button type="button" data-timer-stop="${t.id}" aria-label="Ta bort timer">✕</button></span>`;
-  }
-  function timerBar() {
-    const loose = timers.filter(t => !t.key); // stegens timers ritas vid sitt steg
-    if (!loose.length) return '';
-    return '<div class="timers">' + loose.map(timerChip).join('') + '</div>';
+    return `<span class="timer${t.done ? ' done' : ''}" data-timer-id="${t.id}"><strong class="timer-left">${t.done ? 'Klar' : fmtLeft(t.end - Date.now())}</strong><button type="button" data-timer-stop="${t.id}" aria-label="Ta bort timer ${esc(t.label)}">✕</button></span>`;
   }
   function startTimer(minutes, label, key) {
     // AudioContext måste skapas i ett användartryck, annars vägrar mobilen spela ljud senare.
@@ -1032,24 +1092,32 @@ if (typeof document !== 'undefined') (async function () {
       const el = document.querySelector(`[data-timer-id="${t.id}"]`);
       if (!el) continue;
       el.classList.toggle('done', t.done);
-      el.querySelector('.timer-left').textContent = t.done ? 'Klar!' : fmtLeft(t.end - now);
+      el.querySelector('.timer-left').textContent = t.done ? 'Klar' : fmtLeft(t.end - now);
     }
   }, 1000);
 
   // ---------- render + händelser ----------
   // Skärmen hålls vaken medan ett recept är uppe (man står och lagar mat).
   let wakeLock = null; // promise för aktivt/väntande lås
+  let wakeActive = false; // låset är beviljat: köksläget visar "Skärmen hålls tänd"
+  function setWakeActive(on) {
+    wakeActive = on;
+    const note = $('#wakeNote');
+    if (note) note.textContent = on ? 'Skärmen hålls tänd' : '';
+  }
   function syncWakeLock() {
     const want = /^#\/recept\//.test(location.hash) && document.visibilityState === 'visible';
     if (want && !wakeLock && navigator.wakeLock) {
       const p = navigator.wakeLock.request('screen').then(l => {
-        l.addEventListener('release', () => { if (wakeLock === p) wakeLock = null; });
+        setWakeActive(true);
+        l.addEventListener('release', () => { setWakeActive(false); if (wakeLock === p) wakeLock = null; });
         return l;
       }).catch(() => { if (wakeLock === p) wakeLock = null; return null; });
       wakeLock = p;
     } else if (!want && wakeLock) {
       wakeLock.then(l => l && l.release().catch(() => {}));
       wakeLock = null;
+      setWakeActive(false);
     }
   }
   document.addEventListener('visibilitychange', syncWakeLock);
@@ -1080,9 +1148,8 @@ if (typeof document !== 'undefined') (async function () {
     document.querySelectorAll('.nav a').forEach(a => {
       const m = a.dataset.match;
       let active;
-      const recipeMatch = h.match(/^#\/recept\/(.+)$/);
-      if (recipeMatch) {
-        const id = localRecipeId(decodeURIComponent(recipeMatch[1]));
+      const id = recipeIdFromHash(h);
+      if (id !== null) {
         const mine = state.recipes.some(x => x.id === id);
         active = mine ? m === '#/' : (friendList || []).some(x => publicRowKey(x) === id) ? m === '#/vanner' : m === '#/allas';
       } else {
@@ -1101,11 +1168,22 @@ if (typeof document !== 'undefined') (async function () {
   function render() {
     const h = location.hash || '#/';
     headMoreItems = null;
+    const cook = h.match(/^#\/recept\/([^/]+)\/laga\/(\d+)$/);
     const m = h.match(/^#\/(recept|redigera)\/(.+)$/);
     const userMatch = h.match(/^#\/anvandare\/(\d+)$/);
     const joinMatch = h.match(/^#\/join\/([A-Z0-9]{6,16})$/);
+    if (TABS.includes(h)) lastTab = h;
+    document.body.classList.toggle('is-cooking', !!cook);
     let html;
-    if (m && m[1] === 'recept') html = viewRecipe(decodeURIComponent(m[2]));
+    if (cook) html = viewCook(decodeURIComponent(cook[1]), Number(cook[2]));
+    else if (m && m[1] === 'recept') {
+      if (!history.state || !history.state.from) { try { history.replaceState({ from: lastTab }, ''); } catch (e) { /* file:// */ } }
+      html = viewRecipe(decodeURIComponent(m[2]));
+      const id = recipeIdFromHash(h);
+      const own = state.recipes.find(x => x.id === id);
+      if (findRecipe(id)) setHeadMore(sheetItem('Kopiera recept', 'id="shareRecipe"')
+        + (own ? sheetItem(own.private ? 'Gör synligt under Allas recept' : 'Gör hemligt', 'id="togglePrivate"') + sheetItem('Ta bort recept', 'id="deleteRecipe" class="sheet-item is-danger"') : ''), 'Receptet');
+    }
     else if (m && m[1] === 'redigera') html = viewEditor(decodeURIComponent(m[2]));
     else if (userMatch) html = viewUserProfile(userMatch[1]);
     else if (joinMatch) html = viewJoin(joinMatch[1]);
@@ -1140,30 +1218,8 @@ if (typeof document !== 'undefined') (async function () {
       if (i >= 0) timers.splice(i, 1);
       render();
     });
-    const timerForm = $('#timerForm');
-    if (timerForm) timerForm.onsubmit = e => {
-      e.preventDefault();
-      const min = Number($('#timerMin').value);
-      if (min > 0) startTimer(min, min + ' min');
-    };
-
-    view.querySelectorAll('[data-select]').forEach(b => b.onclick = () => {
-      const r = state.recipes.find(x => x.id === b.dataset.select);
-      state.selections.push({ id: r.id, portions: r.portions });
-      save();
-    });
-    view.querySelectorAll('[data-select-p]').forEach(b => b.onclick = () => {
-      const [id, p] = b.dataset.selectP.split('|');
-      state.selections.push({ id, portions: Number(p) });
-      save();
-    });
-    view.querySelectorAll('[data-unselect]').forEach(b => b.onclick = () => {
-      state.selections = state.selections.filter(s => s.id !== b.dataset.unselect);
-      delete state.struck[b.dataset.unselect]; // klar med receptet: nollställ bockade ingredienser
-      save();
-    });
     view.querySelectorAll('[data-ing]').forEach(row => row.onclick = () => {
-      const id = localRecipeId(decodeURIComponent(location.hash.replace('#/recept/', '')));
+      const id = recipeIdFromHash();
       const k = row.dataset.ing;
       const cur = state.struck[id] || [];
       const next = cur.includes(k) ? cur.filter(x => x !== k) : [...cur, k];
@@ -1174,6 +1230,25 @@ if (typeof document !== 'undefined') (async function () {
       if (e.target.closest('.card-row, a, button')) return; // knappraden är död zon
       location.hash = '#/recept/' + encodeURIComponent(c.dataset.card);
     });
+    // köksläget: svep vänster/höger byter steg, portionsknappen öppnar en stepper
+    const cook = $('#cook');
+    if (cook) {
+      let x0 = null, y0 = null;
+      cook.ontouchstart = e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; };
+      cook.ontouchend = e => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) < 60 || Math.abs(dy) > 80) return;
+        const n = Number(cook.dataset.n), total = Number(cook.dataset.total);
+        const next = dx < 0 ? n + 1 : n - 1;
+        if (next >= 1 && next <= total) location.hash = location.hash.replace(/\/laga\/\d+$/, '/laga/' + next);
+      };
+      $('#cookPortions').onclick = () => {
+        openSheet(`<div class="rv-portions" style="align-items:center;padding:8px 0 4px"><div class="stepper"><button type="button" data-rstep="-1" aria-label="Färre portioner">−</button><span id="sheetPortions">${portionsFor(findRecipe(recipeIdFromHash()), recipeIdFromHash())} port</span><button type="button" data-rstep="1" aria-label="Fler portioner">+</button></div></div><button class="btn btn-ghost sheet-cancel" type="button" data-close>Klar</button>`, 'Portioner');
+        bindSheet();
+      };
+    }
     view.querySelectorAll('[data-toggle-list]').forEach(b => b.onclick = e => {
       e.preventDefault(); e.stopPropagation(); // kortet runt knappen är en länk
       const id = b.dataset.toggleList;
@@ -1186,36 +1261,14 @@ if (typeof document !== 'undefined') (async function () {
         save();
         toast('Borttagen ur listan', { action: 'Ångra', onAction: () => { state.selections.push(sel); if (struck) state.struck[id] = struck; save(); } });
       } else {
-        state.selections.push({ id, portions: r.portions });
+        const portions = Number(b.dataset.portions) || r.portions;
+        state.selections.push({ id, portions });
+        delete previewPortions[id];
         save();
-        toast(`${r.title} i listan · ${r.portions} port`, { action: 'Visa listan', href: '#/lista' });
+        toast(`${r.title} i listan · ${portions} port`, { action: 'Visa listan', href: '#/lista' });
       }
     });
-    view.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => {
-      const id = localRecipeId(decodeURIComponent(location.hash.replace('#/recept/', '')));
-      const r = state.recipes.find(x => x.id === id);
-      const sel = selFor(r.id);
-      if (sel) { sel.portions = Math.max(1, sel.portions + Number(b.dataset.rstep)); save(); }
-      else { // inte i listan än: ändra bara förhandsvisningen
-        previewPortions[r.id] = Math.max(1, (previewPortions[r.id] || r.portions) + Number(b.dataset.rstep));
-        render();
-      }
-    });
-    view.querySelectorAll('[data-share]').forEach(b => b.onclick = async () => {
-      const r = findRecipe(b.dataset.share);
-      const portions = selFor(r.id)?.portions || previewPortions[r.id] || r.portions;
-      try { await navigator.clipboard.writeText(recipeAsText(r, portions)); b.textContent = 'Kopierat till urklipp!'; }
-      catch (e) { b.textContent = 'Kunde inte kopiera'; }
-      setTimeout(() => { b.textContent = 'Kopiera recept'; }, 2500);
-    });
-    // Fire-and-forget mot sparräknaren: kopian i egna state är det viktiga, ett tappat
-    // räknar-anrop är ofarligt. Räknaren i vyn uppdateras optimistiskt.
-    const unsave = r => {
-      if (!r || !r.src || !loggedIn()) return;
-      api('/save', { method: 'DELETE', body: JSON.stringify({ ownerId: r.src.owner, recipeId: r.src.id }) }).catch(() => {});
-      const row = allPublicRows().find(x => x.id === r.src.id && x.ownerId === r.src.owner);
-      if (row && row.saves > 0) row.saves--;
-    };
+    view.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => stepPortions(Number(b.dataset.rstep)));
     view.querySelectorAll('[data-add-allas]').forEach(b => b.onclick = () => {
       const id = b.dataset.addAllas;
       // feed-raden först: den bär ownerId som starter.json saknar
@@ -1240,16 +1293,6 @@ if (typeof document !== 'undefined') (async function () {
       state.recipes = state.recipes.filter(x => x !== r);
       state.selections = state.selections.filter(s => s.id !== r.id);
       delete state.struck[r.id];
-      save();
-    });
-    view.querySelectorAll('[data-delete]').forEach(b => b.onclick = () => {
-      const r = state.recipes.find(x => x.id === b.dataset.delete);
-      if (!confirm('Ta bort "' + r.title + '"? Tas endast bort från dina recept, går inte att ångra.')) return;
-      unsave(r);
-      state.recipes = state.recipes.filter(x => x.id !== r.id);
-      state.selections = state.selections.filter(s => s.id !== r.id);
-      delete state.struck[r.id];
-      location.hash = '#/';
       save();
     });
 
@@ -1479,8 +1522,60 @@ if (typeof document !== 'undefined') (async function () {
     };
   }
 
+  // Fire-and-forget mot sparräknaren: kopian i egna state är det viktiga, ett tappat
+  // räknar-anrop är ofarligt. Räknaren i vyn uppdateras optimistiskt.
+  function unsave(r) {
+    if (!r || !r.src || !loggedIn()) return;
+    api('/save', { method: 'DELETE', body: JSON.stringify({ ownerId: r.src.owner, recipeId: r.src.id }) }).catch(() => {});
+    const row = allPublicRows().find(x => x.id === r.src.id && x.ownerId === r.src.owner);
+    if (row && row.saves > 0) row.saves--;
+  }
+  // Portionsväljaren i receptvyn och köksläget: styr listans mängder om receptet ligger där,
+  // annars bara förhandsvisningen.
+  function stepPortions(delta) {
+    const id = recipeIdFromHash();
+    const r = findRecipe(id);
+    if (!r) return;
+    const sel = state.recipes.some(x => x.id === id) ? selFor(id) : null;
+    if (sel) { sel.portions = Math.max(1, sel.portions + delta); save(); }
+    else { previewPortions[id] = Math.max(1, (previewPortions[id] || r.portions) + delta); render(); }
+    const sp = $('#sheetPortions');
+    if (sp) sp.textContent = portionsFor(r, id) + ' port';
+  }
+
   // Knapparna i ···-menyn. Töm listan skriver inte mot servern förrän ångra-fönstret (6 s) gått ut.
   function bindSheet() {
+    const sh = $('#sheet');
+    sh.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => stepPortions(Number(b.dataset.rstep)));
+    const share = $('#shareRecipe');
+    if (share) share.onclick = async () => {
+      closeSheet();
+      const id = recipeIdFromHash();
+      const r = findRecipe(id);
+      try { await navigator.clipboard.writeText(recipeAsText(r, portionsFor(r, id))); toast('Receptet kopierat som text'); }
+      catch (e) { toast('Kunde inte kopiera'); }
+    };
+    const priv = $('#togglePrivate');
+    if (priv) priv.onclick = () => {
+      closeSheet();
+      const r = state.recipes.find(x => x.id === recipeIdFromHash());
+      if (!r) return;
+      if (r.private) delete r.private; else r.private = true;
+      save();
+      toast(r.private ? 'Receptet är hemligt och visas inte för andra' : 'Receptet visas under Allas recept');
+    };
+    const del = $('#deleteRecipe');
+    if (del) del.onclick = () => {
+      closeSheet();
+      const r = state.recipes.find(x => x.id === recipeIdFromHash());
+      if (!r || !confirm('Ta bort "' + r.title + '"? Tas endast bort från dina recept, går inte att ångra.')) return;
+      unsave(r);
+      state.recipes = state.recipes.filter(x => x.id !== r.id);
+      state.selections = state.selections.filter(s => s.id !== r.id);
+      delete state.struck[r.id];
+      location.hash = '#/';
+      save();
+    };
     const copyListBtn = $('#copyList');
     if (copyListBtn) copyListBtn.onclick = async () => {
       closeSheet();
