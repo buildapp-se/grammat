@@ -117,6 +117,8 @@ h3{font-size:1rem;font-weight:600;margin:1.2rem 0 .4rem}
 .sheet-item:hover{background:var(--bg)}
 .sheet-item.is-danger{color:var(--accent)}
 .sheet-item small{font-weight:400;font-size:14px;color:var(--muted)}
+.sheet-item.is-stacked{flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px}
+.sheet-item.is-stacked small{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}
 .sheet-cancel{width:100%;margin-top:6px}
 .sheet-panel form{padding:4px 12px 0}
 @media(min-width:700px){
@@ -282,6 +284,19 @@ textarea{width:100%;font-size:16px;line-height:1.5}
 .ed-line3 span{white-space:nowrap}
 .ed-remove{width:var(--tap);height:var(--tap);flex:none;background:none;border:none;border-radius:10px;color:var(--muted);font-size:18px}
 .ed-add{width:100%;min-height:48px;background:none;border:1.5px dashed var(--ink);border-radius:var(--r);font-weight:600;font-size:15px}
+/* ---- startsida via inbjudningslänk ---- */
+.invite{padding-top:1.4rem}
+.invite-pill{display:inline-flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--card);font-size:14px}
+.invite-pill i{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-style:normal}
+.invite h1{font-size:34px;margin-top:18px}
+.invite-lede{margin-top:14px;font-size:16px;line-height:1.5;color:#3A372F}
+.invite-actions{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.invite-actions .hint{text-align:center;margin:2px 0 0;font-size:13px}
+.invite-recipes{margin-top:36px}
+.invite-recipes .label{margin:0 0 12px}
+.invite-more{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:6px;color:var(--accent);font-weight:600;font-size:14px;background:none;border:none;padding:0}
+.sheet-form label{margin:.4rem 0 .8rem}
+.sheet-form .warn{margin:0 0 .8rem}
 /* ---- konto: inloggning ---- */
 .btn-block{display:flex;width:100%;min-height:56px;font-size:17px}
 .linkrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:15px;color:var(--muted)}
@@ -344,6 +359,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=ap7-20260916"></script>
+<script src="app.js?v=ap6-20260916"></script>
 </body>
 </html>
