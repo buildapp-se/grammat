@@ -11,6 +11,19 @@ reviewedAt: 2026-09-16
 
 # Handoff
 
+## 2026-09-16: manuella timrar ritas vid sitt fält
+
+Manuella timrar (fältet under stegen) ritades av `timerBar()` högst upp i receptvyn,
+ovanför Ingredienser, medan stegtimrar ritas i sitt steg. Patrik: ser konstigt ut.
+`timerBar()` flyttad till raden ovanför `timerForm`; stegtimrarna stannar i steget
+(beslut Brain, "avgör du"). Versionsfrågan `app.js?v=timer-20260916`. `node --check`,
+`node test.js`, `node test-ui.cjs` gröna, mätt lokalt i Playwright på 375 px: brickan
+55 px ovanför fältet, under stegen.
+
+Skärmbilder för Claude Design-genomlysningen ligger i
+`backups/design-review-20260916/` (11 vyer, 375 px, utan rullningslist). Vänner och
+Konto inloggat saknas, kräver Patriks konto.
+
 ## 2026-09-16: tryckytor 44 px
 
 Loggan (31 px) och sidfotens Integritetspolicy (15 px) fick `min-height: 44px`

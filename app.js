@@ -667,13 +667,13 @@ if (typeof document !== 'undefined') (async function () {
     return `<div class="view-head"><h1>${esc(r.title)}</h1>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Redigera</a>` : ''}</div>
       <p class="hint">${esc(COURSE_LABELS[r.course])}</p>
       ${portionBar}
-      ${timerBar()}
       ${nutrLine}
       <h2>Ingredienser</h2>
       ${mine ? '<p class="hint">Tryck på en rad när du har varan hemma eller redan lagt den i grytan, den stryks och hoppar ur inköpslistan.</p>' : ''}
       <table class="ing-table"><tbody>${rows}</tbody></table>
       <h2>Gör så här</h2>
       ${steps}
+      ${timerBar()}
       ${timerForm}
       ${r.source ? `<p class="source"><a href="${esc(r.source)}" rel="noopener">Källa</a></p>` : ''}
       ${actionBar}`;
