@@ -11,6 +11,12 @@ reviewedAt: 2026-09-16
 
 # Handoff
 
+## 2026-09-16: tryckytor 44 px
+
+Loggan (31 px) och sidfotens Integritetspolicy (15 px) fick `min-height: 44px`
+i `390c807`, pushad till main (Pages), mätt live med ux-checks: 0 ytor under
+44 px. `node test.js` grönt.
+
 ## 2026-09-16: vänskapsmigrationen och workern publicerade, kontonamnet ur mejlen borta
 
 Extern granskning av policytexter: `createFirebaseUser` tog mejlens lokaldel som

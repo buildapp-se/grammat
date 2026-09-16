@@ -63,4 +63,4 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 - TLS: 2026-09-16, pass, SSL Labs A+ on buildapp.se, TLS 1.2 minimum and HSTS since today
 - Lighthouse: 2026-09-16, pass, a11y 100, best practices 100, SEO 100 (mobile, no perf)
 - Markup: 2026-09-16, warn, W3C 3 CSS errors on ::view-transition rules the validator does not know, 0 broken links
-- UX: 2026-09-16, warn, 5 of 6 script checks pass, logo link 31 px, no --interact
+- UX: 2026-09-16, pass, 0 targets under 44 px after the fix (logo and footer link), 5 of 6 script checks pass, no --interact
