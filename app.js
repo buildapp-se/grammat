@@ -612,38 +612,59 @@ if (typeof document !== 'undefined') (async function () {
       : myLocalIds.has(r.id);
   }
 
-  function publicRecipeCard(r, showOwner = true) {
+  // Allas, Vänner och profilsidor: en rad på 64 px per recept, hela raden öppnar receptet,
+  // knappen till höger sparar (+) eller visar att det redan är sparat (grön ✓).
+  function publicRecipeRow(r, showOwner = true) {
     if (authName && r.owner === authName) {
       const own = state.recipes.find(x => x.id === r.id);
-      if (own) return recipeCard(own);
+      if (own) return recipeRowOwn(own);
     }
     const mine = mineForPublic(r);
     const nutr = nutritionPerPortion(r, nutrients);
     const key = publicRowKey(r);
     const linkId = Number.isInteger(r.ownerId) ? key : r.id;
-    const owner = showOwner && r._ownerLabel && Number.isInteger(r.ownerId)
-      ? ` · från <a href="#/anvandare/${esc(r.ownerId)}">${esc(r._ownerLabel)}</a>`
-      : showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : '';
-    return `<article class="card" data-card="${esc(linkId)}">
-      <a class="card-title" href="#/recept/${esc(linkId)}">${esc(r.title)}</a>
-      <div class="card-meta">${esc(r.portions)} port · ${ingLabel(r.ingredients.length)}${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</div>
-      <div class="card-row">
-        ${mine ? `<button class="btn btn-ghost" data-remove-allas="${esc(key)}">Ta bort ur mina recept</button>` : `<button class="btn" data-add-allas="${esc(key)}">Lägg till i mina recept</button>`}
-      </div>
+    const owner = showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : '';
+    return `<article class="prow">
+      <a class="prow-link" href="#/recept/${esc(linkId)}"><span class="prow-title">${esc(r.title)}</span><span class="prow-meta">${esc(r.portions)} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</span></a>
+      ${mine
+        ? `<button type="button" class="rcard-btn is-on" data-remove-allas="${esc(key)}" aria-pressed="true" aria-label="Ta bort ur mina recept: ${esc(r.title)}">✓</button>`
+        : `<button type="button" class="rcard-btn" data-add-allas="${esc(key)}" aria-pressed="false" aria-label="Spara till mina recept: ${esc(r.title)}">+</button>`}
+    </article>`;
+  }
+  // Ett eget recept som råkar ligga i det publika flödet: samma rad, knappen styr listan.
+  function recipeRowOwn(r) {
+    const sel = selFor(r.id);
+    const nutr = nutritionPerPortion(r, nutrients);
+    return `<article class="prow">
+      <a class="prow-link" href="#/recept/${esc(r.id)}"><span class="prow-title">${esc(r.title)}</span><span class="prow-meta">${(sel ? sel.portions : r.portions)} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal` : ''} · ditt recept</span></a>
+      <button type="button" class="rcard-btn${sel ? ' is-on' : ''}" data-toggle-list="${esc(r.id)}" aria-pressed="${sel ? 'true' : 'false'}" aria-label="${sel ? 'Ta bort ur listan' : 'Lägg i listan'}: ${esc(r.title)}">${sel ? '✓' : '+'}</button>
     </article>`;
   }
 
+  // Kategorierna fälls ihop, valet minns i localStorage. Stora kategorier visar fem rader
+  // och "Visa N till" tills man bett om resten (i minnet, nollställs vid omladdning).
+  const CAT_SHOW = 5;
+  const expandedCourses = new Set();
+  function catOpenState() { try { return JSON.parse(localStorage.getItem('grammat:allasOpen') || '{}'); } catch (e) { return {}; } }
   function publicRecipeSections(list, showOwner = true) {
-      const byCourse = {};
-      list = list.filter(r => matchesQuery(r, query));
-      if (!list.length && query.trim()) return noMatch();
-      for (const r of list) {
-        const course = normalizeCourse(r.course);
-        (byCourse[course] = byCourse[course] || []).push({ ...r, course });
-      }
-      return COURSES.filter(c => byCourse[c]).map(c => `
-        <h2>${esc(COURSE_LABELS[c])}</h2>
-        <div class="cards">${byCourse[c].map(r => publicRecipeCard(r, showOwner)).join('')}</div>`).join('');
+    const byCourse = {};
+    list = list.filter(r => matchesQuery(r, query));
+    if (!list.length && query.trim()) return noMatch();
+    for (const r of list) {
+      const course = normalizeCourse(r.course);
+      (byCourse[course] = byCourse[course] || []).push({ ...r, course });
+    }
+    const openState = catOpenState();
+    const searching = !!query.trim();
+    return COURSES.filter(c => byCourse[c]).map(c => {
+      const all = byCourse[c];
+      const shown = searching || expandedCourses.has(c) ? all : all.slice(0, CAT_SHOW);
+      const open = searching || openState[c] !== false;
+      return `<details class="cat" data-course="${c}"${open ? ' open' : ''}>
+        <summary><span>${esc(COURSE_LABELS[c])} · ${all.length}</span></summary>
+        <div class="cat-list">${shown.map(r => publicRecipeRow(r, showOwner)).join('')}${shown.length < all.length ? `<button type="button" class="cat-more" data-more="${c}">Visa ${all.length - shown.length} till</button>` : ''}</div>
+      </details>`;
+    }).join('');
   }
 
   function viewAllasRecept() {
@@ -661,7 +682,7 @@ if (typeof document !== 'undefined') (async function () {
       othersHtml = '';
     }
 
-    return `<div class="view-head"><h1>Allas recept</h1></div>
+    return `<div class="list-head"><h1>Allas recept</h1><span class="list-count">${starterRows.length} recept</span></div>
       ${searchBox()}
       ${publicRecipeSections(starterRows)}
       ${othersHtml}`;
@@ -724,7 +745,7 @@ if (typeof document !== 'undefined') (async function () {
     const sel = mine ? selFor(id) : null;
     const portions = portionsFor(r, id);
     const f = portions / r.portions;
-    const from = (history.state && history.state.from) || lastTab;
+    const from = (history.state && history.state.from) || (mine || lastTab !== '#/' ? lastTab : '#/allas');
     // Bockade rader (har hemma/redan i grytan) samlas längst ner, senast bockad överst,
     // och utesluts ur inköpslistan.
     const struckKeys = state.struck[id] || [];
@@ -885,31 +906,40 @@ if (typeof document !== 'undefined') (async function () {
     const r = id ? state.recipes.find(x => x.id === id) : null;
     if (id && !r) return '<p class="empty">Receptet finns inte.</p>';
     const ings = r ? r.ingredients : [{}, {}, {}];
-    const rowHtml = (ing = {}) => `<div class="ed-row">
-      <input type="text" class="ed-name" placeholder="ingrediens" value="${esc(ing.name || '')}" maxlength="80">
-      <input type="number" class="ed-amount" placeholder="mängd" value="${ing.amount != null ? ing.amount : ''}" min="0" step="any" inputmode="decimal">
-      <select class="ed-unit"><option value="g"${(ing.unit || 'g') === 'g' ? ' selected' : ''}>g</option><option value="ml"${ing.unit === 'ml' ? ' selected' : ''}>ml</option></select>
-      <input type="number" class="ed-count" placeholder="antal" value="${ing.count != null ? ing.count : ''}" min="0" step="any" inputmode="decimal" title="ungefärligt antal (st), valfritt">
-      <select class="ed-cat">${CATS.map(c => `<option value="${c}"${(ing.cat || 'övrigt') === c ? ' selected' : ''}>${CAT_LABELS[c]}</option>`).join('')}</select>
-      <button type="button" class="ed-remove" aria-label="Ta bort raden">×</button>
+    // Ett kort per ingrediens: namn och ta bort på rad 1, mängd/enhet/avdelning på rad 2,
+    // ungefärligt styckantal på rad 3 (bara när enheten är g eller ml).
+    const rowHtml = (ing = {}) => {
+      const unit = ing.toTaste ? 'smak' : (ing.unit || 'g');
+      return `<div class="ed-row">
+      <div class="ed-line1"><input type="text" class="ed-name" placeholder="ingrediens" value="${esc(ing.name || '')}" maxlength="80" aria-label="Ingrediens"><button type="button" class="ed-remove" aria-label="Ta bort raden">✕</button></div>
+      <div class="ed-line2">
+        <input type="number" class="ed-amount" placeholder="mängd" value="${ing.amount != null ? ing.amount : ''}" min="0" step="any" inputmode="decimal" aria-label="Mängd"${unit === 'smak' ? ' disabled' : ''}>
+        <select class="ed-unit" aria-label="Enhet"><option value="g"${unit === 'g' ? ' selected' : ''}>g</option><option value="ml"${unit === 'ml' ? ' selected' : ''}>ml</option><option value="smak"${unit === 'smak' ? ' selected' : ''}>efter smak</option></select>
+        <select class="ed-cat" aria-label="Avdelning"><option value="" disabled${ing.cat ? '' : ' selected'}>Avdelning</option>${CATS.map(c => `<option value="${c}"${ing.cat === c ? ' selected' : ''}>${CAT_LABELS[c]}</option>`).join('')}</select>
+      </div>
+      <div class="ed-line3"${unit === 'smak' ? ' hidden' : ''}><span>Ungefär</span><input type="number" class="ed-count" value="${ing.count != null ? ing.count : ''}" min="0" step="any" inputmode="decimal" aria-label="Ungefärligt antal"><span>st (valfritt)</span></div>
     </div>`;
-    return `<div class="view-head"><h1>${r ? 'Redigera recept' : 'Nytt recept'}</h1></div>
-      <form id="edForm" data-id="${r ? esc(r.id) : ''}">
-        <label>Namn <input type="text" id="edTitle" value="${r ? esc(r.title) : ''}" maxlength="80" required></label>
-        <label>Portioner <input type="number" id="edPortions" value="${r ? r.portions : 4}" min="1" max="99" required></label>
-        <label>Kategori <select id="edCourse">${COURSES.map(c => `<option value="${c}"${(r ? r.course : 'huvudratt') === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select></label>
-        <label>Källa (länk, valfritt) <input type="url" id="edSource" value="${r ? esc(r.source || '') : ''}"></label>
-        <label><input type="checkbox" id="edPrivate"${r && r.private ? ' checked' : ''}> Hemligt recept, visas inte för andra under Allas recept</label>
-        <h2>Ingredienser</h2>
-        <p class="hint">Mängd i gram eller ml så att listan kan räkna. Lämna mängden tom för "efter smak". Antal är ungefärligt styckantal (valfritt). Tumregler: 1 msk = 15 ml, 1 tsk = 5 ml, 1 dl = 100 ml.</p>
-        <div id="edRows">${ings.map(rowHtml).join('')}</div>
-        <p><button type="button" class="btn btn-ghost" id="edAddRow">+ Rad</button></p>
-        <h2>Gör så här</h2>
-        <p class="hint">Ett steg per rad.</p>
-        <textarea id="edSteps" rows="8">${r ? esc(r.steps.join('\n')) : ''}</textarea>
-        <p><button class="btn" type="submit">Spara recept</button> <a class="btn btn-ghost" href="${r ? '#/recept/' + esc(r.id) : '#/'}">Avbryt</a></p>
-      </form>
-      <template id="edRowTpl">${rowHtml()}</template>`;
+    };
+    return `<form id="edForm" data-id="${r ? esc(r.id) : ''}">
+      <div class="ed-top"><a class="btn btn-ghost" href="${r ? '#/recept/' + esc(r.id) : '#/'}">Avbryt</a><button class="btn" type="submit">Spara recept</button></div>
+      <h1>${r ? 'Ändra recept' : 'Nytt recept'}</h1>
+      <label class="ed-field">Namn <input type="text" id="edTitle" value="${r ? esc(r.title) : ''}" maxlength="80" required></label>
+      <div class="ed-grid">
+        <div class="ed-field">Portioner
+          <div class="stepper"><button type="button" data-edstep="-1" aria-label="Färre portioner">−</button><span id="edPortionsOut">${r ? r.portions : 4}</span><button type="button" data-edstep="1" aria-label="Fler portioner">+</button></div>
+          <input type="hidden" id="edPortions" value="${r ? r.portions : 4}">
+        </div>
+        <label class="ed-field">Kategori <select id="edCourse">${COURSES.map(c => `<option value="${c}"${(r ? r.course : 'huvudratt') === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select></label>
+      </div>
+      <label class="ed-field">Källa (länk, valfritt) <input type="url" id="edSource" value="${r ? esc(r.source || '') : ''}"></label>
+      <label class="check-row"><input type="checkbox" id="edPrivate"${r && r.private ? ' checked' : ''}> Hemligt recept, visas inte under Allas recept</label>
+      <div class="ed-section"><div class="label">Ingredienser · <span id="edCount">${ings.length}</span></div><div class="ed-rules">1 msk = 15 ml · 1 tsk = 5 ml · 1 dl = 100 ml · tom mängd = efter smak</div></div>
+      <div id="edRows">${ings.map(rowHtml).join('')}</div>
+      <button type="button" class="ed-add" id="edAddRow">+ Ingrediens</button>
+      <div class="ed-section"><div class="label">Gör så här · ett steg per rad</div></div>
+      <textarea id="edSteps" rows="8" aria-label="Gör så här">${r ? esc(r.steps.join('\n')) : ''}</textarea>
+    </form>
+    <template id="edRowTpl">${rowHtml()}</template>`;
   }
 
   function viewImport() {
@@ -985,14 +1015,13 @@ if (typeof document !== 'undefined') (async function () {
       </p>
       <p id="backupError" class="warn" hidden></p>`;
     const loginForms = `
-      <p><button class="gsi" id="googleLogin" type="button"><svg class="gsi-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Fortsätt med Google</button></p>
+      <p><button class="gsi btn-block" id="googleLogin" type="button"><svg class="gsi-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Fortsätt med Google</button></p>
       <form id="emailForm">
         <label>E-post <input type="email" id="authEmail" autocomplete="username" required></label>
         <label>Lösenord <input type="password" id="authPw" minlength="6" maxlength="64" autocomplete="current-password" required></label>
         <p id="authError" class="warn" hidden></p>
-        <p><button class="btn" type="submit" data-mode="login">Logga in</button>
-        <button class="btn btn-ghost" type="submit" data-mode="register">Skapa konto</button>
-        <button class="btn btn-ghost" type="button" id="forgotPw">Glömt lösenordet?</button></p>
+        <p><button class="btn btn-ink btn-block" type="submit" data-mode="login">Logga in</button></p>
+        <p class="linkrow"><button class="btn-link" type="submit" data-mode="register">Skapa konto</button> · <button class="btn-link" type="button" id="forgotPw">Glömt lösenordet?</button></p>
       </form>`;
     if (fbUser) {
       const providers = fbUser.providerData.map(p => p.providerId);
@@ -1269,6 +1298,13 @@ if (typeof document !== 'undefined') (async function () {
       }
     });
     view.querySelectorAll('[data-rstep]').forEach(b => b.onclick = () => stepPortions(Number(b.dataset.rstep)));
+    view.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { expandedCourses.add(b.dataset.more); render(); });
+    view.querySelectorAll('details.cat').forEach(d => d.ontoggle = () => {
+      if (query.trim()) return; // sökning tvingar upp allt, inget att minnas
+      const st = catOpenState();
+      st[d.dataset.course] = d.open;
+      try { localStorage.setItem('grammat:allasOpen', JSON.stringify(st)); } catch (e) { /* privat läge */ }
+    });
     view.querySelectorAll('[data-add-allas]').forEach(b => b.onclick = () => {
       const id = b.dataset.addAllas;
       // feed-raden först: den bär ownerId som starter.json saknar
@@ -1318,17 +1354,52 @@ if (typeof document !== 'undefined') (async function () {
 
     const edForm = $('#edForm');
     if (edForm) {
-      $('#edAddRow').onclick = () => $('#edRows').insertAdjacentHTML('beforeend', $('#edRowTpl').innerHTML);
-      view.querySelector('#edRows').onclick = e => { if (e.target.classList.contains('ed-remove')) e.target.closest('.ed-row').remove(); };
+      const rowsEl = $('#edRows');
+      const updateCount = () => { $('#edCount').textContent = rowsEl.querySelectorAll('.ed-row').length; };
+      const addRow = () => {
+        rowsEl.insertAdjacentHTML('beforeend', $('#edRowTpl').innerHTML);
+        updateCount();
+        rowsEl.lastElementChild.querySelector('.ed-name').focus();
+      };
+      $('#edAddRow').onclick = addRow;
+      view.querySelectorAll('[data-edstep]').forEach(b => b.onclick = () => {
+        const inp = $('#edPortions');
+        inp.value = Math.min(99, Math.max(1, Number(inp.value) + Number(b.dataset.edstep)));
+        $('#edPortionsOut').textContent = inp.value;
+      });
+      rowsEl.onclick = e => {
+        const btn = e.target.closest('.ed-remove');
+        if (!btn) return;
+        const row = btn.closest('.ed-row');
+        const next = row.nextElementSibling;
+        row.remove();
+        updateCount();
+        toast('Raden borttagen', { action: 'Ångra', onAction: () => { rowsEl.insertBefore(row, next && next.parentNode === rowsEl ? next : null); updateCount(); } });
+      };
+      rowsEl.onchange = e => { // "efter smak" stänger mängd- och antalsfälten
+        if (!e.target.classList.contains('ed-unit')) return;
+        const row = e.target.closest('.ed-row');
+        const smak = e.target.value === 'smak';
+        row.querySelector('.ed-amount').disabled = smak;
+        row.querySelector('.ed-line3').hidden = smak;
+      };
+      rowsEl.onkeydown = e => { // Enter i sista raden ger en ny rad, annars hoppar den till nästa
+        if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+        e.preventDefault();
+        const row = e.target.closest('.ed-row');
+        if (row === rowsEl.lastElementChild) addRow();
+        else row.nextElementSibling.querySelector('.ed-name').focus();
+      };
       edForm.onsubmit = e => {
         e.preventDefault();
         const ingredients = [...view.querySelectorAll('.ed-row')].map(row => {
           const name = row.querySelector('.ed-name').value.trim();
           if (!name) return null;
-          const amount = row.querySelector('.ed-amount').value;
-          const count = row.querySelector('.ed-count').value;
-          const ing = { name, cat: row.querySelector('.ed-cat').value };
-          if (amount !== '') { ing.amount = Number(amount); ing.unit = row.querySelector('.ed-unit').value; }
+          const unit = row.querySelector('.ed-unit').value;
+          const amount = unit === 'smak' ? '' : row.querySelector('.ed-amount').value;
+          const count = unit === 'smak' ? '' : row.querySelector('.ed-count').value;
+          const ing = { name, cat: row.querySelector('.ed-cat').value || 'övrigt' };
+          if (amount !== '') { ing.amount = Number(amount); ing.unit = unit; }
           else ing.toTaste = true;
           if (count !== '') { ing.count = Number(count); ing.countUnit = 'st'; }
           return ing;

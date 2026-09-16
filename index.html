@@ -240,10 +240,52 @@ input[type=checkbox]:checked::before{content:'✓';color:var(--card);font-size:1
 label{display:block;margin:.8rem 0;font-weight:600;font-size:14px}
 label input:not([type=checkbox]),label select{display:block;width:100%;margin-top:.35rem;font-weight:400;font-size:17px}
 textarea{width:100%;font-size:16px;line-height:1.5}
-.ed-row{display:grid;grid-template-columns:1fr 4.6rem 3.6rem 4rem 6.5rem 2.75rem;gap:.4rem;margin-bottom:.4rem;align-items:center}
-.ed-row input,.ed-row select{padding:.35em .5em;font-size:15px;min-width:0}
-.ed-remove{background:none;border:none;font-size:1.1rem;color:var(--muted);min-width:var(--tap);min-height:var(--tap)}
-@media(max-width:560px){.ed-row{grid-template-columns:1fr 4rem 3.2rem 2.75rem;grid-auto-rows:auto}.ed-row .ed-count,.ed-row .ed-cat{grid-column:span 2}}
+/* ---- Allas recept som rader i hopfällbara kategorier ---- */
+.cat{margin-top:8px}
+.cat summary{list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:var(--tap);cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cat summary::-webkit-details-marker{display:none}
+.cat summary::after{content:'▸'}
+.cat[open] summary::after{content:'▾'}
+.cat-list{background:var(--card);border-radius:14px;overflow:hidden;margin-top:6px}
+.prow{display:flex;align-items:center;gap:12px;padding:0 8px 0 16px;min-height:64px;border-bottom:1px dashed var(--line);position:relative}
+.prow:last-child{border-bottom:none}
+.prow-link{flex:1;min-width:0;padding:10px 0;text-decoration:none;color:inherit}
+.prow-link::after{content:'';position:absolute;inset:0}
+.prow-title{display:block;font-family:var(--serif);font-size:18px;line-height:1.2}
+.prow-meta{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+.prow .rcard-btn{margin:10px 0}
+.cat-more{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;background:none;border:none;font-family:var(--mono);font-size:13px;color:var(--accent)}
+/* ---- receptformuläret: ett kort per ingrediens ---- */
+.ed-top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;margin:-.5rem 0 .6rem;background:var(--bg)}
+.ed-top .btn{padding:0 16px;font-size:14px}
+.ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ed-field,.ed-grid .ed-field{display:block;font-weight:600;font-size:14px;margin:.9rem 0 0}
+.ed-field input,.ed-field select,.ed-field .stepper{display:flex;width:100%;margin-top:6px;font-weight:400;font-size:17px;min-height:48px}
+.ed-field .stepper{justify-content:space-between;padding:0 4px}
+.ed-field .stepper button{width:40px;height:40px}
+.ed-field .stepper span{flex:1;font-size:16px}
+.check-row{display:flex;align-items:center;gap:12px;min-height:var(--tap);margin:.6rem 0 0;font-weight:400;font-size:15px;cursor:pointer}
+.ed-section{display:flex;flex-direction:column;gap:4px;margin:1.4rem 0 .6rem}
+.ed-section .label{margin:0}
+.ed-rules{font-size:12px;color:var(--muted)}
+.ed-row{background:var(--card);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ed-line1{display:flex;gap:8px;align-items:center}
+.ed-line1 input{flex:1;min-width:0}
+.ed-line2{display:grid;grid-template-columns:1fr 72px 1fr;gap:8px}
+.ed-line3{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.ed-line3 input{width:64px;min-height:36px;padding:0 10px;border-color:var(--line);font-family:var(--mono);font-size:14px}
+.ed-row input,.ed-row select{min-width:0;border-radius:10px;font-size:16px;padding:0 12px;min-height:var(--tap);margin:0;width:auto}
+.ed-row select{padding:0 4px 0 10px}
+.ed-row .ed-amount,.ed-row .ed-unit{font-family:var(--mono)}
+.ed-row .ed-cat{font-size:14px}
+.ed-row .ed-line3 input{flex:0 0 64px;width:64px;min-height:36px;padding:0 10px}
+.ed-line3 span{white-space:nowrap}
+.ed-remove{width:var(--tap);height:var(--tap);flex:none;background:none;border:none;border-radius:10px;color:var(--muted);font-size:18px}
+.ed-add{width:100%;min-height:48px;background:none;border:1.5px dashed var(--ink);border-radius:var(--r);font-weight:600;font-size:15px}
+/* ---- konto: inloggning ---- */
+.btn-block{display:flex;width:100%;min-height:56px;font-size:17px}
+.linkrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:15px;color:var(--muted)}
+.btn-link{background:none;border:none;color:var(--ink);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 6px;text-decoration:underline;text-underline-offset:3px}
 @media(min-width:700px){
   .wrap{padding-bottom:3rem}
   .extra-fixed{position:static;padding:14px 0 0;background:none}
@@ -302,6 +344,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=ap4-20260916"></script>
+<script src="app.js?v=ap7-20260916"></script>
 </body>
 </html>
