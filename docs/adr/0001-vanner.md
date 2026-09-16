@@ -1,6 +1,6 @@
 # Vänner med ömsesidig acceptans
 
-Status: implementerat och automatiskt testat lokalt 2026-09-11. Publicering väntar på godkänd D1-backup.
+Status: implementerat och automatiskt testat lokalt 2026-09-11, publicerat 2026-09-16 (migration och Worker, ingen D1-export togs, migrationen är additiv).
 
 ## Beslut
 

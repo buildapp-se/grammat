@@ -2,17 +2,16 @@
 schemaVersion: 1
 status: active
 currentGoal: Hålla grammat i drift och stänga de sista punkterna före lansering i privat krets
-nextAction: Invänta uttryckligt godkännande av lokal D1-export, ta backup, applicera 0001_friendships.sql, publicera Worker och pusha frontend. Se sessionen 2026-09-11 nedan
+nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på buildapp.se/grammat och byter namn under Inställningar; sedan mobil-QA av kontovyn. Se sessionen 2026-09-16 nedan
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-  - Automatisk godkännandegranskning nekade D1-exporten 2026-09-11 eftersom den innehåller privata konto- och receptuppgifter. Inget har publicerats
 reviewedAt: 2026-09-16
 ---
 
 # Handoff
 
-## 2026-09-16: kontonamnet ur mejlen borta i koden, workern inte deployad
+## 2026-09-16: vänskapsmigrationen och workern publicerade, kontonamnet ur mejlen borta
 
 Extern granskning av policytexter: `createFirebaseUser` tog mejlens lokaldel som
 publikt kontonamn när Google-namn saknades. Nu bara Google-namnet, annars `kock`
@@ -20,18 +19,21 @@ med siffra; namnet byts under Inställningar (`PUT /name`). Policyn 1.3 säger d
 plus GitHub Pages som webbhotell och Firebase-koden från Googles CDN. Commit
 `2b9f3ed`, pushad, policyn verifierad live.
 
-**Workern är inte deployad**: `npx wrangler deploy` stoppades av
-godkännandegranskningen. Ändringen ligger i samma `worker.js` som vänskapskoden,
-så den går ut med publiceringsgrinden nedan (export, migration, deploy), inte
-före. Konton som redan skapats med mejlens lokaldel som namn rättas inte
-automatiskt; ägaren avgör om de ska ses över för hand.
+**Publicerat samma eftermiddag på ägarens order** ("gör deploy på grammat"):
+`wrangler d1 migrations apply recept --remote` (0001_friendships.sql, rent
+additiv, `IF NOT EXISTS`) och `wrangler deploy`, version
+`05baaae3-97bb-4bdd-ac07-e6d586631fbf`. Verifierat: `GET /friends` svarar 401
+(fanns inte i den gamla workern, gav 404). **Ingen D1-export togs**: den
+nekades 2026-09-11 och migrationen är additiv; D1 Time Travel är
+återställningsvägen om något ändå gått fel. Konton som redan skapats med
+mejlens lokaldel som namn rättas inte automatiskt; ägaren avgör om de ska ses
+över för hand.
 
-**Fynd:** live `index.html` serverar redan `app.js?v=recept-konto-20260911`
-(frontend med vänner) medan `recept-api` senast ändrades 2026-07-25. Grinden
-nedan sa "pusha frontend sist", men den är ute. Vänfunktionerna i klienten
-talar alltså mot ett API som saknar dem tills deployen görs.
+**Fynd på vägen:** frontend med vänner (`app.js?v=recept-konto-20260911`) var
+live sedan tidigare mot ett API utan vänendpoints, trots att grinden sa
+"pusha frontend sist". Stängt av deployen ovan.
 
-## 2026-09-11: lokalt verifierat, ännu inte publicerat
+## 2026-09-11: lokalt verifierat, publicerat 2026-09-16
 
 Användarens beställning: rätta egna recept i Allas, flytta Logga ut direkt under
 identiteten, ta bort namn/PIN-formulären från inloggning och Konto, förklara
