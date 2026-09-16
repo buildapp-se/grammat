@@ -73,7 +73,7 @@ async function until(check, label) {
   assert.equal(JSON.parse(backupText).state.recipes[0].title,'Alice pasta');
   assert.equal(alice.document.querySelector('[data-match="#/lista"]').textContent.trim(),'Lista');
   await navigate(alice, '#/lista', '.extra-form');
-  assert.equal(alice.document.querySelector('h1').textContent,'Handla');
+  assert.equal(alice.document.querySelector('h1').textContent,'Lista');
 
   await navigate(alice, '#/vanner', '#friendForm');
   let input=alice.document.querySelector('#friendName'); input.value='alice'; input.dispatchEvent(new alice.Event('input'));

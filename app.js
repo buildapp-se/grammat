@@ -359,17 +359,38 @@ if (typeof document !== 'undefined') (async function () {
 
   let pushTimer = null;
   let syncError = false;
+  let lastSynced = null; // senaste lyckade skrivning eller läsning mot servern
+  // Synkstatus för listan: bockar skrivs alltid lokalt först, servern får dem 800 ms senare.
+  function syncStatus() {
+    if (!loggedIn()) return { cls: '', text: 'Sparas i den här webbläsaren' };
+    if (!navigator.onLine || syncError) return { cls: 'is-offline', text: 'Offline · sparas lokalt, synkas sen' };
+    if (pushTimer) return { cls: '', text: 'Sparar…' };
+    if (lastSynced) return { cls: '', text: 'Synkad ' + lastSynced.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' }) };
+    return { cls: '', text: 'Synkad' };
+  }
+  function syncPill(allDone) {
+    const st = allDone ? { cls: 'is-ok', text: 'Allt klart' } : syncStatus();
+    return `<div class="pill ${st.cls}" id="syncPill"><i></i>${esc(st.text)}</div>`;
+  }
+  function updateSyncPill() {
+    const pill = $('#syncPill');
+    if (pill && !pill.classList.contains('is-ok')) pill.outerHTML = syncPill(false);
+  }
   function save(rerender = true) {
     localStorage.setItem('state', JSON.stringify(state));
     if (loggedIn()) {
       clearTimeout(pushTimer);
       pushTimer = setTimeout(async () => {
-        try { await api('/state', { method: 'PUT', body: JSON.stringify(state) }); syncError = false; }
+        try { await api('/state', { method: 'PUT', body: JSON.stringify(state) }); syncError = false; lastSynced = new Date(); }
         catch (e) { syncError = true; renderNav(); }
+        pushTimer = null;
+        updateSyncPill();
       }, 800);
     }
     if (rerender) render();
   }
+  window.addEventListener('online', () => { if (syncError && loggedIn()) save(false); updateSyncPill(); });
+  window.addEventListener('offline', updateSyncPill);
 
   async function pullState() {
     if (!loggedIn()) return;
@@ -379,6 +400,7 @@ if (typeof document !== 'undefined') (async function () {
       if (remote && Array.isArray(remote.recipes)) { state = normalizeState(remote); localStorage.setItem('state', JSON.stringify(state)); }
       else save(false); // nytt konto: ladda upp det lokala
       syncError = false;
+      lastSynced = new Date();
     } catch (e) {
       if (e.message === 'Inte inloggad.' || String(e.message).includes('401')) { legacy = null; localStorage.removeItem('auth'); }
       syncError = true;
@@ -742,52 +764,56 @@ if (typeof document !== 'undefined') (async function () {
     return lines.join('\n');
   }
 
+  let cartOpen = false; // "I vagnen" öppen eller hopfälld, överlever omrendering
   function viewList() {
     const items = aggregate(state.recipes, state.selections, state.struck);
     const byCat = {};
     for (const it of items) (byCat[it.cat] = byCat[it.cat] || []).push(it);
     const checked = new Set(state.checked);
+    // Mängden ligger direkt efter namnet i mono, så ögat slipper hoppa över raden.
+    const row = (key, name, qty, right, done) => `<label class="row${done ? ' done' : ''}">
+        <input type="checkbox" class="row-check" data-check="${esc(key)}"${done ? ' checked' : ''} aria-label="Bocka av ${esc(name)}">
+        <span class="row-name">${esc(name)}${qty ? `<span class="row-qty">${esc(qty)}</span>` : ''}</span>${right}
+      </label>`;
     let body = '';
+    const cart = [];
     for (const cat of CATS) {
       if (!byCat[cat]) continue;
+      const open = byCat[cat].filter(it => !checked.has(it.key)).sort((a, b) => a.name.localeCompare(b.name, 'sv'));
+      for (const it of byCat[cat]) if (checked.has(it.key)) cart.push(row(it.key, it.name, fmtItem(it), '', true));
+      if (!open.length) continue;
       body += `<div class="kvitto-cat">· · · ${esc(CAT_LABELS[cat].toUpperCase())} · · ·</div>`;
-      for (const it of byCat[cat].sort((a, b) => a.name.localeCompare(b.name, 'sv'))) {
-        const done = checked.has(it.key);
-        const srcs = it.sources.map(s => esc(s.title) + (s.amount != null ? ' ' + fmtNum(s.amount) + ' ' + esc(s.unit || '') : '')).join(' · ');
-        body += `<div class="kvitto-item${done ? ' done' : ''}">
-          <button class="kvitto-check" data-check="${esc(it.key)}" aria-label="Bocka av ${esc(it.name)}">${done ? '×' : ''}</button>
-          <details class="kvitto-name"><summary>${esc(it.name)}</summary><div class="kvitto-src">${srcs}</div></details>
-          <span class="kvitto-amount">${esc(fmtItem(it))}</span>
-        </div>`;
-      }
+      for (const it of open) body += row(it.key, it.name, fmtItem(it), '', false);
     }
-    if (state.extras.length) {
+    const extraRight = ex => `<span class="row-tag">EGEN</span><button type="button" class="row-del" data-del-extra="${esc(ex.id)}" aria-label="Ta bort ${esc(ex.text)}">✕</button>`;
+    const openExtras = state.extras.filter(ex => !checked.has('extra:' + ex.id));
+    for (const ex of state.extras) if (checked.has('extra:' + ex.id)) cart.push(row('extra:' + ex.id, ex.text, '', extraRight(ex), true));
+    if (openExtras.length) {
       body += '<div class="kvitto-cat">· · · EGNA RADER · · ·</div>';
-      for (const ex of state.extras) {
-        const done = checked.has('extra:' + ex.id);
-        body += `<div class="kvitto-item${done ? ' done' : ''}">
-          <button class="kvitto-check" data-check="extra:${esc(ex.id)}" aria-label="Bocka av ${esc(ex.text)}">${done ? '×' : ''}</button>
-          <span class="kvitto-name">${esc(ex.text)}</span>
-          <button class="kvitto-del" data-del-extra="${esc(ex.id)}" aria-label="Ta bort ${esc(ex.text)}">🗑</button>
-        </div>`;
-      }
+      for (const ex of openExtras) body += row('extra:' + ex.id, ex.text, '', extraRight(ex), false);
     }
     const total = items.length + state.extras.length;
-    const doneCount = state.checked.length;
-    const recipesLine = state.selections.map(s => { const r = state.recipes.find(x => x.id === s.id); return r ? esc(r.title) + ' × ' + s.portions : ''; }).filter(Boolean).join('<br>');
-    return `<div class="view-head"><h1>Handla</h1></div>
-      ${total === 0 ? '<p class="empty">Listan är tom. Lägg recept i listan under Recept.</p>' : `
-      <div class="kvitto">
-        <div class="kvitto-head">GRAMMAT<br>${new Date().toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-        <div class="kvitto-recipes">${recipesLine}</div>
+    const left = total - cart.length;
+    const recipeRows = state.selections.map(sel => {
+      const r = state.recipes.find(x => x.id === sel.id);
+      return r ? `<a class="list-recipe" href="#/recept/${esc(r.id)}"><span class="t">${esc(r.title)}</span><span class="p">${sel.portions} port ›</span></a>` : '';
+    }).join('');
+    const cartHtml = cart.length ? `<details class="cart" id="cart"${cartOpen ? ' open' : ''}>
+        <summary><span><span class="tick">✓</span>I vagnen</span><span class="n">${cart.length} · ${cartOpen ? 'dölj' : 'visa'}</span></summary>
+        ${cart.join('')}
+      </details>` : '';
+    return `<div class="list-head"><h1>Lista</h1>${total ? `<span class="list-count">${left} kvar av ${total}</span>` : ''}</div>
+      ${syncPill(total > 0 && left === 0)}
+      ${total === 0 ? '<div class="empty-state"><div class="empty-title">Listan är tom</div><p>Lägg recept i listan från Recept, eller skriv en egen rad nedan.</p></div>' : `
+      <div class="list">
+        ${recipeRows}
         ${body}
-        <div class="kvitto-foot">SUMMA: ${total} varor · ${doneCount} avbockade</div>
+        ${cartHtml}
       </div>`}
-      <form class="extra-form" id="extraForm">
-        <input type="text" id="extraText" placeholder="Egen rad, t.ex. mjölk eller toapapper" maxlength="80" required>
-        <button class="btn" type="submit">Lägg till</button>
-      </form>
-      ${total > 0 ? '<p class="action-row"><button class="btn btn-ghost" id="copyList" type="button">Kopiera listan</button> <button class="btn btn-danger" id="clearList">Töm listan</button></p>' : ''}`;
+      <form class="extra-form extra-fixed" id="extraForm">
+        <input type="text" id="extraText" placeholder="Egen rad, t.ex. mjölk" maxlength="80" required aria-label="Egen rad">
+        <button class="btn extra-add" type="submit" aria-label="Lägg till raden">+</button>
+      </form>`;
   }
 
   function viewEditor(id) {
@@ -1049,6 +1075,8 @@ if (typeof document !== 'undefined') (async function () {
     user.setAttribute('aria-label', loggedIn() ? 'Konto: ' + (name || fbUser?.email || '') : 'Logga in');
     $('#tagline').hidden = !(h === '#/' && !loggedIn());
     $('#headNew').hidden = h !== '#/';
+    $('#headMore').hidden = !headMoreItems;
+    document.body.classList.toggle('has-fixed-form', h === '#/lista');
     document.querySelectorAll('.nav a').forEach(a => {
       const m = a.dataset.match;
       let active;
@@ -1066,8 +1094,13 @@ if (typeof document !== 'undefined') (async function () {
     });
   }
 
+  // Vyn som ritas kan lägga sina sekundära val (Kopiera, Töm …) bakom ··· i headern.
+  let headMoreItems = null;
+  function setHeadMore(html, title) { headMoreItems = html ? { html, title } : null; }
+
   function render() {
     const h = location.hash || '#/';
+    headMoreItems = null;
     const m = h.match(/^#\/(recept|redigera)\/(.+)$/);
     const userMatch = h.match(/^#\/anvandare\/(\d+)$/);
     const joinMatch = h.match(/^#\/join\/([A-Z0-9]{6,16})$/);
@@ -1078,7 +1111,7 @@ if (typeof document !== 'undefined') (async function () {
     else if (joinMatch) html = viewJoin(joinMatch[1]);
     else if (h === '#/nytt') html = viewEditor(null);
     else if (h === '#/importera') html = viewImport();
-    else if (h === '#/lista') html = viewList();
+    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
     else if (h === '#/konto') html = viewAccount();
     else if (h === '#/vanner') html = viewFriends();
     else if (h === '#/allas') html = viewAllasRecept();
@@ -1220,11 +1253,14 @@ if (typeof document !== 'undefined') (async function () {
       save();
     });
 
-    view.querySelectorAll('[data-check]').forEach(b => b.onclick = () => {
+    view.querySelectorAll('[data-check]').forEach(b => b.onchange = () => {
       const k = b.dataset.check;
       state.checked = state.checked.includes(k) ? state.checked.filter(x => x !== k) : [...state.checked, k];
+      if (navigator.vibrate) navigator.vibrate(30); // kvitto i handen när man inte tittar
       save();
     });
+    const cart = $('#cart');
+    if (cart) cart.ontoggle = () => { cartOpen = cart.open; cart.querySelector('.n').textContent = cart.querySelectorAll('.row').length + ' · ' + (cartOpen ? 'dölj' : 'visa'); };
     view.querySelectorAll('[data-del-extra]').forEach(b => b.onclick = () => {
       state.extras = state.extras.filter(x => String(x.id) !== b.dataset.delExtra);
       state.checked = state.checked.filter(k => k !== 'extra:' + b.dataset.delExtra);
@@ -1234,19 +1270,6 @@ if (typeof document !== 'undefined') (async function () {
     if (extraForm) extraForm.onsubmit = e => {
       e.preventDefault();
       state.extras.push({ id: Date.now(), text: $('#extraText').value.trim() });
-      save();
-    };
-    const copyListBtn = $('#copyList');
-    if (copyListBtn) copyListBtn.onclick = async () => {
-      try { await navigator.clipboard.writeText(listAsText()); copyListBtn.textContent = 'Kopierad!'; }
-      catch (e) { copyListBtn.textContent = 'Kunde inte kopiera'; }
-      setTimeout(() => { copyListBtn.textContent = 'Kopiera listan'; }, 2500);
-    };
-    const clearBtn = $('#clearList');
-    if (clearBtn) clearBtn.onclick = () => {
-      if (!confirm('Töm hela listan?')) return;
-      for (const s of state.selections) delete state.struck[s.id]; // recepten lämnar listan: nollställ bockar
-      state.selections = []; state.extras = []; state.checked = [];
       save();
     };
 
@@ -1456,6 +1479,26 @@ if (typeof document !== 'undefined') (async function () {
     };
   }
 
+  // Knapparna i ···-menyn. Töm listan skriver inte mot servern förrän ångra-fönstret (6 s) gått ut.
+  function bindSheet() {
+    const copyListBtn = $('#copyList');
+    if (copyListBtn) copyListBtn.onclick = async () => {
+      closeSheet();
+      try { await navigator.clipboard.writeText(listAsText()); toast('Listan kopierad'); }
+      catch (e) { toast('Kunde inte kopiera'); }
+    };
+    const clearBtn = $('#clearList');
+    if (clearBtn) clearBtn.onclick = () => {
+      closeSheet();
+      const before = { selections: state.selections, extras: state.extras, checked: state.checked, struck: state.struck };
+      state.selections = []; state.extras = []; state.checked = []; state.struck = {};
+      render();
+      toast('Listan tömd', { ms: 6000, action: 'Ångra',
+        onAction: () => { Object.assign(state, before); render(); },
+        onTimeout: () => save(false) });
+    };
+  }
+
   // Firebase startas efter första renderingen. onAuthStateChanged fyller på när den
   // persisterade sessionen återställts; hade man kvar en legacy-inloggning kopplas den
   // gamla kontoraden automatiskt till Firebase-uid:t (engångsuppgradering).
@@ -1480,6 +1523,11 @@ if (typeof document !== 'undefined') (async function () {
     });
   }
 
+  $('#headMore').onclick = () => {
+    if (!headMoreItems) return;
+    openSheet(headMoreItems.html + '<button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>', headMoreItems.title);
+    bindSheet();
+  };
   $('#headNew').onclick = e => {
     e.preventDefault();
     openSheet(`<a class="sheet-item" href="#/nytt">Skriv själv</a>
