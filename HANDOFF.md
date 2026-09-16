@@ -7,7 +7,7 @@ blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
   - Automatisk godkännandegranskning nekade D1-exporten 2026-09-11 eftersom den innehåller privata konto- och receptuppgifter. Inget har publicerats
-reviewedAt: 2026-09-11
+reviewedAt: 2026-09-16
 ---
 
 # Handoff
@@ -93,3 +93,7 @@ Läget för nästa session (människa eller agent). Arkitektur i `docs/PROJECT.m
 - **PowerShell 5.1**: citattecken i `git commit -m` mangalas, använd Bash-verktyget eller `-F fil`. `app.js` och `index.html` är CRLF på disk, `test.js` LF.
 - **wrangler 4.107.1 är trasig på den här maskinen** (workerd kraschar med `std::terminate`). Pinna `npx wrangler@4.108.0`.
 - **Dataobservation 2026-07-08**: julia/hans state krympte (12→0 resp. 11→1 recept), troligen avsiktligt. Återställning: `backups/recept-2026-07-07-145724.sql`.
+
+## Granskning 2026-09-16
+
+Cross-project audit run from elwyn-dash (session 5 in the daily note). Results written to `## Audits` in CONTEXT.md, findings appended to BACKLOG.md under `## Granskning 2026-09-16`. Headers on buildapp.se and the TLS grade are zone-level and are fixed once in Cloudflare, not here.

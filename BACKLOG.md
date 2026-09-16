@@ -43,3 +43,9 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 - [ ] Fler recept ur `recept 2.mht`. Pausad på begäran.
 - [ ] Timer i bakgrundsflik: larmet kan dröja och vibration utebli när fliken inte
   är aktiv. Notification API via service worker om det visar sig störa i köket.
+
+## Granskning 2026-09-16
+
+Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, headers, TLS, OWASP). Mätvärdena står under `## Audits` i CONTEXT.md.
+
+- [ ] `[P3]` UX, Fitts: logotyplänken "grammat." är 31 px hög på telefon, konventionen är 44 px.
