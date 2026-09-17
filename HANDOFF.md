@@ -11,6 +11,42 @@ reviewedAt: 2026-09-16
 
 # Handoff
 
+## 2026-09-16 kväll: designgenomlysningen AP1 till AP7 byggd på branchen `design-genomlysning`
+
+Claude Designs genomlysning (15 fynd, sju arbetspaket, mockups A till G) är
+implementerad som ett paket per commit i byggordningen AP1 → AP2 → AP3 → AP5 →
+AP4 → AP7 → AP6. Allt under "Fungerar redan, lämnas ifred" är orört: gram med
+styckmängd i parentes, avdelningarna i listan, siffran i fliken, summering,
+sök, egna rader, kopiera listan, wake lock, timer med ljud, vänförfrågningar,
+hemliga recept, stryk-på-tryck, timerchips, näringsrad, AI-import, backup,
+paletten och logotypen. Inga ändringar i `worker/`.
+
+**Avvikelser från underlaget, medvetna:**
+
+- Underlaget antar Firestore (`enableIndexedDbPersistence`). Backend är D1 via
+  workern, så synkpillen i Lista bygger på appens egen kö (localStorage först,
+  `PUT /state` 800 ms senare), `navigator.onLine` och online/offline-händelser.
+  Misslyckad skrivning görs om när nätet kommer tillbaka. Service worker för
+  själva appskalet offline är fortfarande "kanske senare" i BACKLOG.
+- Enheten "st" i ingrediensformuläret är inte med: datamodellen räknar i g/ml
+  (lämnas ifred) och styckantal finns som tredje raden "Ungefär N st".
+- Google Fonts-länken är borta (systemtypsnitt enligt AP1). `integritet.html`
+  laddar dem fortfarande själv, så policytexten stämmer, men den sidan är inte
+  omstylad.
+- Källraden per vara i listan (vilka recept som bidrar) försvann när hela raden
+  blev tryckyta. Summeringen finns kvar, bara inte uppdelningen.
+- Google-knappen har appens ram (AP7) i stället för Googles vita branding.
+
+Verifierat: `node --check app.js`, `node test.js`, `node test-ui.cjs` gröna
+efter varje paket (DOM-testet uppdaterat för ny nav, Lista, sheet och
+#/hej-sidan). Skärmbilder i Playwright 375 px av alla vyer mot stubbat API.
+**Inte verifierat:** riktig telefon (vibration, wake lock-texten, svep i
+köksläget, navigator.share), Firebase-inloggning via #/hej-sidan i produktion.
+
+Versionsfrågan är `app.js?v=ap6-20260916`. Nästa steg: merge till main
+(= deploy), öppna appen på mobilen, ta skärmbilder och skicka till Claude
+Design för andra genomgången.
+
 ## 2026-09-16: manuella timrar ritas vid sitt fält
 
 Manuella timrar (fältet under stegen) ritades av `timerBar()` högst upp i receptvyn,

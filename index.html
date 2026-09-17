@@ -13,142 +13,301 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#EAEDDF">
+<meta name="theme-color" content="#EFEEE3">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=Spline+Sans+Mono:wght@400;600&family=Roboto:wght@500&display=swap">
 <style>
 :root{
-  --papper:#EAEDDF;      /* blekt örtgrönt papper */
-  --ink:#20281A;         /* djup grytgrön, nästan svart */
-  --ink2:#5C5A4E;        /* dämpad text (WCAG AA mot kvitto/papper) */
-  --lin:#CDD3BC;         /* linjer, ramar */
-  --lingon:#9E2B3E;      /* primär accent, knappar */
-  --gron:#2E6B43;        /* markering, avbockat (mörk pinjegrön) */
-  --strykt:#6B6858;      /* överstruken/avbockad text */
-  --kvitto:#FBFAF2;      /* kvittopapper */
-  --font-display:'Bricolage Grotesque',sans-serif;
-  --font-body:'Schibsted Grotesk',sans-serif;
-  --font-mono:'Spline Sans Mono',monospace;
+  --bg:#EFEEE3;          /* krämvit bakgrund */
+  --card:#FBFAF4;        /* kort, fält, kvitto */
+  --ink:#1B1A15;         /* bläck: text, ramar, primära knappar */
+  --muted:#6B675C;       /* dämpad text, minst 4,6:1 mot kort */
+  --line:#D9D6C6;        /* streckade avdelare, inaktiva segment */
+  --accent:#9A2A3A;      /* burgundy: logotyp, badge, aktiv timer */
+  --ok:#3E6B3A;          /* klart, avbockat, sparat */
+  --warn:#B8860B;        /* offline */
+  --serif:"Iowan Old Style","Palatino Linotype",Charter,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:12px;              /* radie på knappar och fält, kort 14 px */
+  --tap:44px;            /* minsta tryckyta */
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{font-family:var(--font-body);background:var(--papper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);font-size:17px;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+@media(min-width:600px){body{font-size:16px}}
 a{color:inherit}
-button{font:inherit;cursor:pointer}
-.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 6rem}
-.site-foot{margin-top:2rem;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
-.site-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--lin);display:inline-flex;align-items:center;min-height:44px}
-.site-foot a:hover{color:var(--lingon);border-color:var(--lingon)}
-header.brand{padding:1.5rem 0 .5rem}
-.wordmark{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,7vw,2.6rem);line-height:1.02;letter-spacing:-.03em;display:inline-flex;align-items:center;min-height:44px;color:var(--ink);text-decoration:none}
-.wordmark em{font-style:normal;color:var(--lingon)}
-.tagline{font-family:var(--font-mono);font-size:.72rem;color:var(--ink2);letter-spacing:.08em;text-transform:uppercase;margin-top:.35rem}
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);display:flex;justify-content:center;gap:0;z-index:10;padding-bottom:env(safe-area-inset-bottom)}
-.nav a{flex:1;max-width:214px;text-align:center;padding:.9rem .5rem;color:rgba(234,237,223,.6);text-decoration:none;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-top:3px solid transparent}
-.nav a.active{border-top-color:var(--gron);color:#fff;font-weight:700;background:rgba(255,255,255,.07)}
-.nav a:focus-visible{outline:2px solid var(--papper);outline-offset:-4px}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding:.75rem 1.25rem 88px}
+.site-foot{margin-top:2rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.site-foot a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);display:inline-flex;align-items:center;min-height:var(--tap)}
+.site-foot a:hover{color:var(--accent);border-color:var(--accent)}
+header.brand{padding:.4rem 0 0}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:var(--tap)}
+.wordmark{font-family:var(--sans);font-weight:800;font-size:20px;line-height:1;letter-spacing:-.02em;display:inline-flex;align-items:center;min-height:var(--tap);color:var(--ink);text-decoration:none}
+.wordmark em{font-style:normal;color:var(--accent)}
+.tagline{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.1rem}
+.head-actions{display:flex;align-items:center;gap:8px}
+.head-new{padding:0 14px}
+.head-more{width:var(--tap);height:var(--tap);display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card);font-size:18px;letter-spacing:.1em;padding-left:.1em}
+.head-user{display:inline-flex;align-items:center;justify-content:center;min-width:var(--tap);height:var(--tap);padding:0 12px;border-radius:var(--r);background:var(--ink);color:var(--card);font-family:var(--mono);font-size:14px;text-decoration:none}
+.head-user.is-guest{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);font-family:var(--sans);font-weight:600;padding:0 14px}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--card);border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.nav a{height:52px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;color:#3A372F;text-decoration:none;white-space:nowrap;border-radius:var(--r)}
+.nav a.active{background:var(--ink);color:var(--card)}
+.nav-badge{background:var(--accent);color:var(--card);border-radius:999px;font-family:var(--mono);font-weight:400;font-size:11px;line-height:1.4;padding:1px 7px}
+.nav a:focus-visible{outline-offset:-3px}
 main{padding-top:1rem}
 .view-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:1.2rem 0 1rem;flex-wrap:wrap}
-h1{font-family:var(--font-display);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;line-height:1.1}
-h2{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin:1.6rem 0 .6rem}
-.btn{display:inline-block;background:var(--lingon);color:#fff;border:2px solid var(--lingon);border-radius:8px;padding:.5em 1.1em;font-weight:700;font-size:.95rem;text-decoration:none;transition:transform .12s ease}
+h1{font-family:var(--serif);font-weight:500;font-size:30px;letter-spacing:-.01em;line-height:1.15;text-wrap:pretty}
+h2,.label{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:1.6rem 0 .6rem}
+h3{font-size:1rem;font-weight:600;margin:1.2rem 0 .4rem}
+.meta,.qty{font-family:var(--mono);color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:var(--tap);background:var(--accent);color:var(--card);border:1.5px solid var(--accent);border-radius:var(--r);padding:.4em 1.1em;font-weight:600;font-size:15px;line-height:1.2;text-decoration:none;transition:transform .12s ease}
 .btn:hover{transform:translateY(-1px)}
-.btn:focus-visible,.kvitto-check:focus-visible,.stepper button:focus-visible{outline:3px solid var(--gron);outline-offset:2px}
-.btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
-.btn-danger{background:transparent;color:var(--lingon);border-color:var(--lingon)}
-/* Google-knappen följer developers.google.com/identity/branding-guidelines (ljust tema): vit, 1 px #747775, färgad G-logga, 12 px före loggan, 10 px efter. */
-.gsi{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 12px;background:#fff;color:#1f1f1f;border:1px solid #747775;border-radius:20px;font-family:Roboto,var(--font-body);font-weight:500;font-size:14px;line-height:20px;letter-spacing:.25px}
-.gsi:hover{background:#f6f6f6}
+.btn-ghost{background:var(--card);color:var(--ink);border-color:var(--ink)}
+.btn-ink{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.btn-danger{background:var(--card);color:var(--accent);border-color:var(--accent)}
+/* Google-knappen: G-loggan enligt developers.google.com/identity/branding-guidelines, ramen som övriga knappar. */
+.gsi{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--tap);padding:0 14px;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:var(--r);font-weight:600;font-size:15px}
+.gsi:hover{background:#fff}
 .gsi-logo{width:20px;height:20px;flex:none}
 .search{margin:-.2rem 0 1.2rem}
-.search input{width:100%}
-.timer-btn{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:999px;padding:.05em .6em;font-size:.8rem;white-space:nowrap;vertical-align:middle}
-.timer-form{display:flex;gap:.6rem;align-items:center;margin-top:1rem}
-.timer-form input{width:8rem}
-.timers{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
-.timer{display:inline-flex;align-items:center;gap:.5rem;background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:.15rem .55rem;font-family:var(--font-mono);font-size:.85rem;vertical-align:middle;white-space:nowrap}
-.timers .timer{padding:.35rem .7rem;font-size:.9rem}
-.timer.done{background:var(--lingon);color:#fff;border-color:var(--lingon)}
-.timer button{background:none;border:none;color:inherit;font-size:1rem;padding:0 .2rem}
-.cards{display:grid;gap:.9rem}
-.card{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:1rem 1.1rem;display:flex;flex-direction:column}
+.search input{width:100%;min-height:48px;border-radius:14px}
+/* timerchips i stegtexten: bläck i vila, accent när de räknar ner och när de är klara.
+   ::before ger 44 px tryckyta utan att chippet växer i texten. */
+.timer-btn,.timer{position:relative;display:inline-flex;align-items:center;gap:.4em;background:var(--ink);color:var(--card);border:1.5px solid var(--ink);border-radius:999px;padding:1px 10px;font-family:var(--mono);font-size:14px;line-height:1.5;white-space:nowrap;vertical-align:middle}
+.timer-btn::before{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+.timer{background:var(--accent);border-color:var(--accent)}
+.timer.done strong{font-weight:700}
+.timer button{background:none;border:none;color:inherit;font-size:14px;padding:0 0 0 2px;min-width:28px;min-height:28px;margin-right:-8px}
+.cook .timer-btn,.cook .timer{font-size:18px;padding:2px 12px}
+.cards{display:grid;gap:.6rem}
+.card{background:var(--card);border-radius:14px;padding:1rem 1.1rem;display:flex;flex-direction:column}
 .card[data-card]{cursor:pointer}
-.card-title{font-family:var(--font-display);font-weight:700;font-size:1.2rem;text-decoration:none;display:block}
-.card-title:hover{color:var(--lingon)}
-.card-meta{font-family:var(--font-mono);font-size:.75rem;color:var(--ink2);margin:.15rem 0 .7rem}
+.card-title{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.2;text-decoration:none;display:block}
+.card-title:hover{color:var(--accent)}
+.card-meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin:.25rem 0 .7rem}
 .card-row{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:auto;padding-top:.9rem}
-.stepper{display:inline-flex;align-items:center;gap:.15rem;border:1.5px solid var(--ink);border-radius:8px;background:#fff}
-.stepper button{width:2.2rem;height:2.2rem;background:none;border:none;font-size:1.2rem;font-weight:700;color:var(--ink)}
-.stepper span{font-family:var(--font-mono);font-size:.85rem;min-width:4.5em;text-align:center}
+/* receptkortet: hela kortet är länken (utsträckt via ::after), knappen ligger ovanpå. Höjden ändras aldrig. */
+.rcard{position:relative;flex-direction:row;align-items:center;gap:12px;padding:16px;min-height:72px}
+.rcard-link{flex:1;min-width:0;text-decoration:none;color:inherit}
+.rcard-link::after{content:'';position:absolute;inset:0;border-radius:14px}
+.rcard-link .card-title{display:block}
+.rcard-link .card-meta{display:block;margin:4px 0 0}
+.rcard-btn{position:relative;z-index:1;flex:none;width:var(--tap);height:var(--tap);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card);color:var(--ink);font-size:22px;line-height:1}
+.rcard-btn.is-on{background:var(--ok);border-color:var(--ok);color:var(--card);font-size:16px}
+.empty-state{margin:1.4rem 0}
+.empty-title{font-family:var(--serif);font-size:22px;line-height:1.2;margin-bottom:.4rem}
+.empty-state p{color:var(--muted)}
+/* toast ovanför naven */
+.toast{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--card);border-radius:var(--r);padding:8px 8px 8px 16px;font-size:15px;box-shadow:0 6px 24px rgba(27,26,21,.25)}
+.toast-text{flex:1;min-width:0;padding:6px 0}
+.toast-action{background:none;border:none;color:var(--card);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 10px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;border-radius:8px}
+/* sheet: liten meny nerifrån på mobil, dialog i mitten på större skärm */
+.sheet{position:fixed;inset:0;z-index:30}
+.sheet-back{position:absolute;inset:0;background:rgba(27,26,21,.45)}
+.sheet-panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:20px 20px 0 0;padding:12px 12px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto}
+.sheet-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:8px 12px 10px}
+.sheet-item{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 12px;border:none;border-radius:var(--r);background:none;color:var(--ink);font-size:17px;font-weight:600;text-align:left;text-decoration:none}
+.sheet-item:hover{background:var(--bg)}
+.sheet-item.is-danger{color:var(--accent)}
+.sheet-item small{font-weight:400;font-size:14px;color:var(--muted)}
+.sheet-item.is-stacked{flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px}
+.sheet-item.is-stacked small{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}
+.sheet-cancel{width:100%;margin-top:6px}
+.sheet-panel form{padding:4px 12px 0}
+@media(min-width:700px){
+  .toast{left:auto;right:24px;bottom:24px;max-width:420px}
+  .sheet-panel{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:400px;border-radius:16px;padding-bottom:16px}
+}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card)}
+.stepper button{width:var(--tap);height:var(--tap);background:none;border:none;font-size:20px;color:var(--ink)}
+.stepper span{font-family:var(--mono);font-size:15px;padding:0 6px;white-space:nowrap;text-align:center}
 .portion-bar{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.5rem}
-.ing-table{width:100%;border-collapse:collapse;background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;overflow:hidden}
-.ing-table td{padding:.45rem .8rem;border-bottom:1px solid var(--lin);font-size:.95rem}
+.ing-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden}
+.ing-table td{padding:.5rem .9rem;border-bottom:1px dashed var(--line);font-size:16px}
 .ing-table tr:last-child td{border-bottom:none}
-.ing-table .num{text-align:right;font-family:var(--font-mono);font-size:.85rem;white-space:nowrap}
+.ing-table .num{text-align:right;font-family:var(--mono);font-size:14px;color:#3A372F;white-space:nowrap}
 .ing-row[data-ing]{cursor:pointer}
-.ing-row.struck td{text-decoration:line-through;color:var(--strykt)}
-.ing-row .tick{display:inline-block;color:var(--gron);font-weight:700;margin-right:.4rem}
-.ing-group td{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);padding-top:.9rem}
-.steps{padding-left:1.3rem;display:grid;gap:.55rem}
-.steps li::marker{font-family:var(--font-mono);font-weight:600;color:var(--lingon)}
-.source{margin-top:1rem;font-size:.85rem;color:var(--ink2)}
-.empty{color:var(--ink2);margin:1.2rem 0}
-.warn{color:var(--lingon);font-weight:500}
-.hint{font-size:.85rem;color:var(--ink2);margin:.3rem 0 .8rem}
+.ing-row[data-ing] td{min-height:var(--tap)}
+.ing-row.struck td{text-decoration:line-through;color:var(--muted)}
+.ing-row .tick{display:inline-block;color:var(--ok);font-weight:700;margin-right:.4rem}
+.ing-group td{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-top:.9rem}
+.steps{padding-left:1.4rem;display:grid;gap:.7rem;font-size:17px;line-height:1.45}
+.steps li::marker{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.source{margin-top:1rem;font-size:.85rem;color:var(--muted)}
+.empty{color:var(--muted);margin:1.2rem 0}
+.warn{color:var(--accent);font-weight:500}
+.hint{font-size:.85rem;color:var(--muted);margin:.3rem 0 .8rem}
 
-/* ---- signaturen: kvittot ---- */
-.kvitto{background:var(--kvitto);font-family:var(--font-mono);border:1px solid var(--lin);border-radius:2px;padding:1.4rem 1.1rem;box-shadow:0 2px 10px rgba(32,40,26,.08);position:relative}
-.kvitto::before,.kvitto::after{content:'';position:absolute;left:0;right:0;height:8px;background:linear-gradient(-45deg,transparent 33.33%,var(--kvitto) 33.33%,var(--kvitto) 66.67%,transparent 66.67%),linear-gradient(45deg,transparent 33.33%,var(--kvitto) 33.33%,var(--kvitto) 66.67%,transparent 66.67%);background-size:12px 16px}
-.kvitto::before{top:-8px;transform:rotate(180deg)}
-.kvitto::after{bottom:-8px}
-.kvitto-head{text-align:center;font-size:.78rem;letter-spacing:.14em;border-bottom:1px dashed var(--ink2);padding-bottom:.8rem}
-.kvitto-recipes{text-align:center;font-size:.72rem;color:var(--ink2);padding:.6rem 0;border-bottom:1px dashed var(--ink2)}
-.kvitto-cat{font-size:.7rem;letter-spacing:.14em;color:var(--ink2);text-align:center;margin:1rem 0 .3rem}
-.kvitto-item{display:flex;align-items:baseline;gap:.6rem;padding:.3rem 0;font-size:.86rem}
-.kvitto-check{width:1.35rem;height:1.35rem;flex-shrink:0;align-self:center;border:1.5px solid var(--ink);border-radius:4px;background:#fff;font-weight:600;line-height:1;color:var(--lingon)}
-.kvitto-item.done .kvitto-check{background:var(--gron);border-color:var(--gron);color:#fff}
-.kvitto-name{flex:1;min-width:0}
-.kvitto-name summary{list-style:none;cursor:pointer}
-.kvitto-name summary::-webkit-details-marker{display:none}
-.kvitto-item.done .kvitto-name summary,.kvitto-item.done>span.kvitto-name{text-decoration:line-through;color:var(--strykt)}
-.kvitto-src{font-size:.72rem;color:var(--ink2);padding:.2rem 0 .3rem}
-.kvitto-amount{font-size:.8rem;white-space:nowrap;text-align:right}
-.kvitto-item.done .kvitto-amount{color:var(--strykt)}
-.kvitto-del{background:none;border:none;font-size:.9rem;opacity:.6}
-.kvitto-foot{border-top:1px dashed var(--ink2);margin-top:1rem;padding-top:.8rem;text-align:center;font-size:.78rem;letter-spacing:.1em}
+/* ---- signaturen: kvittot, nu som lista i butiksläge ---- */
+.list-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:1.2rem 0 .6rem}
+.list-count{font-family:var(--mono);font-size:13px;color:#3A372F;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#E2E0D2;font-family:var(--mono);font-size:12px;color:#3A372F;margin-bottom:14px}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.pill.is-offline i{background:var(--warn)}
+.pill.is-ok{background:var(--ok);color:var(--card)}
+.pill.is-ok i{background:var(--card)}
+.list{background:var(--card);border-radius:14px;padding:4px 0 8px}
+.list-recipe{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 16px;min-height:44px;border-bottom:1px dashed var(--line);text-decoration:none}
+.list-recipe .t{font-family:var(--serif);font-size:16px;line-height:1.25}
+.list-recipe .p{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.kvitto-cat{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-align:center;padding:14px 16px 4px}
+.row{display:flex;align-items:center;gap:14px;padding:0 16px;min-height:52px;margin:0;font-weight:400;font-size:17px;cursor:pointer;line-height:1.3}
+.row .row-check{width:28px;height:28px;border-radius:8px;margin:0}
+.row-name{flex:1;min-width:0}
+.row-qty{font-family:var(--mono);font-size:14px;color:var(--muted);margin-left:.45em}
+.row-tag{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.row.done{color:var(--muted)}
+.row.done .row-name{text-decoration:line-through}
+.row-del{width:var(--tap);height:var(--tap);flex:none;margin-right:-10px;background:none;border:none;color:var(--muted);font-size:18px;border-radius:10px}
+.cart{margin:8px 12px 4px;background:var(--bg);border-radius:10px}
+.cart summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:8px 14px;cursor:pointer;font-size:15px}
+.cart summary::-webkit-details-marker{display:none}
+.cart summary .tick{width:22px;height:22px;border-radius:6px;background:var(--ok);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:13px;margin-right:10px;vertical-align:middle}
+.cart summary .n{font-family:var(--mono);font-size:13px;color:#3A372F}
+.cart .row{padding:0 10px}
+/* fältet för egna rader ligger fast ovanför naven på mobil */
+.extra-form{display:flex;gap:10px;align-items:center}
+.extra-form input{flex:1;min-width:0;height:52px;border-radius:14px}
+.extra-add{width:52px;height:52px;flex:none;border-radius:14px;padding:0;font-size:26px;line-height:1}
+.extra-fixed{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom));z-index:9;padding:10px 16px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.has-fixed-form .wrap{padding-bottom:168px}
+.has-fixed-form .toast{bottom:calc(160px + env(safe-area-inset-bottom))}
 
+/* ---- receptvyn ---- */
+.rv-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:.4rem 0 1rem}
+.rv-top .btn{padding:0 14px;font-size:14px}
+.rv-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rv-title{margin:6px 0 0}
+.rv-portions{display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start}
+.rv-portions .meta{font-size:13px}
+.rv-actions{display:flex;gap:8px;margin-top:12px}
+.rv-actions .btn{flex:1;min-height:48px;padding:0 8px;white-space:nowrap}
+.rv-actions .btn.is-on{border-color:var(--ok);color:var(--ok)}
+.rv-card{margin-top:20px;padding:14px 16px}
+.rv-card .label,.rv-steps .label{margin:0 0 8px}
+.rv-card .hint{margin:0 0 6px}
+.rv-card .ing-table{border-radius:0}
+.rv-card .ing-table td{padding:6px 0}
+.rv-steps{margin-top:22px}
+.rv-steps .steps{padding-left:1.6rem;gap:1rem}
+.rv-steps .hint{margin-top:1rem}
+/* ---- köksläget: ett steg per skärm ---- */
+.is-cooking header.brand,.is-cooking .site-foot{display:none}
+.is-cooking .wrap{padding:0 0 1rem;max-width:none}
+.is-cooking main{padding-top:0}
+.cook{min-height:100dvh;display:flex;flex-direction:column;background:var(--card);touch-action:pan-y}
+.cook-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px}
+.cook-top .btn{padding:0 14px;font-size:14px}
+.cook-top .rv-kicker{text-align:center;flex:1;min-width:0}
+.cook-portions{font-family:var(--mono);font-weight:400}
+.cook-title{font-family:var(--serif);font-size:20px;line-height:1.2;color:#3A372F;padding:8px 20px 0}
+.progress{display:flex;gap:5px;padding:12px 20px 0}
+.progress i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.progress i.done{background:var(--ink)}
+.progress i.now{background:var(--accent)}
+.cook-ings{margin:20px 20px 0;padding:14px 16px;background:var(--bg);border-radius:12px}
+.cook-ings .label{margin:0 0 8px}
+.cook-ings div{display:flex;justify-content:space-between;gap:12px;font-size:17px;padding:2px 0}
+.cook-ings .qty{font-family:var(--mono);color:#3A372F;white-space:nowrap}
+.cook-step{padding:24px 20px 0;flex:1}
+.cook-stepno{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--accent);margin-bottom:10px}
+.cook-text{font-size:24px;line-height:1.4;text-wrap:pretty}
+.cook-step .hint{margin-top:24px;font-size:14px}
+.cook-nav{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:16px 16px calc(20px + env(safe-area-inset-bottom));border-top:1.5px dashed var(--line);margin-top:16px}
+.cook-nav .btn{min-height:60px;font-size:17px;border-radius:14px}
+.cook-nav .btn[aria-disabled=true]{opacity:.35;pointer-events:none}
+@media(min-width:700px){.cook{max-width:560px;margin:0 auto;min-height:0;border-radius:20px;margin-top:2rem}.is-cooking .wrap{padding:0 1.25rem 2rem}}
 .howto{margin-bottom:1.2rem}
 .prompt-box{margin:1rem 0}
-.prompt-box summary{cursor:pointer;font-weight:500}
-.prompt-box pre{background:var(--kvitto);border:1.5px solid var(--ink);border-radius:10px;padding:1rem;font-family:var(--font-mono);font-size:.72rem;white-space:pre-wrap;overflow-x:auto;margin-top:.6rem}
-.extra-form{display:flex;gap:.6rem;margin-top:1.2rem}
+.prompt-box summary{cursor:pointer;font-weight:500;min-height:var(--tap);display:flex;align-items:center}
+.prompt-box pre{background:var(--card);border-radius:14px;padding:1rem;font-family:var(--mono);font-size:.72rem;white-space:pre-wrap;overflow-x:auto;margin-top:.6rem}
 .action-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem}
-.extra-form input{flex:1}
 .backup-actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
 .friend-list{list-style:none;padding:0;margin:0}
-.friend-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.7rem 0;border-bottom:1px solid var(--ink2)}
+.friend-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px dashed var(--line);min-height:52px}
 .friend-row>a{overflow-wrap:anywhere}
 .friend-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .backup-file input{position:absolute;inline-size:1px;block-size:1px;opacity:0;pointer-events:none}
-input,select,textarea{font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-radius:8px;padding:.45em .7em}
-input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gron);outline-offset:1px}
-label{display:block;margin:.8rem 0;font-weight:500}
-label input{display:block;width:100%;margin-top:.25rem}
-textarea{width:100%}
-.ed-row{display:grid;grid-template-columns:1fr 4.6rem 3.6rem 4rem 6.5rem 2rem;gap:.4rem;margin-bottom:.4rem;align-items:center}
-.ed-row input,.ed-row select{padding:.35em .5em;font-size:.85rem;min-width:0}
-.ed-remove{background:none;border:none;font-size:1.1rem;color:var(--ink2)}
-@media(max-width:560px){.ed-row{grid-template-columns:1fr 4rem 3.2rem 2rem;grid-auto-rows:auto}.ed-row .ed-count,.ed-row .ed-cat{grid-column:span 2}}
-@media(min-width:720px){
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--ink);border-radius:var(--r);padding:.45em .8em;min-height:var(--tap)}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:24px;height:24px;min-height:0;padding:0;border-radius:6px;background:var(--card);display:inline-grid;place-content:center;vertical-align:middle;flex:none;cursor:pointer}
+input[type=checkbox]:checked{background:var(--ok);border-color:var(--ok)}
+input[type=checkbox]:checked::before{content:'✓';color:var(--card);font-size:15px;line-height:1;font-weight:700}
+label{display:block;margin:.8rem 0;font-weight:600;font-size:14px}
+label input:not([type=checkbox]),label select{display:block;width:100%;margin-top:.35rem;font-weight:400;font-size:17px}
+textarea{width:100%;font-size:16px;line-height:1.5}
+/* ---- Allas recept som rader i hopfällbara kategorier ---- */
+.cat{margin-top:8px}
+.cat summary{list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:var(--tap);cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cat summary::-webkit-details-marker{display:none}
+.cat summary::after{content:'▸'}
+.cat[open] summary::after{content:'▾'}
+.cat-list{background:var(--card);border-radius:14px;overflow:hidden;margin-top:6px}
+.prow{display:flex;align-items:center;gap:12px;padding:0 8px 0 16px;min-height:64px;border-bottom:1px dashed var(--line);position:relative}
+.prow:last-child{border-bottom:none}
+.prow-link{flex:1;min-width:0;padding:10px 0;text-decoration:none;color:inherit}
+.prow-link::after{content:'';position:absolute;inset:0}
+.prow-title{display:block;font-family:var(--serif);font-size:18px;line-height:1.2}
+.prow-meta{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+.prow .rcard-btn{margin:10px 0}
+.cat-more{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;background:none;border:none;font-family:var(--mono);font-size:13px;color:var(--accent)}
+/* ---- receptformuläret: ett kort per ingrediens ---- */
+.ed-top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;margin:-.5rem 0 .6rem;background:var(--bg)}
+.ed-top .btn{padding:0 16px;font-size:14px}
+.ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ed-field,.ed-grid .ed-field{display:block;font-weight:600;font-size:14px;margin:.9rem 0 0}
+.ed-field input,.ed-field select,.ed-field .stepper{display:flex;width:100%;margin-top:6px;font-weight:400;font-size:17px;min-height:48px}
+.ed-field .stepper{justify-content:space-between;padding:0 4px}
+.ed-field .stepper button{width:40px;height:40px}
+.ed-field .stepper span{flex:1;font-size:16px}
+.check-row{display:flex;align-items:center;gap:12px;min-height:var(--tap);margin:.6rem 0 0;font-weight:400;font-size:15px;cursor:pointer}
+.ed-section{display:flex;flex-direction:column;gap:4px;margin:1.4rem 0 .6rem}
+.ed-section .label{margin:0}
+.ed-rules{font-size:12px;color:var(--muted)}
+.ed-row{background:var(--card);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ed-line1{display:flex;gap:8px;align-items:center}
+.ed-line1 input{flex:1;min-width:0}
+.ed-line2{display:grid;grid-template-columns:1fr 72px 1fr;gap:8px}
+.ed-line3{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.ed-line3 input{width:64px;min-height:36px;padding:0 10px;border-color:var(--line);font-family:var(--mono);font-size:14px}
+.ed-row input,.ed-row select{min-width:0;border-radius:10px;font-size:16px;padding:0 12px;min-height:var(--tap);margin:0;width:auto}
+.ed-row select{padding:0 4px 0 10px}
+.ed-row .ed-amount,.ed-row .ed-unit{font-family:var(--mono)}
+.ed-row .ed-cat{font-size:14px}
+.ed-row .ed-line3 input{flex:0 0 64px;width:64px;min-height:36px;padding:0 10px}
+.ed-line3 span{white-space:nowrap}
+.ed-remove{width:var(--tap);height:var(--tap);flex:none;background:none;border:none;border-radius:10px;color:var(--muted);font-size:18px}
+.ed-add{width:100%;min-height:48px;background:none;border:1.5px dashed var(--ink);border-radius:var(--r);font-weight:600;font-size:15px}
+/* ---- startsida via inbjudningslänk ---- */
+.invite{padding-top:1.4rem}
+.invite-pill{display:inline-flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--card);font-size:14px}
+.invite-pill i{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-style:normal}
+.invite h1{font-size:34px;margin-top:18px}
+.invite-lede{margin-top:14px;font-size:16px;line-height:1.5;color:#3A372F}
+.invite-actions{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.invite-actions .hint{text-align:center;margin:2px 0 0;font-size:13px}
+.invite-recipes{margin-top:36px}
+.invite-recipes .label{margin:0 0 12px}
+.invite-more{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:6px;color:var(--accent);font-weight:600;font-size:14px;background:none;border:none;padding:0}
+.sheet-form label{margin:.4rem 0 .8rem}
+.sheet-form .warn{margin:0 0 .8rem}
+/* ---- konto: inloggning ---- */
+.btn-block{display:flex;width:100%;min-height:56px;font-size:17px}
+.linkrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:15px;color:var(--muted)}
+.btn-link{background:none;border:none;color:var(--ink);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+@media(min-width:700px){
   .wrap{padding-bottom:3rem}
-  .nav{position:static;background:transparent;justify-content:flex-start;gap:1.6rem;margin-top:.8rem}
-  .nav a{flex:0 0 auto;color:var(--ink2);padding:.2rem 0;border-top:none;border-bottom:3px solid transparent}
-  .nav a.active{border-bottom-color:var(--lingon);color:var(--ink);font-weight:700}
+  .extra-fixed{position:static;padding:14px 0 0;background:none}
+  .has-fixed-form .wrap{padding-bottom:3rem}
+  .has-fixed-form .toast{bottom:24px}
+  .nav{position:static;display:flex;justify-content:flex-start;gap:6px;background:transparent;border-top:none;padding:0;margin-top:.8rem}
+  .nav a{height:var(--tap);padding:0 16px}
   .cards{grid-template-columns:1fr 1fr}
 }
 @media(min-width:1000px){
@@ -161,19 +320,27 @@ textarea{width:100%}
 <body>
 <div class="wrap">
   <header class="brand">
-    <a class="wordmark" href="#/">gram<em>mat</em>.</a>
-    <div class="tagline">recept &amp; inköpslista · allt i gram</div>
+    <div class="brand-row">
+      <a class="wordmark" href="#/">gram<em>mat</em>.</a>
+      <div class="head-actions">
+        <a class="btn btn-ghost head-new" id="headNew" href="#/nytt" hidden>+ Nytt</a>
+        <button class="head-more" id="headMore" type="button" aria-label="Fler val" hidden>···</button>
+        <a class="head-user" id="navUser" href="#/konto" data-name="">Logga in</a>
+      </div>
+    </div>
+    <div class="tagline" id="tagline">recept &amp; inköpslista · allt i gram</div>
     <nav class="nav" aria-label="Huvudmeny">
-      <a href="#/" data-match="#/">Mina recept</a>
-      <a href="#/lista" data-match="#/lista">Handla<span id="navListCount"></span></a>
+      <a href="#/" data-match="#/">Recept</a>
+      <a href="#/lista" data-match="#/lista">Lista<span class="nav-badge" id="navListCount" hidden></span></a>
       <a href="#/vanner" data-match="#/vanner">V&auml;nner</a>
-      <a href="#/allas" data-match="#/allas">Allas recept</a>
-      <a href="#/konto" data-match="#/konto" id="navUser">konto</a>
+      <a href="#/allas" data-match="#/allas">Allas</a>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
   <footer class="site-foot"><a href="integritet.html">Integritetspolicy</a></footer>
 </div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="sheet" class="sheet" hidden><div class="sheet-back"></div><div class="sheet-panel" role="dialog" aria-modal="true"></div></div>
 <script type="module">
 // Firebase Auth (endast identitet, all data ligger i D1). ESM direkt från CDN, ingen byggkedja.
 // Laddar den inte (offline/blockerad) kör appen vidare utloggad mot lokal state.
@@ -192,6 +359,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=timer-20260916"></script>
+<script src="app.js?v=ap6-20260916"></script>
 </body>
 </html>

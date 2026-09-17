@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -182,6 +182,16 @@ assert.ok(matchesQuery(recipes[0], ''), 'tom sökning matchar');
 assert.strictEqual(recipes.filter(r => matchesQuery(r, 'VITLÖK')).length >= 2, true, 'ingrediens-sök hittar minst köttfärssås och kebab');
 assert.ok(recipes.some(r => r.id === 'veg-lasagne' && matchesQuery(r, 'lasagne')), 'titel-sök');
 assert.ok(!matchesQuery(recipes[0], 'xyzzy'), 'ingen träff');
+
+// 14. Böjning: ett recept med en ingrediens
+assert.strictEqual(ingLabel(1), '1 ingrediens');
+assert.strictEqual(ingLabel(15), '15 ingredienser');
+
+// 15. Köksläget: ingredienser som nämns i ett steg, hela namn eller ordstam med ordgräns
+const cookIngs = [{ name: 'gul lök' }, { name: 'vitlök' }, { name: 'räkor, avrunna' }, { name: 'mango (fryst)' }, { name: 'salt' }];
+assert.deepStrictEqual(stepIngredients('Fräs löken och vitlöken', cookIngs).map(i => i.name), ['gul lök', 'vitlök']);
+assert.deepStrictEqual(stepIngredients('Lägg i räkorna och mangon', cookIngs).map(i => i.name), ['räkor, avrunna', 'mango (fryst)']);
+assert.deepStrictEqual(stepIngredients('Servera.', cookIngs), [], 'inget nämnt ger tom lista');
 
 // 13. Timer ur stegtext: min och tim, intervall ger övre gränsen, dubbletter bort, sekunder ignoreras
 assert.deepStrictEqual(stepTimers('Koka i 20 min, rör om'), [{ label: '20 min', minutes: 20 }]);
