@@ -57,8 +57,8 @@ egen state, det finns kvar även om ägaren tar bort originalet eller sitt konto
 
 **Fälla:** sessionen började på en lokal `main` som låg tio commits efter fjärren, och
 AP8 byggdes först mot koden före AP1 till AP7. Kör `git fetch` innan arbete i det här
-repot, grenar slås ihop på GitHub från andra sessioner. Det kasserade försöket ligger
-kvar lokalt som grenen `ap8-stale`.
+repot, grenar slås ihop på GitHub från andra sessioner. Det kasserade försöket
+(`4fd28b4`, grenen `ap8-stale`) raderades av Patrik samma dag, det nådde aldrig GitHub.
 
 ## 2026-09-16 kväll: designgenomlysningen AP1 till AP7 byggd på branchen `design-genomlysning`
 
