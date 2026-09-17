@@ -464,7 +464,7 @@ if (typeof document !== 'undefined') (async function () {
   // ---------- vyer ----------
   function selFor(id) { return state.selections.find(s => s.id === id); }
   let query = ''; // sökfras, delas av Mina/Allas/Vänner och överlever omrendering
-  const searchBox = () => `<p class="search"><input type="search" id="q" value="${esc(query)}" placeholder="Sök recept eller ingrediens" aria-label="Sök recept" autocomplete="off"></p>`;
+  const searchBox = () => `<p class="search"><input type="search" id="q" value="${esc(query)}" placeholder="${desk.matches ? 'Sök recept, ingrediens' : 'Sök recept eller ingrediens'}" aria-label="Sök recept" autocomplete="off"></p>`;
   const noMatch = () => `<p class="empty">Inget recept matchar "${esc(query.trim())}".</p>`;
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
@@ -574,6 +574,18 @@ if (typeof document !== 'undefined') (async function () {
     render();
   }
 
+  // Knapparna delas av korten, raderna och desktopens innehållsförteckning.
+  function listBtn(r) {
+    const sel = selFor(r.id);
+    return `<button type="button" class="rcard-btn${sel ? ' is-on' : ''}" data-toggle-list="${esc(r.id)}" aria-pressed="${sel ? 'true' : 'false'}" aria-label="${sel ? 'Ta bort ur listan' : 'Lägg i listan'}: ${esc(r.title)}">${sel ? '✓' : '+'}</button>`;
+  }
+  function saveBtn(r) {
+    const key = publicRowKey(r);
+    return mineForPublic(r)
+      ? `<button type="button" class="rcard-btn is-on" data-remove-allas="${esc(key)}" aria-pressed="true" aria-label="Ta bort ur mina recept: ${esc(r.title)}">✓</button>`
+      : `<button type="button" class="rcard-btn" data-add-allas="${esc(key)}" aria-pressed="false" aria-label="Spara till mina recept: ${esc(r.title)}">+</button>`;
+  }
+
   // Hela kortet öppnar receptet, knappen i hörnet lägger i/tar ur listan. Kortet byter aldrig höjd.
   function recipeCard(r) {
     const sel = selFor(r.id);
@@ -581,8 +593,69 @@ if (typeof document !== 'undefined') (async function () {
     const portions = sel ? sel.portions : r.portions;
     return `<article class="card rcard">
       <a class="rcard-link" href="#/recept/${esc(r.id)}"><span class="card-title">${esc(r.title)}</span><span class="card-meta">${portions} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal/port` : ''}</span></a>
-      <button type="button" class="rcard-btn${sel ? ' is-on' : ''}" data-toggle-list="${esc(r.id)}" aria-pressed="${sel ? 'true' : 'false'}" aria-label="${sel ? 'Ta bort ur listan' : 'Lägg i listan'}: ${esc(r.title)}">${sel ? '✓' : '+'}</button>
+      ${listBtn(r)}
     </article>`;
+  }
+
+  // ---------- desktop: listorna som innehållsförteckning (AP8, mockup H) ----------
+  // Från 700 px ritas Mina recept, Allas recept, Vänner och användarsidan som numrerade rader
+  // med ett register i en klistrad vänsterspalt. Under 700 px gäller korten och raderna ovan
+  // och nedan. jsdom saknar matchMedia, så test-ui.cjs prövar alltid mobilvyn.
+  const desk = window.matchMedia ? window.matchMedia('(min-width:700px)') : { matches: false };
+  if (desk.addEventListener) desk.addEventListener('change', () => render());
+  let tocFilter = null; // Allas recept: registret filtrerar på en kategori i stället för att rulla
+
+  // Löpnumret ritas av en CSS-räknare (decimal-leading-zero), det finns inte i DOM.
+  function tocRow(r, linkId, btn, extra = '') {
+    const nutr = nutritionPerPortion(r, nutrients);
+    const sel = selFor(r.id);
+    const portions = btn === listBtn && sel ? sel.portions : r.portions;
+    return `<article class="toc-row">
+      <a class="toc-title" href="#/recept/${esc(linkId)}">${esc(r.title)}<span class="toc-open" aria-hidden="true">Öppna ›</span></a>
+      <span class="toc-meta">${esc(portions)} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal` : ''}${extra}</span>
+      ${btn(r)}
+    </article>`;
+  }
+  const tocOwnRow = r => tocRow(r, r.id, listBtn);
+  function tocPublicRow(r, showOwner) {
+    if (authName && r.owner === authName) {
+      const own = state.recipes.find(x => x.id === r.id);
+      if (own) return tocRow(own, own.id, listBtn, ' · ditt recept');
+    }
+    return tocRow(r, Number.isInteger(r.ownerId) ? publicRowKey(r) : r.id, saveBtn,
+      (r.saves ? ` · sparad av ${fmtNum(r.saves)}` : '') + (showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : ''));
+  }
+  const tocSection = (id, label, body, accent) => `<section id="toc-${esc(id)}"><h2 class="toc-h${accent ? ' is-accent' : ''}">${esc(label)}</h2>${body}</section>`;
+  // Registret är knappar, inte #-länkar: hashen är appens router, ett ankare hade bytt vy.
+  const regRow = (target, label, n, cls) => `<button type="button" class="${cls || ''}" data-toc="${esc(target)}"><span>${esc(label)}</span><span class="n">${n}</span></button>`;
+  function tocLayout(title, count, register, main, o = {}) {
+    return `<div class="toc"${o.filter ? ' data-filter="1"' : ''}>
+      <aside class="toc-side">
+        <div><h1>${esc(title).replace(' ', '<br>')}</h1><div class="toc-count">${count}</div></div>
+        ${o.search === false ? '' : searchBox()}
+        <nav class="toc-reg" aria-label="Register">${register}</nav>
+        ${o.side || ''}
+      </aside>
+      <div class="toc-main">${main}</div>
+    </div>`;
+  }
+  function groupByCourse(list) {
+    const by = {};
+    for (const r of list) { const c = normalizeCourse(r.course); (by[c] = by[c] || []).push(r); }
+    return by;
+  }
+  // Allas recept och användarsidan. o: showOwner, filter (registret filtrerar), empty, tail, side
+  function tocPublic(title, list, o = {}) {
+    const hits = list.filter(r => matchesQuery(r, query));
+    const by = groupByCourse(hits);
+    const courses = COURSES.filter(c => by[c]);
+    const active = o.filter && courses.includes(tocFilter) ? tocFilter : null;
+    const register = (o.filter ? regRow('', 'Alla', hits.length, active ? '' : 'is-on') : '')
+      + courses.map(c => regRow(c, COURSE_LABELS[c], by[c].length, active === c ? 'is-on' : '')).join('');
+    const sections = (active ? [active] : courses)
+      .map(c => tocSection(c, COURSE_LABELS[c], by[c].map(r => tocPublicRow(r, o.showOwner !== false)).join(''))).join('');
+    return tocLayout(title, `${list.length} recept`, register,
+      (hits.length ? sections : list.length ? noMatch() : o.empty || '') + (o.tail || ''), o);
   }
 
   function viewCatalog() {
@@ -599,6 +672,14 @@ if (typeof document !== 'undefined') (async function () {
       <p>Skriv ditt första recept eller spara ett från Allas recept.</p>
       <p class="action-row"><a class="btn btn-ink" href="#/nytt">Skriv ett recept</a><a class="btn btn-ghost" href="#/allas">Allas recept</a></p>
     </div>`;
+    if (desk.matches && state.recipes.length) {
+      const courses = COURSES.filter(c => byCourse[c]);
+      const n = state.selections.length;
+      return tocLayout('Mina recept', `${state.recipes.length} recept${n ? ` · ${n} i listan` : ''}`,
+        (inList.length ? regRow('lista', 'I listan', inList.length, 'is-accent') : '') + courses.map(c => regRow(c, COURSE_LABELS[c], byCourse[c].length)).join(''),
+        !hits.length ? noMatch() : (inList.length ? tocSection('lista', 'I listan', inList.map(tocOwnRow).join(''), true) : '')
+          + courses.map(c => tocSection(c, COURSE_LABELS[c], byCourse[c].map(tocOwnRow).join(''))).join(''));
+    }
     return `<div class="view-head"><h1>Mina recept</h1></div>
       ${state.recipes.length ? searchBox() : ''}
       ${!state.recipes.length ? empty : hits.length ? sections : noMatch()}`;
@@ -619,16 +700,12 @@ if (typeof document !== 'undefined') (async function () {
       const own = state.recipes.find(x => x.id === r.id);
       if (own) return recipeRowOwn(own);
     }
-    const mine = mineForPublic(r);
     const nutr = nutritionPerPortion(r, nutrients);
-    const key = publicRowKey(r);
-    const linkId = Number.isInteger(r.ownerId) ? key : r.id;
+    const linkId = Number.isInteger(r.ownerId) ? publicRowKey(r) : r.id;
     const owner = showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : '';
     return `<article class="prow">
       <a class="prow-link" href="#/recept/${esc(linkId)}"><span class="prow-title">${esc(r.title)}</span><span class="prow-meta">${esc(r.portions)} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal` : ''}${r.saves ? ` · sparad av ${fmtNum(r.saves)}` : ''}${owner}</span></a>
-      ${mine
-        ? `<button type="button" class="rcard-btn is-on" data-remove-allas="${esc(key)}" aria-pressed="true" aria-label="Ta bort ur mina recept: ${esc(r.title)}">✓</button>`
-        : `<button type="button" class="rcard-btn" data-add-allas="${esc(key)}" aria-pressed="false" aria-label="Spara till mina recept: ${esc(r.title)}">+</button>`}
+      ${saveBtn(r)}
     </article>`;
   }
   // Ett eget recept som råkar ligga i det publika flödet: samma rad, knappen styr listan.
@@ -637,7 +714,7 @@ if (typeof document !== 'undefined') (async function () {
     const nutr = nutritionPerPortion(r, nutrients);
     return `<article class="prow">
       <a class="prow-link" href="#/recept/${esc(r.id)}"><span class="prow-title">${esc(r.title)}</span><span class="prow-meta">${(sel ? sel.portions : r.portions)} port${nutr.kcal ? ` · ${fmtNum(nutr.kcal)} kcal` : ''} · ditt recept</span></a>
-      <button type="button" class="rcard-btn${sel ? ' is-on' : ''}" data-toggle-list="${esc(r.id)}" aria-pressed="${sel ? 'true' : 'false'}" aria-label="${sel ? 'Ta bort ur listan' : 'Lägg i listan'}: ${esc(r.title)}">${sel ? '✓' : '+'}</button>
+      ${listBtn(r)}
     </article>`;
   }
 
@@ -682,6 +759,7 @@ if (typeof document !== 'undefined') (async function () {
       othersHtml = '';
     }
 
+    if (desk.matches) return tocPublic('Allas recept', starterRows, { filter: true, tail: othersHtml });
     return `<div class="list-head"><h1>Allas recept</h1><span class="list-count">${starterRows.length} recept</span></div>
       ${searchBox()}
       ${publicRecipeSections(starterRows)}
@@ -713,6 +791,24 @@ if (typeof document !== 'undefined') (async function () {
         <p>Skicka din inbjudningslänk, så blir ni vänner direkt när personen loggat in. Vänner ser varandras offentliga recept, aldrig hemliga.</p>
         <p class="action-row"><button class="btn btn-ink" type="button" data-copy-invite>Kopiera min inbjudningslänk</button></p>
       </div>`;
+    }
+    if (desk.matches) {
+      // Desktop: ett avsnitt per vän, registret rullar dit. Förfrågningar först, vänlistan sist.
+      const hits = (friendList || []).filter(r => matchesQuery(r, query));
+      const groups = connections.friends.map(f => ({ f, own: hits.filter(r => r.ownerId === f.userId) })).filter(g => g.own.length || !query.trim());
+      const inc = connections.incoming.length;
+      const register = (pending ? regRow('pending', 'Förfrågningar', inc || '', inc ? 'is-accent' : '') : '')
+        + groups.map(g => regRow('van-' + g.f.userId, g.f.name, g.own.length)).join('')
+        + (connections.friends.length ? regRow('friends', 'Dina vänner', connections.friends.length) : '');
+      const main = (connectionsError ? '<p class="warn">Kunde inte ladda vänner. Öppna fliken igen för att försöka på nytt.</p>' : '')
+        + (friendNotice ? `<p role="status" class="hint">${esc(friendNotice)}</p>` : '')
+        + (pending ? `<section id="toc-pending">${pending}</section>` : '')
+        + (friendLoadError ? '<p class="warn">Kunde inte ladda vänners recept just nu.</p>' : friendList === null ? '<p class="hint">Laddar recept …</p>' : '')
+        + groups.map(g => tocSection('van-' + g.f.userId, g.f.name, g.own.length ? g.own.map(r => tocPublicRow(r, false)).join('') : '<p class="hint">Inga offentliga recept än.</p>')).join('')
+        + (query.trim() && !hits.length ? noMatch() : '')
+        + `<section id="toc-friends">${section('Dina vänner', connections.friends, 'friends')}</section>`;
+      return tocLayout('Vänner', `${(friendList || []).length} recept · ${connections.friends.length} ${connections.friends.length === 1 ? 'vän' : 'vänner'}`, register, main,
+        { search: !!(friendList || []).length, side: '<button class="btn btn-ghost" id="addFriend" type="button">Lägg till vän</button>' });
     }
     // Vännernas recept grupperade per vän, i samma radkomponent som Allas.
     let recipes = '';
@@ -784,6 +880,7 @@ if (typeof document !== 'undefined') (async function () {
     const profile = userProfiles[ownerId];
     if (profile.error) return '<p class="warn">Kunde inte ladda användarens recept just nu.</p>';
     const recipes = (profile.recipes || []).map(r => ({ ...r, _ownerLabel: profile.owner || r.owner || '' }));
+    if (desk.matches) return tocPublic(profile.owner || 'Användare', recipes, { showOwner: false, empty: '<p class="empty">Inga offentliga recept än.</p>', side: '<a class="btn btn-ghost" href="#/allas">Alla recept</a>' });
     return `<div class="view-head"><h1>${esc(profile.owner || 'Användare')}</h1><a class="btn btn-ghost" href="#/allas">Alla recept</a></div>
       ${recipes.length ? publicRecipeSections(recipes, false) : '<p class="empty">Inga offentliga recept än.</p>'}`;
   }
@@ -1288,6 +1385,10 @@ if (typeof document !== 'undefined') (async function () {
       nq.focus();
       nq.setSelectionRange(nq.value.length, nq.value.length);
     };
+    view.querySelectorAll('[data-toc]').forEach(b => b.onclick = () => {
+      if (b.closest('.toc').dataset.filter) { tocFilter = b.dataset.toc || null; render(); }
+      else document.getElementById('toc-' + b.dataset.toc).scrollIntoView();
+    });
     view.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => startTimer(Number(b.dataset.timer), b.dataset.timerLabel, b.dataset.timerKey));
     view.querySelectorAll('[data-timer-stop]').forEach(b => b.onclick = () => {
       const i = timers.findIndex(t => String(t.id) === b.dataset.timerStop);

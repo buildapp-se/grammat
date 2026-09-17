@@ -6,10 +6,55 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-09-16
+reviewedAt: 2026-09-17
 ---
 
 # Handoff
+
+## 2026-09-17: AP8, listorna som innehållsförteckning från 700 px
+
+Mockup H och arbetspaket AP8 ur Claude Design-projektet
+`c84b2c87-41f3-4778-9843-cb3370ee625d`. Från 700 px ritas Mina recept, Allas recept,
+Vänner och användarsidan som numrerade rader (serif 24 px, 68 px höga) med klistrad
+vänsterspalt: rubrik 44 px, antal, sök, register. Sidhuvudet blir en rad: logga, flikarna,
+"+ Nytt recept" och kontoinitial. Under 700 px är AP1 till AP7 orörda.
+
+Hur: `desk = matchMedia('(min-width:700px)')` i `app.js` väljer `tocLayout()` i de fyra
+vyerna och ritar om när brytpunkten passeras. Knapparna är de befintliga (`listBtn`,
+`saveBtn`, utbrutna ur kortet och raden), så toast och ångra följer med. Löpnumren är en
+CSS-räknare, inte text i DOM. Registret är knappar, inte `#`-länkar: hashen är appens
+router och ett ankare hade bytt vy. Sidhuvudet görs med `display:contents` på
+`.brand-row`, ingen ny markup utom ` recept` i "+ Nytt" (visas från 860 px).
+Versionsfrågan `app.js?v=ap8-20260917`.
+
+Val tagna åt Patrik:
+- Recept i listan står bara under "I listan", som på mobilen (AP3). Mockupens antal
+  (2+18+3=23) tyder på dubblering, men då får samma recept två löpnummer.
+- Registret: Mina recept rullar till avsnittet, Allas filtrerar (enligt AP8), Vänner har
+  en rad per vän (följer AP6:s gruppering) plus Förfrågningar i burgundy och Dina vänner.
+- Mellan 700 och 859 px hamnar metaraden under titeln. Vid 700 px rann långa titlar annars
+  in i den, mätt.
+- "Klistra in från AI" nås som förut via "+ Nytt". "+ Nytt" visas som förut bara på
+  Mina recept, inte i alla vyer som mockupens sidhuvud antyder.
+- Inte byggt: "… 13 till". AP8-texten nämner det inte, registret sköter navigeringen.
+- Övriga vyer (recept, lista, konto) behåller bredden 640 px, 920 px från 1000 px.
+
+Verifierat: `node --check app.js`, `node test.js`, `node test-friends.cjs` och
+`node test-ui.cjs`, som nu har en desktopkörning (jsdom saknar `matchMedia`, testet
+sätter den): Vänner per vän, filtret i Allas, I listan utan dubblett. Lokalt i Chrome:
+mått mot AP8 (960 px innehåll, 220 px spalt, 48 px lucka, rad 68 px, knapp 44×44),
+sex bredder 375 till 1280 i Mina och Allas utan överlapp, sidscroll eller ytor under
+44 px, sök med bibehållet fokus, ingen rad byter höjd vid hovring, inga konsolfel.
+**Inte verifierat:** Vänner och användarsidan inloggat i riktig webbläsare (bara jsdom).
+
+**Fynd, inte rättat (utanför AP8):** ✓ i Allas och Vänner (`data-remove-allas` i
+`bind()`) tar bort det sparade receptet med ett klick, utan bekräftelse eller ångra.
+Har man redigerat sin kopia är ändringarna borta. ✓ i Mina recept har ångra-toast.
+
+**Fälla:** sessionen började på en lokal `main` som låg tio commits efter fjärren, och
+AP8 byggdes först mot koden före AP1 till AP7. Kör `git fetch` innan arbete i det här
+repot, grenar slås ihop på GitHub från andra sessioner. Det kasserade försöket ligger
+kvar lokalt som grenen `ap8-stale`.
 
 ## 2026-09-16 kväll: designgenomlysningen AP1 till AP7 byggd på branchen `design-genomlysning`
 

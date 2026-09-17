@@ -20,7 +20,7 @@ async function until(check, label) {
     await worker.fetch(new Request('https://test.invalid/state', {method:'PUT',headers:{Authorization:'Bearer test-only-session-' + id},body:JSON.stringify({recipes,selections:[],extras:[],checked:[],struck:{}})}),{DB:db});
   }
   const html = fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');
-  async function open(user, hash) {
+  async function open(user, hash, desktop) {
     const console = new VirtualConsole();
     console.on('jsdomError', error => errors.push(error.message));
     const dom = new JSDOM(html, {url:'https://test.invalid/' + hash,runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:console});
@@ -29,6 +29,7 @@ async function until(check, label) {
     let authCallback;
     w.confirm = () => true;
     w.alert = text => errors.push(text);
+    if (desktop) w.matchMedia = () => ({matches:true,addEventListener() {}}); // jsdom saknar matchMedia: utan den ritas mobilvyn
     w.fetch = async (url, opts) => {
       if (url.startsWith('starter.json')) return Response.json([]);
       if (url === 'nutrients.json') return Response.json({});
@@ -95,6 +96,21 @@ async function until(check, label) {
   await navigate(alice,'#/vanner','#addFriend'); // fliken laddas om vid varje besök, ingen Uppdatera-knapp
   await until(() => text(alice).includes('Bob pasta'),'sender feed after revisit');
   assert.ok(text(alice).includes('bob · 1'), 'friends recipes grouped per friend');
+  // Desktop (AP8): samma data som numrerade rader med register, inga mobilrader.
+  const wide=await open(2,'#/vanner',true);
+  await until(() => wide.document.querySelector('#toc-van-1 .toc-row'),'desktop friends section per friend');
+  assert.ok(wide.document.querySelector('#toc-van-1').textContent.includes('Alice pasta'));
+  assert.equal(wide.document.querySelector('[data-toc="van-1"]').textContent,'alice1','register row per friend with count');
+  assert.ok(wide.document.querySelector('.toc-side #addFriend') && wide.document.querySelector('#toc-friends [data-remove-friend]'),'add friend in sidebar, friend list in main');
+  assert.equal(wide.document.querySelectorAll('.prow, .rcard').length,0,'no mobile rows on desktop');
+  await navigate(wide,'#/allas','.toc[data-filter]');
+  await until(() => wide.document.querySelector('[data-toc="huvudratt"]'),'desktop Allas register');
+  wide.document.querySelector('[data-toc="huvudratt"]').click();
+  assert.deepEqual([...wide.document.querySelectorAll('.toc-h')].map(h => h.textContent),['Huvudrätt'],'register filters Allas to one section');
+  assert.ok(wide.document.querySelector('[data-toc="huvudratt"]').classList.contains('is-on'));
+  await navigate(wide,'#/','.toc-row [data-toggle-list]');
+  wide.document.querySelector('[data-toggle-list]').click();
+  assert.deepEqual([...wide.document.querySelectorAll('.toc-h')].map(h => h.textContent),['I listan'],'listed recipe moves to I listan, not duplicated');
   const add=alice.document.querySelector('[data-add-allas="2|pasta"]');
   add.click(); add.click();
   assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes.length,2,'double click saves only once');
