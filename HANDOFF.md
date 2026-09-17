@@ -47,9 +47,13 @@ sex bredder 375 till 1280 i Mina och Allas utan överlapp, sidscroll eller ytor 
 44 px, sök med bibehållet fokus, ingen rad byter höjd vid hovring, inga konsolfel.
 **Inte verifierat:** Vänner och användarsidan inloggat i riktig webbläsare (bara jsdom).
 
-**Fynd, inte rättat (utanför AP8):** ✓ i Allas och Vänner (`data-remove-allas` i
-`bind()`) tar bort det sparade receptet med ett klick, utan bekräftelse eller ångra.
-Har man redigerat sin kopia är ändringarna borta. ✓ i Mina recept har ångra-toast.
+**Fynd, rättat samma dag på Patriks order:** ✓ i Allas och Vänner (`data-remove-allas` i
+`bind()`) tog bort det sparade receptet med ett klick, utan ångra, och en redigerad kopia
+var då borta. Nu: toast "Borttaget ur mina recept" med Ångra i 4 s, som lägger tillbaka
+receptet på sin plats med listval och strukna rader. Sparräknaren på servern (`unsave`)
+rörs först när ångra-fönstret gått ut. Prövat i `test-ui.cjs`. Versionsfrågan
+`app.js?v=angra-20260917`. Bra att veta: ett sparat recept är en fullständig kopia i ens
+egen state, det finns kvar även om ägaren tar bort originalet eller sitt konto.
 
 **Fälla:** sessionen började på en lokal `main` som låg tio commits efter fjärren, och
 AP8 byggdes först mot koden före AP1 till AP7. Kör `git fetch` innan arbete i det här

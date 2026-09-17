@@ -1473,11 +1473,18 @@ if (typeof document !== 'undefined') (async function () {
       const key = b.dataset.removeAllas;
       const r = state.recipes.find(x => x.src ? x.src.owner + '|' + x.src.id === key : 'starter|' + x.id === key || x.id === key);
       if (!r) return;
-      unsave(r);
+      // Kopian kan vara redigerad, så ett klick på ✓ får inte vara slutgiltigt: allt läggs
+      // tillbaka vid Ångra, och sparräknaren på servern rörs först när ångra-fönstret gått ut.
+      const at = state.recipes.indexOf(r), sel = selFor(r.id), struck = state.struck[r.id];
       state.recipes = state.recipes.filter(x => x !== r);
       state.selections = state.selections.filter(s => s.id !== r.id);
       delete state.struck[r.id];
       save();
+      toast('Borttaget ur mina recept', {
+        action: 'Ångra',
+        onAction: () => { if (state.recipes.some(x => x.id === r.id)) return; /* sparat på nytt under tiden */ state.recipes.splice(at, 0, r); if (sel) state.selections.push(sel); if (struck) state.struck[r.id] = struck; save(); },
+        onTimeout: () => unsave(r),
+      });
     });
 
     view.querySelectorAll('[data-check]').forEach(b => b.onchange = () => {

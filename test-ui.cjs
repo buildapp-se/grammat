@@ -115,6 +115,10 @@ async function until(check, label) {
   add.click(); add.click();
   assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes.length,2,'double click saves only once');
   assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes[1].src.owner,2,'same slug retains correct provenance');
+  alice.document.querySelector('[data-remove-allas="2|pasta"]').click();
+  assert.equal(JSON.parse(alice.localStorage.getItem('state')).recipes.length,1,'✓ removes the saved copy');
+  alice.document.querySelector('#toast .toast-action').click();
+  assert.deepEqual(JSON.parse(alice.localStorage.getItem('state')).recipes.map(r => r.src?.owner),[undefined,2],'Ångra restores the saved copy in place');
   await navigate(alice,'#/recept/2%7Cpasta','.rv-top');
   assert.ok(!alice.document.querySelector('[data-add-allas]'),'saved public detail cannot add twice');
   await navigate(alice,'#/vanner','#addFriend');
