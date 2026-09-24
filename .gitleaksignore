@@ -1,0 +1,3 @@
+# gitleaks-undantag, granskade 2026-09-24 (aifabriken tools/audit-run.mjs secrets). Bara publika identifierare och falsklarm; en riktig hemlighet undantas aldrig här.
+# Firebase webb-apiKey, publik identifierare
+70c93ad87d8f7ef9c35dd7842a50486724cc6ab5:index.html:gcp-api-key:153

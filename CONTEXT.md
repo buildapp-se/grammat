@@ -64,3 +64,6 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 - Lighthouse: 2026-09-16, pass, a11y 100, best practices 100, SEO 100 (mobile, no perf)
 - Markup: 2026-09-16, warn, W3C 3 CSS errors on ::view-transition rules the validator does not know, 0 broken links
 - UX: 2026-09-16, pass, 0 targets under 44 px after the fix (logo and footer link), 5 of 6 script checks pass, no --interact
+- npm audit: 2026-09-24, n/a, no package.json
+- Secrets: 2026-09-24, pass, gitleaks 0 findings in 106 commits, 1 reviewed as public in .gitleaksignore
+- Actions: 2026-09-24, n/a, no GitHub Actions workflows
