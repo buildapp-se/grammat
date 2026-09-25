@@ -9,6 +9,16 @@ const COURSE_LABELS = { forratt: 'Förrätt', huvudratt: 'Huvudrätt', efterratt
 function keyOf(name) { return name.toLowerCase().trim(); }
 function ingLabel(n) { return n === 1 ? '1 ingrediens' : n + ' ingredienser'; }
 function normalizeCourse(course) { return COURSES.includes(course) ? course : 'huvudratt'; }
+// Egna kategorier: privata, workern stryker dem ur allt publikt. Array eller kommasträng in, unika och trimmade ut.
+function normTags(v) {
+  const list = Array.isArray(v) ? v : String(v || '').split(',');
+  const out = [];
+  for (const t of list) {
+    const tag = typeof t === 'string' ? t.trim().slice(0, 30) : '';
+    if (tag && !out.some(x => x.toLowerCase() === tag.toLowerCase())) out.push(tag);
+  }
+  return out.slice(0, 10);
+}
 
 // Summerar valda recept (skalade till valda portioner) till inköpsrader.
 // struck = { receptId: [ingrediensnyckel, ...] }: bockade ingredienser (har hemma/redan i grytan) utesluts.
@@ -182,6 +192,8 @@ function normalizeState(raw) {
       steps: Array.isArray(r.steps) ? r.steps.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()) : [],
     };
     if (r.private === true) out.private = true; // hemligt: indexeras aldrig av servern
+    const tags = normTags(r.tags);
+    if (tags.length) out.tags = tags;
     // src = varifrån receptet sparades (ägar-id + recept-id), driver sparräknaren vid borttag
     if (r.src && typeof r.src === 'object' && Number.isInteger(r.src.owner) && typeof r.src.id === 'string') out.src = { owner: r.src.owner, id: r.src.id };
     return out;
@@ -215,7 +227,7 @@ function makeBackup(state) {
 function matchesQuery(r, q) {
   q = String(q || '').trim().toLowerCase();
   if (!q) return true;
-  return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q));
+  return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q)) || (r.tags || []).some(t => t.toLowerCase().includes(q));
 }
 
 // Tider i ett stegs text ("koka 20 min", "vila 1 tim") -> [{ label, minutes }].
@@ -338,7 +350,7 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -663,10 +675,17 @@ if (typeof document !== 'undefined') (async function () {
     const inList = hits.filter(r => selFor(r.id));
     const byCourse = {};
     for (const r of hits) if (!selFor(r.id)) (byCourse[r.course] = byCourse[r.course] || []).push(r);
+    // Egna kategorier efter de fasta. Ett recept kan stå i flera, som en spellista.
+    const byTag = {};
+    for (const r of hits) for (const t of r.tags || []) (byTag[t] = byTag[t] || []).push(r);
+    const tags = Object.keys(byTag).sort((a, b) => a.localeCompare(b, 'sv'));
     const sections = (inList.length ? `<h2>I listan</h2><div class="cards">${inList.map(recipeCard).join('')}</div>` : '')
       + COURSES.filter(c => byCourse[c]).map(c => `
       <h2>${esc(COURSE_LABELS[c])}</h2>
-      <div class="cards">${byCourse[c].map(recipeCard).join('')}</div>`).join('');
+      <div class="cards">${byCourse[c].map(recipeCard).join('')}</div>`).join('')
+      + tags.map(t => `
+      <h2>${esc(t)}</h2>
+      <div class="cards">${byTag[t].map(recipeCard).join('')}</div>`).join('');
     const empty = `<div class="empty-state">
       <div class="empty-title">Inga recept ännu</div>
       <p>Skriv ditt första recept eller spara ett från Allas recept.</p>
@@ -676,9 +695,11 @@ if (typeof document !== 'undefined') (async function () {
       const courses = COURSES.filter(c => byCourse[c]);
       const n = state.selections.length;
       return tocLayout('Mina recept', `${state.recipes.length} recept${n ? ` · ${n} i listan` : ''}`,
-        (inList.length ? regRow('lista', 'I listan', inList.length, 'is-accent') : '') + courses.map(c => regRow(c, COURSE_LABELS[c], byCourse[c].length)).join(''),
+        (inList.length ? regRow('lista', 'I listan', inList.length, 'is-accent') : '') + courses.map(c => regRow(c, COURSE_LABELS[c], byCourse[c].length)).join('')
+          + tags.map((t, i) => regRow('tag' + i, t, byTag[t].length)).join(''),
         !hits.length ? noMatch() : (inList.length ? tocSection('lista', 'I listan', inList.map(tocOwnRow).join(''), true) : '')
-          + courses.map(c => tocSection(c, COURSE_LABELS[c], byCourse[c].map(tocOwnRow).join(''))).join(''));
+          + courses.map(c => tocSection(c, COURSE_LABELS[c], byCourse[c].map(tocOwnRow).join(''))).join('')
+          + tags.map((t, i) => tocSection('tag' + i, t, byTag[t].map(tocOwnRow).join(''))).join(''));
     }
     return `<div class="view-head"><h1>Mina recept</h1></div>
       ${state.recipes.length ? searchBox() : ''}
@@ -1088,6 +1109,7 @@ if (typeof document !== 'undefined') (async function () {
       <div class="ed-line3"${unit === 'smak' ? ' hidden' : ''}><span>Ungefär</span><input type="number" class="ed-count" value="${ing.count != null ? ing.count : ''}" min="0" step="any" inputmode="decimal" aria-label="Ungefärligt antal"><span>st (valfritt)</span></div>
     </div>`;
     };
+    const allTags = [...new Set(state.recipes.flatMap(x => x.tags || []))].sort((a, b) => a.localeCompare(b, 'sv'));
     return `<form id="edForm" data-id="${r ? esc(r.id) : ''}">
       <div class="ed-top"><a class="btn btn-ghost" href="${r ? '#/recept/' + esc(r.id) : '#/'}">Avbryt</a><button class="btn" type="submit">Spara recept</button></div>
       <h1>${r ? 'Ändra recept' : 'Nytt recept'}</h1>
@@ -1099,6 +1121,8 @@ if (typeof document !== 'undefined') (async function () {
         </div>
         <label class="ed-field">Kategori <select id="edCourse">${COURSES.map(c => `<option value="${c}"${(r ? r.course : 'huvudratt') === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select></label>
       </div>
+      <label class="ed-field">Egna kategorier (valfritt, bara du ser dem, skilj med komma) <input type="text" id="edTags" value="${r ? esc((r.tags || []).join(', ')) : ''}" maxlength="200" placeholder="t.ex. Vardag, Julbord"></label>
+      ${allTags.length ? `<p class="hint">Dina hittills: ${esc(allTags.join(', '))}</p>` : ''}
       <label class="ed-field">Källa (länk, valfritt) <input type="url" id="edSource" value="${r ? esc(r.source || '') : ''}"></label>
       <label class="check-row"><input type="checkbox" id="edPrivate"${r && r.private ? ' checked' : ''}> Hemligt recept, visas inte under Allas recept</label>
       <div class="ed-section"><div class="label">Ingredienser · <span id="edCount">${ings.length}</span></div><div class="ed-rules">1 msk = 15 ml · 1 tsk = 5 ml · 1 dl = 100 ml · tom mängd = efter smak</div></div>
@@ -1571,6 +1595,8 @@ if (typeof document !== 'undefined') (async function () {
           steps: $('#edSteps').value.split('\n').map(s => s.trim()).filter(Boolean),
         };
         if ($('#edPrivate').checked) recipe.private = true;
+        const tags = normTags($('#edTags').value);
+        if (tags.length) recipe.tags = tags;
         const old = oldId && state.recipes.find(r => r.id === oldId);
         if (old && old.src) recipe.src = old.src; // redigerad kopia räknas fortfarande som sparad
         if (oldId) state.recipes = state.recipes.map(r => r.id === oldId ? recipe : r);

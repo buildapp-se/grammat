@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -178,6 +178,7 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.strictEqual(hostile.ingredients[0].unit, 'g', 'unit tvingas till g/ml');
   assert.strictEqual(hostile.course, 'huvudratt', 'okänd course normaliseras');
   assert.strictEqual(sanitizeIndexed({ portions: 6.4, ingredients: [{ unit: 'ml' }] }).portions, 6, 'giltiga portions behålls');
+  assert.strictEqual(sanitizeIndexed({ tags: ['Hemligt'], ingredients: [] }).tags, undefined, 'egna kategorier når aldrig publika indexet');
 // 12. Sök: titel eller ingrediens, skiftlägesokänsligt, tom fras matchar allt
 assert.ok(matchesQuery(recipes[0], ''), 'tom sökning matchar');
 assert.strictEqual(recipes.filter(r => matchesQuery(r, 'VITLÖK')).length >= 2, true, 'ingrediens-sök hittar minst köttfärssås och kebab');
@@ -204,3 +205,8 @@ assert.deepStrictEqual(stepTimers('Servera med 200 g ris'), [], 'gram är ingen 
 
   console.log('Alla test OK');
 });
+// Egna kategorier: trimmas, dubbletter oavsett skiftläge bort, överlever backup
+assert.deepStrictEqual(normTags(' Vardag, vardag ,,Julbord'), ['Vardag', 'Julbord'], 'kommasträng normaliseras');
+assert.deepStrictEqual(normTags([1, 'Fest']), ['Fest'], 'icke-strängar bort');
+assert.deepStrictEqual(normalizeState({ recipes: [{ title: 'T', ingredients: [{ name: 'salt' }], tags: ['Fest'] }] }).recipes[0].tags, ['Fest'], 'taggar överlever normalizeState');
+assert.ok(matchesQuery({ title: 'x', ingredients: [], tags: ['Julbord'] }, 'julb'), 'sök träffar egen kategori');

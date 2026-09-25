@@ -104,8 +104,9 @@ async function createFirebaseUser(env, claims) {
 // i portions/unit blev annars aktiv HTML i andras webbläsare.
 // countUnit är fri text ("klyftor", "burk") och kan inte typas, den escapas vid render.
 export function sanitizeIndexed(r) {
+  const { tags, ...pub } = r; // egna kategorier är privata, når aldrig flöden
   return {
-    ...r,
+    ...pub,
     course: normalizeCourse(r.course),
     portions: Number.isFinite(+r.portions) && +r.portions >= 1 ? Math.round(+r.portions) : 4,
     ingredients: r.ingredients.map(i => ({ ...i, unit: i && i.unit === 'ml' ? 'ml' : 'g' })),
