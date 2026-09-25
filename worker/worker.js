@@ -20,7 +20,8 @@ import { friendFeed, handleFriends } from './friends.js';
 // DELETE /save (Bearer) {ownerId,recipeId} -> {ok,saves}   tar bort sparning
 // DELETE /account (Bearer Firebase-JWT) -> {ok}  raderar D1-raden (Firebase-usern raderas client-side)
 const FIREBASE_PROJECT = 'grammat-78450';
-const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas', 'testa'];
+const COURSES = ['testa', 'forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
+const LABELS = ['vegetariskt', 'veganskt', 'glutenfritt', 'laktosfritt', 'snabbt', 'vardag', 'fest', 'barnvänligt', 'frysvänligt', 'asiatiskt', 'italienskt', 'mexikanskt', 'indiskt', 'husmanskost'];
 const normalizeCourse = course => COURSES.includes(course) ? course : 'huvudratt';
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -108,6 +109,7 @@ export function sanitizeIndexed(r) {
   return {
     ...pub,
     course: normalizeCourse(r.course),
+    labels: Array.isArray(r.labels) ? LABELS.filter(l => r.labels.includes(l)) : [],
     portions: Number.isFinite(+r.portions) && +r.portions >= 1 ? Math.round(+r.portions) : 4,
     ingredients: r.ingredients.map(i => ({ ...i, unit: i && i.unit === 'ml' ? 'ml' : 'g' })),
   };

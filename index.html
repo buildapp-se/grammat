@@ -266,6 +266,13 @@ textarea{width:100%;font-size:16px;line-height:1.5}
 .ed-field .stepper{justify-content:space-between;padding:0 4px}
 .ed-field .stepper button{width:40px;height:40px}
 .ed-field .stepper span{flex:1;font-size:16px}
+.rv-course{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink);min-height:var(--tap);padding:0 .6em;border-radius:10px}
+.rv-tags{display:flex;flex-wrap:wrap;gap:8px;margin:.2rem 0 .8rem}
+.tag{min-height:var(--tap);padding:0 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-size:14px}
+.tag.is-own{border-style:dashed;background:transparent}
+.ed-labels{border:0;padding:0;margin:.8rem 0;display:flex;flex-wrap:wrap;gap:8px}
+.ed-labels legend{font-weight:600;font-size:14px;margin-bottom:.35rem;padding:0}
+label.tag-pick{display:inline-flex;align-items:center;gap:8px;min-height:var(--tap);margin:0;padding:0 14px 0 10px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-weight:400;font-size:14px;cursor:pointer}
 .check-row{display:flex;align-items:center;gap:12px;min-height:var(--tap);margin:.6rem 0 0;font-weight:400;font-size:15px;cursor:pointer}
 .ed-section{display:flex;flex-direction:column;gap:4px;margin:1.4rem 0 .6rem}
 .ed-section .label{margin:0}
@@ -410,6 +417,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=taggar-20260925"></script>
+<script src="app.js?v=labels-20260925"></script>
 </body>
 </html>

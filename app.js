@@ -3,7 +3,12 @@
 // ---------- rena funktioner (testas i test.js) ----------
 const CATS = ['grönt', 'kött', 'mejeri', 'skafferi', 'fryst', 'övrigt'];
 const CAT_LABELS = { 'grönt': 'Grönt', 'kött': 'Kött & chark', 'mejeri': 'Mejeri', 'skafferi': 'Skafferi', 'fryst': 'Fryst', 'övrigt': 'Övrigt' };
-const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas', 'testa'];
+const COURSES = ['testa', 'forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
+// Taggar: fast lista som på ICA och Köket.se, så "vegetariskt" alltid stavas lika och workern
+// kan vitlista. Publika, flera per recept. Egna kategorier (tags) är fri text och privata.
+const LABELS = ['vegetariskt', 'veganskt', 'glutenfritt', 'laktosfritt', 'snabbt', 'vardag', 'fest', 'barnvänligt', 'frysvänligt', 'asiatiskt', 'italienskt', 'mexikanskt', 'indiskt', 'husmanskost'];
+const LABEL_TEXT = { snabbt: 'snabbt (under 30 min)' };
+function normLabels(v) { return Array.isArray(v) ? LABELS.filter(l => v.includes(l)) : []; }
 const COURSE_LABELS = { forratt: 'Förrätt', huvudratt: 'Huvudrätt', efterratt: 'Efterrätt', dryck: 'Drycker', sas: 'Såser & röror', testa: 'Att testa' };
 
 function keyOf(name) { return name.toLowerCase().trim(); }
@@ -194,6 +199,8 @@ function normalizeState(raw) {
     if (r.private === true) out.private = true; // hemligt: indexeras aldrig av servern
     const tags = normTags(r.tags);
     if (tags.length) out.tags = tags;
+    const labels = normLabels(r.labels);
+    if (labels.length) out.labels = labels;
     // src = varifrån receptet sparades (ägar-id + recept-id), driver sparräknaren vid borttag
     if (r.src && typeof r.src === 'object' && Number.isInteger(r.src.owner) && typeof r.src.id === 'string') out.src = { owner: r.src.owner, id: r.src.id };
     return out;
@@ -227,7 +234,7 @@ function makeBackup(state) {
 function matchesQuery(r, q) {
   q = String(q || '').trim().toLowerCase();
   if (!q) return true;
-  return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q)) || (r.tags || []).some(t => t.toLowerCase().includes(q));
+  return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q)) || (r.tags || []).concat(r.labels || []).some(t => t.toLowerCase().includes(q));
 }
 
 // Tider i ett stegs text ("koka 20 min", "vila 1 tim") -> [{ label, minutes }].
@@ -309,6 +316,7 @@ function importRecipe(d, takenIds) {
     title: d.title.trim(),
     portions: typeof d.portions === 'number' && d.portions >= 1 ? Math.round(d.portions) : 4,
     course: normalizeCourse(d.course),
+    labels: normLabels(d.labels),
     source: safeUrl(d.source),
     ingredients,
     steps: Array.isArray(d.steps) ? d.steps.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim()) : [],
@@ -321,6 +329,7 @@ const AI_PROMPT = `Du får ett eller flera recept nedan (som text eller länkar)
   "title": "Receptets namn",
   "portions": 4,
   "course": "huvudratt",
+  "labels": ["vegetariskt", "snabbt"],
   "source": "",
   "ingredients": [
     { "name": "gul lök", "amount": 220, "unit": "g", "count": 2, "countUnit": "st", "cat": "grönt" },
@@ -341,6 +350,7 @@ Regler:
 - "cat" måste vara exakt en av: "grönt", "kött", "mejeri", "skafferi", "fryst", "övrigt".
 - "portions": antalet portioner receptet gäller. Framgår det inte, uppskatta.
 - "course" måste vara exakt en av: "forratt", "huvudratt", "efterratt", "dryck", "sas" (såser & röror). Gissa den som passar bäst, framgår det inte: "huvudratt".
+- "labels": noll eller flera av exakt: "vegetariskt", "veganskt", "glutenfritt", "laktosfritt", "snabbt", "vardag", "fest", "barnvänligt", "frysvänligt", "asiatiskt", "italienskt", "mexikanskt", "indiskt", "husmanskost". Sätt bara det som stämmer utifrån ingredienserna ("vegetariskt" = inget kött, ingen fisk; "snabbt" = under 30 minuter). Tom array om inget passar.
 - Har receptet delar (t.ex. sås, garnering): sätt "group": "Sås" osv. på de ingrediensernas rader.
 - "steps": tillagningsstegen som en lista med strängar, ett steg per element. Saknas steg: tom lista.
 - Ingrediensnamn: gemener, korta och butiksvänliga ("gul lök", inte "finhackad stor gul lök"). Samma vara ska heta samma sak som i andra recept.
@@ -350,7 +360,7 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -966,8 +976,11 @@ if (typeof document !== 'undefined') (async function () {
         : `<button class="btn btn-ghost" type="button" data-add-allas="${esc(id)}">Spara till mina</button>`;
     const cookBtn = r.steps.length ? `<a class="btn btn-ink" href="#/recept/${esc(id)}/laga/1">Laga steg för steg</a>` : '';
     return `<div class="rv-top"><a class="btn btn-ghost" href="${esc(from)}">‹ ${esc(BACK_LABELS[from] || (from.startsWith('#/hej/') ? 'Inbjudan' : 'Tillbaka'))}</a>${mine ? `<a class="btn btn-ghost" href="#/redigera/${esc(r.id)}">Ändra</a>` : ''}</div>
-      <div class="rv-kicker">${esc(COURSE_LABELS[r.course])}${owner ? ' · ' + esc(owner) : ''}${r.private ? ' · Hemligt' : ''}</div>
+      <div class="rv-kicker">${mine
+        ? `<select class="rv-course" data-course-pick="${esc(id)}" aria-label="Kategori">${COURSES.map(c => `<option value="${c}"${r.course === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select>`
+        : esc(COURSE_LABELS[r.course])}${owner ? ' · ' + esc(owner) : ''}${r.private ? ' · Hemligt' : ''}</div>
       <h1 class="rv-title">${esc(r.title)}</h1>
+      ${(r.labels || []).length || (mine && (r.tags || []).length) ? `<div class="rv-tags">${normLabels(r.labels).map(t => `<button type="button" class="tag" data-tag-search="${esc(t)}">${esc(t)}</button>`).join('')}${(mine ? r.tags || [] : []).map(t => `<button type="button" class="tag is-own" data-tag-search="${esc(t)}" title="Egen kategori, bara du ser den">${esc(t)}</button>`).join('')}</div>` : ''}
       <div class="rv-portions">
         <div class="stepper"><button type="button" data-rstep="-1" aria-label="Färre portioner">−</button><span>${portions} port</span><button type="button" data-rstep="1" aria-label="Fler portioner">+</button></div>
         <div class="meta">${nutr.kcal ? fmtNum(nutr.kcal) + ' kcal/port · ' : ''}${ingLabel(r.ingredients.length)}</div>
@@ -1121,6 +1134,7 @@ if (typeof document !== 'undefined') (async function () {
         </div>
         <label class="ed-field">Kategori <select id="edCourse">${COURSES.map(c => `<option value="${c}"${(r ? r.course : 'huvudratt') === c ? ' selected' : ''}>${COURSE_LABELS[c]}</option>`).join('')}</select></label>
       </div>
+      <fieldset class="ed-labels"><legend>Taggar (syns för alla, sökbara)</legend>${LABELS.map(l => `<label class="tag-pick"><input type="checkbox" value="${l}"${r && (r.labels || []).includes(l) ? ' checked' : ''}> ${esc(LABEL_TEXT[l] || l)}</label>`).join('')}</fieldset>
       <label class="ed-field">Egna kategorier (valfritt, bara du ser dem, skilj med komma) <input type="text" id="edTags" value="${r ? esc((r.tags || []).join(', ')) : ''}" maxlength="200" placeholder="t.ex. Vardag, Julbord"></label>
       ${allTags.length ? `<p class="hint">Dina hittills: ${esc(allTags.join(', '))}</p>` : ''}
       <label class="ed-field">Källa (länk, valfritt) <input type="url" id="edSource" value="${r ? esc(r.source || '') : ''}"></label>
@@ -1413,6 +1427,15 @@ if (typeof document !== 'undefined') (async function () {
       if (b.closest('.toc').dataset.filter) { tocFilter = b.dataset.toc || null; render(); }
       else document.getElementById('toc-' + b.dataset.toc).scrollIntoView();
     });
+    view.querySelectorAll('[data-course-pick]').forEach(s => s.onchange = () => {
+      const r = state.recipes.find(x => x.id === s.dataset.coursePick);
+      if (r) { r.course = normalizeCourse(s.value); save(); render(); }
+    });
+    // Tagg i receptvyn: sök på den i listan man kom från (Mina för egna, annars Allas)
+    view.querySelectorAll('[data-tag-search]').forEach(b => b.onclick = () => {
+      query = b.dataset.tagSearch;
+      location.hash = state.recipes.some(x => location.hash === '#/recept/' + x.id) ? '#/' : '#/allas';
+    });
     view.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => startTimer(Number(b.dataset.timer), b.dataset.timerLabel, b.dataset.timerKey));
     view.querySelectorAll('[data-timer-stop]').forEach(b => b.onclick = () => {
       const i = timers.findIndex(t => String(t.id) === b.dataset.timerStop);
@@ -1597,6 +1620,8 @@ if (typeof document !== 'undefined') (async function () {
         if ($('#edPrivate').checked) recipe.private = true;
         const tags = normTags($('#edTags').value);
         if (tags.length) recipe.tags = tags;
+        const labels = normLabels([...view.querySelectorAll('.ed-labels input:checked')].map(i => i.value));
+        if (labels.length) recipe.labels = labels;
         const old = oldId && state.recipes.find(r => r.id === oldId);
         if (old && old.src) recipe.src = old.src; // redigerad kopia räknas fortfarande som sparad
         if (oldId) state.recipes = state.recipes.map(r => r.id === oldId ? recipe : r);

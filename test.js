@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -210,3 +210,12 @@ assert.deepStrictEqual(normTags(' Vardag, vardag ,,Julbord'), ['Vardag', 'Julbor
 assert.deepStrictEqual(normTags([1, 'Fest']), ['Fest'], 'icke-strängar bort');
 assert.deepStrictEqual(normalizeState({ recipes: [{ title: 'T', ingredients: [{ name: 'salt' }], tags: ['Fest'] }] }).recipes[0].tags, ['Fest'], 'taggar överlever normalizeState');
 assert.ok(matchesQuery({ title: 'x', ingredients: [], tags: ['Julbord'] }, 'julb'), 'sök träffar egen kategori');
+// Taggar: fast lista, okända bort, följer med import och backup, sökbara
+assert.deepStrictEqual(normLabels(['snabbt', 'hackat', 'vegetariskt']), ['vegetariskt', 'snabbt'], 'bara kända taggar, i listans ordning');
+assert.deepStrictEqual(parseImport('{"title":"T","labels":["veganskt","x"],"ingredients":[{"name":"salt"}]}', [])[0].labels, ['veganskt'], 'import behåller kända taggar');
+assert.deepStrictEqual(normalizeState({ recipes: [{ title: 'T', ingredients: [{ name: 'salt' }], labels: ['fest'] }] }).recipes[0].labels, ['fest'], 'taggar överlever backup');
+assert.ok(matchesQuery({ title: 'x', ingredients: [], labels: ['vegetariskt'] }, 'vegetar'), 'sök hittar tagg');
+assert.strictEqual(COURSES[0], 'testa', 'Att testa står först');
+import('./worker/worker.js').then(({ sanitizeIndexed }) => {
+  assert.deepStrictEqual(sanitizeIndexed({ labels: ['vegetariskt', '<img onerror=x>'], ingredients: [] }).labels, ['vegetariskt'], 'workern vitlistar taggar');
+});
