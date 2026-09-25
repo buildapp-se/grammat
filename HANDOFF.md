@@ -6,10 +6,27 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-09-17
+reviewedAt: 2026-09-25
 ---
 
 # Handoff
+
+## 2026-09-25: Att testa och egna kategorier
+
+- **Att testa** är en sjätte fast kategori (`course: 'testa'`) i `COURSES` i `app.js`,
+  `worker/worker.js` och `worker/reindex-all.js`. AI-importprompten nämner den inte med
+  avsikt: modellen ska gissa rättens riktiga kategori.
+- **Egna kategorier**: fältet `tags` (max 10, 30 tecken, unika oavsett skiftläge, `normTags`).
+  Fri text i redigeraren, kommaseparerad, med dina befintliga som ledtråd. Ett recept kan stå
+  i flera. Visas som egna avsnitt efter de fasta under Mina recept, sökbara. Privata:
+  `sanitizeIndexed` stryker `tags`, så de når aldrig Allas, Vänner eller profilsidor.
+  Workern deployades före frontend av samma skäl (version `cf1d531b`).
+- Val tagna åt Patrik: egna kategorier och taggar är samma fält, inte två system. Egna
+  avsnitt ser ut som de fasta, ingen markering.
+- **Cachefälla**: hämta aldrig `app.js?v=NY` innan Pages har publicerat, edgen cachar då
+  gamla filen under nya nyckeln i timmar. Polla `buildapp.se/grammat/?nc=<slump>` tills
+  nya versionen syns, hämta app.js först därefter. Hände i dag, löst med ny versionsnyckel.
+- Loggans träffyta var redan 44 px (fixad 2026-09-16), backlogpunkten var inaktuell.
 
 ## 2026-09-17: AP8, listorna som innehållsförteckning från 700 px
 

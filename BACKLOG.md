@@ -48,4 +48,11 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, headers, TLS, OWASP). Mätvärdena står under `## Audits` i CONTEXT.md.
 
-- [ ] `[P3]` UX, Fitts: logotyplänken "grammat." är 31 px hög på telefon, konventionen är 44 px.
+- [x] `[P3]` UX, Fitts: logotyplänken "grammat." är 44 px (fixad 2026-09-16, mätt 2026-09-25).
+
+## Kategorier och taggar
+
+- [ ] `[P3]` Byta namn på eller ta bort en egen kategori i alla recept på en gång. I dag
+  görs det recept för recept i redigeraren.
+- [ ] `[P3]` Publika taggar (t.ex. vegetariskt, snabbt) som syns och filtrerar i Allas
+  recept. Kräver ett beslut: fast lista eller fri text, och sanering i workern.

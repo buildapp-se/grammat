@@ -31,6 +31,9 @@ Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
 
 - Inget hushållsbegrepp. Ett par delar konto, och Firebase kontolänkning ger både
   Google och lösenord på samma konto.
+- Sex fasta kategorier (`COURSES`), varav "Att testa" är en. Varje recept har exakt en.
+  Egna kategorier (`tags`) läggs ovanpå, är privata och strykes serverside ur allt publikt
+  (beslut 2026-09-25).
 - Inga bilder på recept, och blob-modellen behålls i stället för normaliserade tabeller.
 - Servern är förtroendegränsen. Allt som renderas för andra användare saneras
   serverside, inte bara i klienten.
