@@ -54,5 +54,5 @@ Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, hea
 
 - [ ] `[P3]` Byta namn på eller ta bort en egen kategori i alla recept på en gång. I dag
   görs det recept för recept i redigeraren.
-- [ ] `[P3]` Publika taggar (t.ex. vegetariskt, snabbt) som syns och filtrerar i Allas
-  recept. Kräver ett beslut: fast lista eller fri text, och sanering i workern.
+- [x] Publika taggar, fast lista, sökbara (2026-09-25).
+- [ ] `[P3]` Taggknappar som filter överst i Allas recept, om sökningen inte räcker.

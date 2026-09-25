@@ -27,6 +27,13 @@ reviewedAt: 2026-09-25
   gamla filen under nya nyckeln i timmar. Polla `buildapp.se/grammat/?nc=<slump>` tills
   nya versionen syns, hämta app.js först därefter. Hände i dag, löst med ny versionsnyckel.
 - Loggans träffyta var redan 44 px (fixad 2026-09-16), backlogpunkten var inaktuell.
+- **Senare samma kväll**: Att testa står först i `COURSES`. Egna recept får en rullista för
+  kategorin direkt i receptvyn (`data-course-pick`). **Publika taggar** i fältet `labels`: fast
+  lista `LABELS` (kost, snabbt, tillfälle, kök), valt efter ICA:s och Köket.se:s filter som båda
+  är kuraterade. Kryssrutor i redigeraren, knappar i receptvyn som söker på taggen, sökbara i
+  alla listor. Workern vitlistar mot samma lista (hålls i synk för hand i `app.js` och
+  `worker/worker.js`). AI-importen sätter taggar. Egna kategorier visas i receptvyn med
+  streckad ram. Worker `fc7ca378`, frontend `labels-20260925`, verifierat live.
 
 ## 2026-09-17: AP8, listorna som innehållsförteckning från 700 px
 

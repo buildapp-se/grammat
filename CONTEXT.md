@@ -33,7 +33,8 @@ Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
   Google och lösenord på samma konto.
 - Sex fasta kategorier (`COURSES`), varav "Att testa" är en. Varje recept har exakt en.
   Egna kategorier (`tags`) läggs ovanpå, är privata och strykes serverside ur allt publikt
-  (beslut 2026-09-25).
+  (beslut 2026-09-25). Publika taggar (`labels`) är en fast lista, inte fri text, så de stavas
+  lika och kan vitlistas serverside; ändras listan måste `app.js` och `worker/worker.js` följas åt.
 - Inga bilder på recept, och blob-modellen behålls i stället för normaliserade tabeller.
 - Servern är förtroendegränsen. Allt som renderas för andra användare saneras
   serverside, inte bara i klienten.
