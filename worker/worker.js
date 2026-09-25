@@ -20,7 +20,7 @@ import { friendFeed, handleFriends } from './friends.js';
 // DELETE /save (Bearer) {ownerId,recipeId} -> {ok,saves}   tar bort sparning
 // DELETE /account (Bearer Firebase-JWT) -> {ok}  raderar D1-raden (Firebase-usern raderas client-side)
 const FIREBASE_PROJECT = 'grammat-78450';
-const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
+const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas', 'testa'];
 const normalizeCourse = course => COURSES.includes(course) ? course : 'huvudratt';
 const cors = {
   'Access-Control-Allow-Origin': '*',

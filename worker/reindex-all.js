@@ -4,7 +4,7 @@
 //   node reindex-all.js dump.json > reindex.sql
 //   npx wrangler d1 execute recept --remote --file reindex.sql     (radera dump.json + reindex.sql efteråt)
 const rows = require(require('path').resolve(process.argv[2]))[0].results;
-const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
+const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas', 'testa'];
 const normalizeCourse = course => COURSES.includes(course) ? course : 'huvudratt';
 const q = s => "'" + String(s).replace(/'/g, "''") + "'";
 let sql = '';

@@ -84,6 +84,7 @@ assert.deepStrictEqual(normalizeState({ recipes: [] }).struck, {}, 'gammal state
 assert.strictEqual(restored.recipes[0].source, '', 'osäker källa följer inte med backup');
 assert.strictEqual(restored.recipes[0].course, 'huvudratt', 'saknad course i backup faller tillbaka till huvudratt');
 assert.ok(COURSES.includes('sas'), 'såser & röror finns som course');
+assert.strictEqual(normalizeCourse('testa'), 'testa', 'Att testa är en egen course');
 assert.strictEqual(restored.selections.length, 1, 'val utan recept filtreras');
 assert.strictEqual(normalizeState(restored).extras[0].text, 'mjölk', 'rå state kan också återställas');
 

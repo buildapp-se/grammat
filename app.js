@@ -3,8 +3,8 @@
 // ---------- rena funktioner (testas i test.js) ----------
 const CATS = ['grönt', 'kött', 'mejeri', 'skafferi', 'fryst', 'övrigt'];
 const CAT_LABELS = { 'grönt': 'Grönt', 'kött': 'Kött & chark', 'mejeri': 'Mejeri', 'skafferi': 'Skafferi', 'fryst': 'Fryst', 'övrigt': 'Övrigt' };
-const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
-const COURSE_LABELS = { forratt: 'Förrätt', huvudratt: 'Huvudrätt', efterratt: 'Efterrätt', dryck: 'Drycker', sas: 'Såser & röror' };
+const COURSES = ['forratt', 'huvudratt', 'efterratt', 'dryck', 'sas', 'testa'];
+const COURSE_LABELS = { forratt: 'Förrätt', huvudratt: 'Huvudrätt', efterratt: 'Efterrätt', dryck: 'Drycker', sas: 'Såser & röror', testa: 'Att testa' };
 
 function keyOf(name) { return name.toLowerCase().trim(); }
 function ingLabel(n) { return n === 1 ? '1 ingrediens' : n + ' ingredienser'; }
