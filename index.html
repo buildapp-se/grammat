@@ -297,7 +297,8 @@ label.tag-pick{display:inline-flex;align-items:center;gap:8px;min-height:var(--t
 .invite-pill i{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-style:normal}
 .invite h1{font-size:34px;margin-top:18px}
 .invite-lede{margin-top:14px;font-size:16px;line-height:1.5;color:#3A372F}
-.invite-actions{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.invite-actions{display:flex;flex-direction:column;gap:10px;margin-top:28px;max-width:400px}
+.login{max-width:400px} /* inloggning ska inte ärva receptvyns 920 px */
 .invite-actions .hint{text-align:center;margin:2px 0 0;font-size:13px}
 .invite-recipes{margin-top:36px}
 .invite-recipes .label{margin:0 0 12px}
@@ -417,6 +418,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=labels-20260925"></script>
+<script src="app.js?v=login400-20260930"></script>
 </body>
 </html>
