@@ -1,0 +1,859 @@
+{
+ "animals": [
+  {
+   "id": "not",
+   "sv": "Nöt",
+   "en": "Beef",
+   "regions": [
+    {
+     "id": "not-hals",
+     "sv": "Hals",
+     "en": "Neck",
+     "aka": [
+      "nöthals",
+      "neck",
+      "UK: clod and sticking"
+     ],
+     "description": "Mycket magert, hårt och smakrikt kött som blir gott först efter långkok på ben.",
+     "bestFor": [
+      "gryta",
+      "långkok"
+     ],
+     "position": "hals, framför högreven"
+    },
+    {
+     "id": "not-hogrev",
+     "sv": "Högrev",
+     "en": "Chuck",
+     "aka": [
+      "chuck roll",
+      "chuck eye",
+      "UK: chuck and blade",
+      "bogrygg"
+     ],
+     "description": "Marmorerat, bindvävsrikt framdelskött, klassiskt till kalops, grytor och grytstek.",
+     "bestFor": [
+      "gryta",
+      "bräsera",
+      "sous vide",
+      "rökning"
+     ],
+     "position": "rygg, främre del ovanför bogen"
+    },
+    {
+     "id": "not-bog",
+     "sv": "Bog (bogbladsplatta, bogrulle, liten bogstek)",
+     "en": "Shoulder / chuck clod",
+     "aka": [
+      "bogbladsplatta",
+      "bogrulle = chuck tender (Svenskt Kött)",
+      "liten bogstek = shoulder tender, teres major",
+      "märgpipa"
+     ],
+     "description": "Framdelskött med grova fibrer, främst till grytor och soppor; liten bogstek är ett mört undantag.",
+     "bestFor": [
+      "gryta",
+      "bräsera",
+      "soppa"
+     ],
+     "position": "skuldra och överarm"
+    },
+    {
+     "id": "not-fjaderbladsbog",
+     "sv": "Fjäderbladsbog (luffarbiff)",
+     "en": "Top blade",
+     "aka": [
+      "luffarbiff",
+      "luffarstek",
+      "US: flat iron steak (styckad på längden)",
+      "UK: feather blade"
+     ],
+     "description": "Smakrik, marmorerad bit på skulderbladet med en sena i mitten; grillas i skivor eller bräseras hel.",
+     "bestFor": [
+      "grill",
+      "stek",
+      "bräsera"
+     ],
+     "position": "skulderbladets ovansida"
+    },
+    {
+     "id": "not-entrecote",
+     "sv": "Entrecôte",
+     "en": "Ribeye",
+     "aka": [
+      "rib eye",
+      "ribeye steak",
+      "entrecôtekärna och entrecôtekappa (ribeye cap, spinalis)",
+      "med långt ben: tomahawk",
+      "med ben: côte de boeuf / bone-in ribeye",
+      "UK: fore rib"
+     ],
+     "description": "Mör, kraftigt marmorerad främre ryggmuskel; stek, grilla eller helstek i ugn.",
+     "bestFor": [
+      "grill",
+      "stek",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "rygg, främre del (revben 6–12 ungefär)"
+    },
+    {
+     "id": "not-ryggbiff",
+     "sv": "Ryggbiff (biff, biffrad)",
+     "en": "Striploin",
+     "aka": [
+      "biffrad",
+      "utskuren biff",
+      "ytterfilé (vilseledande, inte filé)",
+      "US: New York strip, strip steak, strip loin",
+      "UK: sirloin (brittisk sirloin = svensk ryggbiff)",
+      "med filé och ben: T-bone / porterhouse",
+      "bakre del: skomakarbit"
+     ],
+     "description": "Mör och smakrik lång ryggmuskel bakom entrecôten; obs: brittisk sirloin motsvarar ryggbiff, amerikansk sirloin motsvarar snarare rostbiff.",
+     "bestFor": [
+      "stek",
+      "grill",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "rygg, bakre del (ländrygg)"
+    },
+    {
+     "id": "not-oxfile",
+     "sv": "Oxfilé",
+     "en": "Tenderloin",
+     "aka": [
+      "innerfilé",
+      "filé",
+      "UK: fillet",
+      "filet mignon (smala delen)",
+      "chateaubriand / tournedos (mittbit, cœur de filet)"
+     ],
+     "description": "Djurets mest möra och magra muskel på ryggens insida; steks rosa i skivor eller hel.",
+     "bestFor": [
+      "stek",
+      "grill",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "insidan av ländryggen"
+    },
+    {
+     "id": "not-rostbiff",
+     "sv": "Rostbiff",
+     "en": "Top sirloin / rump",
+     "aka": [
+      "US: top sirloin (butt)",
+      "UK: rump",
+      "delas i rostlock med kappa, rostas och rostbiffsspegel"
+     ],
+     "description": "Mager, mör bakdelsbit som helsteks i ugn till rosa, eller skivas; OBS svensk rostbiff är inte brittisk 'roast beef'-bit (där ofta sirloin/rib).",
+     "bestFor": [
+      "ugn",
+      "sous vide",
+      "stek",
+      "grill"
+     ],
+     "position": "bakdel, mellan rygg och lår (höften)"
+    },
+    {
+     "id": "not-rostlock",
+     "sv": "Rostlock med kappa (picanha)",
+     "en": "Picanha / rump cap",
+     "aka": [
+      "picanha",
+      "pichana",
+      "rostbiffslock",
+      "rumpstek",
+      "US: top sirloin cap, coulotte",
+      "UK: rump cap"
+     ],
+     "description": "Del av rostbiffen med tjock fettkappa, grovfibrig och smakrik; populär på grill och som stek.",
+     "bestFor": [
+      "grill",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "rostbiffens ovansida mot svansen"
+    },
+    {
+     "id": "not-rostas",
+     "sv": "Rostas",
+     "en": "Rump heart (ungefärligt)",
+     "aka": [
+      "rostasfilé (är inte filé)",
+      "UK: rump heart / eye of rump",
+      "US: top sirloin center cut (ungefärligt)"
+     ],
+     "description": "Mindre, mörare muskel ur rostbiffen som tillagas som oxfilé; ofta förväxlad med picanha men är en annan del.",
+     "bestFor": [
+      "stek",
+      "grill",
+      "sous vide"
+     ],
+     "position": "inuti rostbiffen"
+    },
+    {
+     "id": "not-fransyska",
+     "sv": "Fransyska",
+     "en": "Knuckle / sirloin tip",
+     "aka": [
+      "US: sirloin tip, knuckle, round tip",
+      "UK: thick flank",
+      "stora, lilla och platta fransyskan",
+      "oxstek",
+      "nötstek"
+     ],
+     "description": "Mager, bindvävsrik stor rund muskel ovanför knät; grytstek, oxstek eller lågtemp i ugn.",
+     "bestFor": [
+      "bräsera",
+      "ugn",
+      "sous vide",
+      "gryta"
+     ],
+     "position": "bakben, framsidan ovanför knät"
+    },
+    {
+     "id": "not-innanlar",
+     "sv": "Innanlår",
+     "en": "Top round",
+     "aka": [
+      "US: top round, inside round",
+      "UK: topside",
+      "lövbiff (skivad)",
+      "elefantöra"
+     ],
+     "description": "Magert, milt kött utan hinnor; snabb tillagning eller hel stek, blir segt vid långkok.",
+     "bestFor": [
+      "stek",
+      "wok",
+      "ugn",
+      "råbiff"
+     ],
+     "position": "bakbenets insida"
+    },
+    {
+     "id": "not-ytterlar",
+     "sv": "Ytterlår och rulle",
+     "en": "Bottom round / eye of round",
+     "aka": [
+      "ytterlår: US bottom round, outside round; UK silverside",
+      "rulle: eye of round, UK silverside eye",
+      "saltrulle",
+      "nötstek/oxstek i butik"
+     ],
+     "description": "Grov, bindvävsrik men mager muskel; långsam tillagning i gryta eller ugn, rulle blir saltrulle.",
+     "bestFor": [
+      "gryta",
+      "ugn",
+      "bräsera"
+     ],
+     "position": "bakbenets utsida"
+    },
+    {
+     "id": "not-bringa",
+     "sv": "Bringa",
+     "en": "Brisket",
+     "aka": [
+      "oxbringa",
+      "nötbringa",
+      "bringspets = brisket point (Svenskt Kött)",
+      "US: brisket (flat + point)",
+      "rimmad oxbringa"
+     ],
+     "description": "Fet, bindvävsrik bröstbit; kokas rimmad, bräseras eller röks länge som BBQ-brisket.",
+     "bestFor": [
+      "gryta",
+      "rökning",
+      "sous vide",
+      "koka"
+     ],
+     "position": "bröst, mellan frambenen"
+    },
+    {
+     "id": "not-revbensstek",
+     "sv": "Revbensstek",
+     "en": "Short ribs",
+     "aka": [
+      "short ribs",
+      "UK: Jacob's ladder, thin rib, short rib",
+      "tunnbringa med ben (delvis)"
+     ],
+     "description": "Marmorerad bit med revben; bräseras eller sous vide länge, sedan grillas.",
+     "bestFor": [
+      "bräsera",
+      "sous vide",
+      "grill"
+     ],
+     "position": "revbenens nedre del under entrecôten"
+    },
+    {
+     "id": "not-flankstek",
+     "sv": "Flankstek (kållapp)",
+     "en": "Flank steak",
+     "aka": [
+      "kållapp",
+      "flank",
+      "UK: bavette (ibland)",
+      "flappstek = US sirloin flap, bavette"
+     ],
+     "description": "Platt, grovfibrig och smakrik bukmuskel; marinera, grilla hett och skär tvärs fibrerna.",
+     "bestFor": [
+      "grill",
+      "stek",
+      "wok"
+     ],
+     "position": "buk, bakre del"
+    },
+    {
+     "id": "not-mellangarde",
+     "sv": "Mellangärde (bringfäste) och njurtapp",
+     "en": "Skirt steak / hanger",
+     "aka": [
+      "yttre bringfäste = outside skirt",
+      "inre bringfäste = inside skirt",
+      "njurtapp = hanger steak, onglet, butcher's steak, slaktarbiff",
+      "fajitas-kött"
+     ],
+     "description": "Tunna, grovfibriga och mycket smakrika muskler; snabb het tillagning och servera rosa.",
+     "bestFor": [
+      "grill",
+      "stek",
+      "wok"
+     ],
+     "position": "mellangärdet innanför revbenen"
+    },
+    {
+     "id": "not-lagg",
+     "sv": "Lägg och oxsvans",
+     "en": "Shank / oxtail",
+     "aka": [
+      "framlägg",
+      "baklägg",
+      "US: shank",
+      "UK: shin (fram), leg (bak)",
+      "osso buco (kalv)",
+      "oxsvans = oxtail"
+     ],
+     "description": "Senigt, gelatinrikt kött som kräver flera timmars långkok; ger mustig buljong.",
+     "bestFor": [
+      "gryta",
+      "långkok",
+      "soppa"
+     ],
+     "position": "benens nedre del resp. svansen"
+    }
+   ]
+  },
+  {
+   "id": "gris",
+   "sv": "Gris",
+   "en": "Pork",
+   "regions": [
+    {
+     "id": "gris-karre",
+     "sv": "Fläskkarré",
+     "en": "Pork collar / neck",
+     "aka": [
+      "karré",
+      "US: pork collar, coppa; övre del av Boston butt",
+      "UK: spare rib joint (ungefärligt)",
+      "OBS: engelskt 'rack' är inte karré"
+     ],
+     "description": "Marmorerad, saftig och tålig nackbit (ca 11 % fett); ugn, grill, långkok eller sous vide.",
+     "bestFor": [
+      "ugn",
+      "grill",
+      "sous vide",
+      "långkok"
+     ],
+     "position": "nacke, ovanför bogen"
+    },
+    {
+     "id": "gris-pluma-sekreto",
+     "sv": "Pluma och sekreto (halsbit)",
+     "en": "Pluma / secreto",
+     "aka": [
+      "pluma = kotlettkappa",
+      "sekreto = halsbit, secreto"
+     ],
+     "description": "Små, rikt marmorerade specialdetaljer från framdelen, grillas snabbt som entrecôte.",
+     "bestFor": [
+      "grill",
+      "stek"
+     ],
+     "position": "framdel, ovanpå kotlett/karré resp. vid bogen"
+    },
+    {
+     "id": "gris-bog",
+     "sv": "Bog (fläskbog, picknickbog, bogblad)",
+     "en": "Pork shoulder",
+     "aka": [
+      "fläskbog",
+      "picknickbog = US picnic shoulder",
+      "bogbladsstek",
+      "pulled pork",
+      "US: Boston butt inkluderar även svensk karré"
+     ],
+     "description": "Smakrikt, medelfett framdelskött; klassiskt till pulled pork, grytor och fläskstek.",
+     "bestFor": [
+      "långkok",
+      "ugn",
+      "sous vide",
+      "rökning",
+      "gryta"
+     ],
+     "position": "skuldra och främre bröstkorg"
+    },
+    {
+     "id": "gris-kotlettrad",
+     "sv": "Kotlettrad och kotlett",
+     "en": "Pork loin / chop",
+     "aka": [
+      "fläskkotlett",
+      "benfri kotlettrad",
+      "fläskytterfilé (renskuren kotlettrad, inte filé)",
+      "fläskhare",
+      "racks av gris = kronkotlett, frenched rack",
+      "US: pork loin, center cut chop"
+     ],
+     "description": "Mager ryggmuskel med eller utan ben och fettkant; steks hel i ugn eller som kotletter.",
+     "bestFor": [
+      "stek",
+      "grill",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "rygg, mitt"
+    },
+    {
+     "id": "gris-kamben",
+     "sv": "Kamben",
+     "en": "Baby back ribs",
+     "aka": [
+      "US: baby back ribs, loin back ribs",
+      "UK: loin ribs"
+     ],
+     "description": "Benen som blir kvar när kotlettraden benas ur; grillas eller ugnsbakas.",
+     "bestFor": [
+      "grill",
+      "ugn",
+      "sous vide"
+     ],
+     "position": "under kotlettraden längs ryggraden"
+    },
+    {
+     "id": "gris-file",
+     "sv": "Fläskfilé",
+     "en": "Pork tenderloin",
+     "aka": [
+      "filé",
+      "innerfilé",
+      "UK: pork fillet"
+     ],
+     "description": "Mager (2–3 % fett) och mycket mör; steks hel eller i medaljonger till 60–68 °C.",
+     "bestFor": [
+      "stek",
+      "ugn",
+      "grill",
+      "sous vide"
+     ],
+     "position": "insidan av ländryggen"
+    },
+    {
+     "id": "gris-sida",
+     "sv": "Sida (sidfläsk)",
+     "en": "Pork belly",
+     "aka": [
+      "sidfläsk",
+      "bröstsida",
+      "ryggsida",
+      "bacon",
+      "pancetta",
+      "UK: belly pork"
+     ],
+     "description": "Fet och smakrik bit som steks i skivor, rimmas till fläsk eller helsteks med krispig svål.",
+     "bestFor": [
+      "ugn",
+      "stek",
+      "sous vide",
+      "rökning"
+     ],
+     "position": "buk"
+    },
+    {
+     "id": "gris-revben",
+     "sv": "Revbensspjäll (tjocka och tunna revben)",
+     "en": "Spare ribs",
+     "aka": [
+      "revben",
+      "spjäll",
+      "tjocka revben",
+      "tunna revben",
+      "St Louis = trimmade spareribs",
+      "broskkam",
+      "US: spare ribs, St Louis-style ribs"
+     ],
+     "description": "Fett, bindvävsrikt kött på ben; långsam grill eller ugn, förkokning eller sous vide före glasering.",
+     "bestFor": [
+      "grill",
+      "ugn",
+      "sous vide",
+      "rökning"
+     ],
+     "position": "bröstkorgens sida, mot buken"
+    },
+    {
+     "id": "gris-skinka",
+     "sv": "Skinka",
+     "en": "Ham / leg",
+     "aka": [
+      "färsk skinka",
+      "skinkstek",
+      "innanlår av gris (skinkinnanlår)",
+      "ytterlår",
+      "fransyska",
+      "skinkrostbiff (förbit)",
+      "spindelstek",
+      "julskinka (rimmad)",
+      "US: fresh ham, leg"
+     ],
+     "description": "Stor, mager bakdel som delas i stekar eller rimmas till julskinka; ugn eller kokning till ca 68–72 °C.",
+     "bestFor": [
+      "ugn",
+      "koka",
+      "sous vide",
+      "grill"
+     ],
+     "position": "bakben, lår"
+    },
+    {
+     "id": "gris-flintastek",
+     "sv": "Flintastek",
+     "en": "Bone-in ham steak",
+     "aka": [
+      "skivad färsk skinka med ben och svål",
+      "US: ham steak (bone-in, färsk)"
+     ],
+     "description": "Skivad färsk skinka med ben och svål, en svensk grillklassiker.",
+     "bestFor": [
+      "grill",
+      "stek"
+     ],
+     "position": "bakben, tvärskivat"
+    },
+    {
+     "id": "gris-lagg",
+     "sv": "Lägg",
+     "en": "Hock / shank",
+     "aka": [
+      "fläsklägg",
+      "rimmad fläsklägg",
+      "pingvinklubba (minilägg)",
+      "US: ham hock, shank",
+      "UK: knuckle",
+      "tyska: Eisbein, Schweinshaxe"
+     ],
+     "description": "Svålrikt, senigt kött som kokas (rimmad till ärtsoppa och rotmos) eller ugnsbakas länge.",
+     "bestFor": [
+      "koka",
+      "långkok",
+      "ugn"
+     ],
+     "position": "benens nedre del"
+    }
+   ]
+  },
+  {
+   "id": "lamm",
+   "sv": "Lamm",
+   "en": "Lamb",
+   "regions": [
+    {
+     "id": "lamm-hals",
+     "sv": "Hals och rygg (nacke)",
+     "en": "Neck",
+     "aka": [
+      "lammhals",
+      "lammnacke",
+      "UK: neck fillet (benfri)",
+      "US: lamb neck"
+     ],
+     "description": "Marmorerat, saftigt kött; övre delen till grytor, nedre delen kan skivas och stekas.",
+     "bestFor": [
+      "gryta",
+      "bräsera"
+     ],
+     "position": "hals och nacke"
+    },
+    {
+     "id": "lamm-bog",
+     "sv": "Bog",
+     "en": "Shoulder",
+     "aka": [
+      "lammbog",
+      "bogstek",
+      "US/UK: lamb shoulder"
+     ],
+     "description": "Långkoksdel som ger sönderfallande kött; får i kål, dillkött, långbakad bog.",
+     "bestFor": [
+      "gryta",
+      "långkok",
+      "ugn",
+      "bräsera"
+     ],
+     "position": "skuldra"
+    },
+    {
+     "id": "lamm-entrecote",
+     "sv": "Entrecôte (karré)",
+     "en": "Lamb ribeye / best end",
+     "aka": [
+      "lammentrecôte",
+      "lammkarré (med ben)",
+      "lammnacke (delvis)",
+      "UK: best end neck"
+     ],
+     "description": "Mör, marmorerad främre ryggdel som steks hel och serveras rosa.",
+     "bestFor": [
+      "stek",
+      "grill",
+      "ugn"
+     ],
+     "position": "rygg, främre del"
+    },
+    {
+     "id": "lamm-racks",
+     "sv": "Racks",
+     "en": "Rack of lamb",
+     "aka": [
+      "lammracks",
+      "frenched rack",
+      "lammkrona (crown roast)",
+      "UK: best end of neck"
+     ],
+     "description": "Halva kotlettraden med långa, rensade ben; steks i ugn och skärs mellan benen.",
+     "bestFor": [
+      "ugn",
+      "grill",
+      "sous vide"
+     ],
+     "position": "rygg, främre kotlettrad"
+    },
+    {
+     "id": "lamm-sadel",
+     "sv": "Sadel, kotletter och ytterfilé",
+     "en": "Saddle / loin",
+     "aka": [
+      "lammsadel",
+      "lammrygg",
+      "lammkotlett",
+      "dubbelkotlett = parkotlett, US: double loin chop",
+      "ytterfilé = loin eye, UK: loin fillet",
+      "US: lamb loin"
+     ],
+     "description": "Ryggpartiet med kotlettrad, ytterfilé och filé; mört, serveras rosa.",
+     "bestFor": [
+      "ugn",
+      "stek",
+      "grill"
+     ],
+     "position": "rygg, bakre del"
+    },
+    {
+     "id": "lamm-file",
+     "sv": "Innerfilé",
+     "en": "Tenderloin",
+     "aka": [
+      "lammfilé",
+      "lamminnerfilé",
+      "US/UK: lamb tenderloin, fillet"
+     ],
+     "description": "Liten (ca 100 g) och mycket mör; steks snabbt och serveras rosa.",
+     "bestFor": [
+      "stek",
+      "grill"
+     ],
+     "position": "insidan av sadeln"
+    },
+    {
+     "id": "lamm-bringa",
+     "sv": "Bringa och tunnbringa",
+     "en": "Breast",
+     "aka": [
+      "lammbringa",
+      "tunnbringa",
+      "slaksida",
+      "lammspjäll",
+      "US/UK: lamb breast, riblets"
+     ],
+     "description": "Fet (ca 17 %) bröstbit med revben; långkok, fylld rulle eller grillade spjäll.",
+     "bestFor": [
+      "långkok",
+      "grill",
+      "ugn"
+     ],
+     "position": "bröstkorgens undersida"
+    },
+    {
+     "id": "lamm-stek",
+     "sv": "Stek (lår)",
+     "en": "Leg",
+     "aka": [
+      "lammstek",
+      "lammlår",
+      "trippelstek = lunchstek",
+      "lammrostbiff",
+      "fårfiol (rimmad, rökt)",
+      "US/UK: leg of lamb"
+     ],
+     "description": "Finmarmorerad bakdel som helsteks i ugn eller delas i ministekar.",
+     "bestFor": [
+      "ugn",
+      "sous vide",
+      "grill"
+     ],
+     "position": "bakben"
+    },
+    {
+     "id": "lamm-lagg",
+     "sv": "Lägg",
+     "en": "Shank",
+     "aka": [
+      "lammlägg",
+      "framlägg",
+      "baklägg",
+      "US/UK: lamb shank"
+     ],
+     "description": "Gelatinrik långkoksdel som blir smältande mör efter bräsering eller låg ugnsvärme.",
+     "bestFor": [
+      "bräsera",
+      "långkok",
+      "sous vide",
+      "ugn"
+     ],
+     "position": "benens nedre del"
+    }
+   ]
+  },
+  {
+   "id": "kyckling",
+   "sv": "Kyckling",
+   "en": "Chicken",
+   "regions": [
+    {
+     "id": "kyckling-brost",
+     "sv": "Bröst (filé)",
+     "en": "Breast",
+     "aka": [
+      "kycklingfilé",
+      "kycklingbröst",
+      "chicken breast",
+      "supreme (med vingben)"
+     ],
+     "description": "Magert vitt kött som lätt blir torrt; stek, ugn eller sous vide.",
+     "bestFor": [
+      "stek",
+      "ugn",
+      "grill",
+      "sous vide"
+     ],
+     "position": "bröstbenets båda sidor"
+    },
+    {
+     "id": "kyckling-innerfile",
+     "sv": "Innerfilé",
+     "en": "Tenderloin / tender",
+     "aka": [
+      "kycklinginnerfilé",
+      "chicken tenders"
+     ],
+     "description": "Liten, mör remsa under bröstfilén; snabb stekning och panering.",
+     "bestFor": [
+      "stek",
+      "wok"
+     ],
+     "position": "undersidan av bröstfilén"
+    },
+    {
+     "id": "kyckling-overlar",
+     "sv": "Lår och lårfilé (överlår)",
+     "en": "Thigh",
+     "aka": [
+      "kycklinglår",
+      "lårfilé",
+      "överlår",
+      "chicken thigh"
+     ],
+     "description": "Saftigt mörkt kött som tål hög värme och lång tid.",
+     "bestFor": [
+      "ugn",
+      "grill",
+      "gryta",
+      "sous vide"
+     ],
+     "position": "benets övre del"
+    },
+    {
+     "id": "kyckling-klubba",
+     "sv": "Klubba (underlår)",
+     "en": "Drumstick",
+     "aka": [
+      "kycklingklubba",
+      "underlår",
+      "drumstick"
+     ],
+     "description": "Mörkt kött på ben, klart vid 82 °C intill benet.",
+     "bestFor": [
+      "ugn",
+      "grill",
+      "fritera"
+     ],
+     "position": "benets nedre del"
+    },
+    {
+     "id": "kyckling-vinge",
+     "sv": "Vinge",
+     "en": "Wing",
+     "aka": [
+      "kycklingvinge",
+      "drumette och flat/wingette",
+      "buffalo wings"
+     ],
+     "description": "Skinn- och bindvävsrik; ugn eller fritös i hög värme.",
+     "bestFor": [
+      "ugn",
+      "grill",
+      "fritera"
+     ],
+     "position": "vingarna"
+    },
+    {
+     "id": "kyckling-skrov",
+     "sv": "Skrov och hel kyckling",
+     "en": "Carcass / whole bird",
+     "aka": [
+      "kycklingskrov",
+      "rygg",
+      "spatchcock = fläkt kyckling"
+     ],
+     "description": "Skrovet ger fond; hel eller fläkt kyckling ugnsteks till 82 °C i låret.",
+     "bestFor": [
+      "fond",
+      "ugn",
+      "grill"
+     ],
+     "position": "rygg och bål"
+    }
+   ]
+  }
+ ],
+ "note": "Struktur efter Svenskt Kötts styckningsschema. Engelska namn är närmaste motsvarighet; svensk styckning mappar inte 1:1 mot US/UK.",
+ "sources": [
+  "https://svensktkott.se/om-kott/styckdetaljer/not/",
+  "https://svensktkott.se/om-kott/styckdetaljer/gris/",
+  "https://svensktkott.se/om-kott/styckdetaljer/lamm/",
+  "https://svensktkott.se/om-kott/kopa-laga-och-forvara/kopa-kott/att-kopa-notkott/"
+ ]
+}

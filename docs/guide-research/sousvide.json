@@ -1,0 +1,1527 @@
+[
+ {
+  "id": "not-entrecote",
+  "animal": "not",
+  "sv": "Entrecôte",
+  "en": "Ribeye",
+  "cutId": "not-entrecote",
+  "thickness": "3–4 cm",
+  "options": [
+   {
+    "label": "Blodig",
+    "tempC": 52,
+    "time": "1–2,5 h",
+    "note": "Max 2,5 h under 54,5 °C"
+   },
+   {
+    "label": "Rosa (medium rare)",
+    "tempC": 55,
+    "time": "1,5–4 h",
+    "note": "Marmorerad: 55–57 rekommenderas"
+   },
+   {
+    "label": "Medium",
+    "tempC": 57,
+    "time": "1,5–4 h",
+    "note": "Fettet smälter bättre, Kenjis val för ribeye"
+   },
+   {
+    "label": "Genomstekt",
+    "tempC": 65,
+    "time": "1,5–3,5 h",
+    "note": null
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "56 °C 1,5–2 h; 54,5 °C 1 h; 54 °C 2 h",
+  "flag": null,
+  "sources": [
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/styckdetaljer/not/entrecote/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-ryggbiff",
+  "animal": "not",
+  "sv": "Ryggbiff",
+  "en": "Striploin (US New York strip, UK sirloin)",
+  "cutId": "not-ryggbiff",
+  "thickness": "2,5–4 cm",
+  "options": [
+   {
+    "label": "Blodig",
+    "tempC": 52,
+    "time": "1–2,5 h",
+    "note": "Max 2,5 h under 54,5 °C"
+   },
+   {
+    "label": "Rosa (medium rare)",
+    "tempC": 55,
+    "time": "1–4 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "1–4 h",
+    "note": null
+   },
+   {
+    "label": "Genomstekt",
+    "tempC": 65,
+    "time": "1–3,5 h",
+    "note": "Torrare, sous vide ger lite vinst här"
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "56 °C 3 h; hel bit 1 kg 54 °C 3 h",
+  "flag": "Baslinje ok. Hel bit (6–8 cm) behöver 3–5 h för att nå kärntemp (Baldwin: 60 mm ca 4¾ h från kyl).",
+  "sources": [
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/sous-vide/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-oxfile",
+  "animal": "not",
+  "sv": "Oxfilé",
+  "en": "Beef tenderloin (UK fillet)",
+  "cutId": "not-oxfile",
+  "thickness": "3–5 cm (skivor) eller hel",
+  "options": [
+   {
+    "label": "Blodig",
+    "tempC": 51,
+    "time": "45 min–2,5 h",
+    "note": "Kenji: filé gärna 49–53 °C"
+   },
+   {
+    "label": "Rosa (medium rare)",
+    "tempC": 54,
+    "time": "45 min–2,5 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 57,
+    "time": "45 min–4 h",
+    "note": null
+   },
+   {
+    "label": "Hel filé, rosa",
+    "tempC": 54,
+    "time": "2,5–3,5 h",
+    "note": "Hel filé ca 6–8 cm tjock: tiden styrs av tjocklek"
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "Hel 54,5 °C 2,5 h; skivor 3 cm 54 °C 1 h",
+  "flag": null,
+  "sources": [
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/sous-vide/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-rostbiff",
+  "animal": "not",
+  "sv": "Rostbiff",
+  "en": "Top sirloin / rump (UK rump)",
+  "cutId": "not-rostbiff",
+  "thickness": "hel bit ca 1 kg",
+  "options": [
+   {
+    "label": "Rosa, jämn",
+    "tempC": 56,
+    "time": "6–14 h",
+    "note": "ChefSteps stek (roast) medium rare 58 °C 6–14 h; 56 för rosa"
+   },
+   {
+    "label": "Mörare, rosa",
+    "tempC": 55,
+    "time": "18–27 h",
+    "note": "Baslinjens 27 h ger mycket mör men mjukare textur"
+   }
+  ],
+  "finish": "Bryn runt om i het panna 2–3 min totalt, vila ej nödvändig",
+  "safety": null,
+  "baseline": "55 °C 27 h",
+  "flag": "Källorna anger kortare tid (6–14 h) för stekar. 27 h är ok men ger mjukare, något 'pastejig' struktur; båda tas med.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/sous-vide/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-fransyska",
+  "animal": "not",
+  "sv": "Fransyska",
+  "en": "Knuckle / sirloin tip (UK thick flank)",
+  "cutId": "not-fransyska",
+  "thickness": "hel bit ca 2 kg",
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 56,
+    "time": "8–16 h",
+    "note": "Bindvävsrik, gynnas av lång tid"
+   },
+   {
+    "label": "Medium",
+    "tempC": 60,
+    "time": "6–14 h",
+    "note": null
+   },
+   {
+    "label": "Mör grytstek-känsla",
+    "tempC": 58,
+    "time": "24 h",
+    "note": "Svenskt Kött: fransyska vinner på upp till 24 h"
+   }
+  ],
+  "finish": "Bryn runt om i het panna",
+  "safety": null,
+  "baseline": "55 °C 4 h (2 kg)",
+  "flag": "4 h räcker knappt för att en 2 kg-bit ska nå kärntemp och ger ingen mörning; valde 8–16 h (ChefSteps roast, Svenskt Kött 'upp till 24 h').",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/sous-vide/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo",
+   "https://douglasbaldwin.com/sous-vide.html"
+  ]
+ },
+ {
+  "id": "not-hogrev",
+  "animal": "not",
+  "sv": "Högrev",
+  "en": "Chuck (chuck roll)",
+  "cutId": "not-hogrev",
+  "thickness": "hel bit 1 kg+ eller skivor 3 cm",
+  "options": [
+   {
+    "label": "Rosa, biffig",
+    "tempC": 55,
+    "time": "24–48 h",
+    "note": "Baldwin: sega bitar 55 °C 24–48 h"
+   },
+   {
+    "label": "Rosa, mörare",
+    "tempC": 57,
+    "time": "36 h",
+    "note": null
+   },
+   {
+    "label": "Mör, skivbar",
+    "tempC": 65,
+    "time": "16–24 h",
+    "note": "ChefSteps tough cuts medium"
+   },
+   {
+    "label": "Sönderfallande",
+    "tempC": 70,
+    "time": "16–24 h",
+    "note": "Baslinje skivor 3 cm"
+   }
+  ],
+  "finish": "Bryn i het panna eller på grill",
+  "safety": null,
+  "baseline": "1 kg+: 58 °C 36 h, 55 °C 36 h; skivor 3 cm: 70 °C 16 h",
+  "flag": null,
+  "sources": [
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-bringa",
+  "animal": "not",
+  "sv": "Oxbringa",
+  "en": "Brisket",
+  "cutId": "not-bringa",
+  "thickness": "hel bit",
+  "options": [
+   {
+    "label": "Skivbar, saftig",
+    "tempC": 57,
+    "time": "36–72 h",
+    "note": "Anova; Baldwin 57 °C 36–48 h"
+   },
+   {
+    "label": "Mör, faller isär",
+    "tempC": 68,
+    "time": "24–36 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Mycket mör",
+    "tempC": 80,
+    "time": "24–36 h",
+    "note": "Baldwin (hög temp)"
+   }
+  ],
+  "finish": "Bryn eller rök kort; eller glasera under grill",
+  "safety": null,
+  "baseline": null,
+  "flag": "Baslinjen har 'Bringa med ben (short ribs) 68 °C 22 h', men short ribs heter revbensstek i svensk styckning. Delat i två poster.",
+  "sources": [
+   "https://anovaculinary.com/pages/sous-vide-brisket-guide",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/sous-vide/"
+  ]
+ },
+ {
+  "id": "not-revbensstek",
+  "animal": "not",
+  "sv": "Revbensstek (short ribs)",
+  "en": "Beef short ribs",
+  "cutId": "not-revbensstek",
+  "thickness": "med ben",
+  "options": [
+   {
+    "label": "Rosa, biffig",
+    "tempC": 57,
+    "time": "48–72 h",
+    "note": "55–57 °C är den klassiska 'steklika' varianten"
+   },
+   {
+    "label": "Mör, klassisk bräsering",
+    "tempC": 68,
+    "time": "22–24 h",
+    "note": "Baslinjens värde, ligger inom ChefSteps tough cuts 65 °C 16–24 h"
+   },
+   {
+    "label": "Faller från benet",
+    "tempC": 80,
+    "time": "12–24 h",
+    "note": null
+   }
+  ],
+  "finish": "Skär bort yttersta hinnan före, bryn eller glasera efter",
+  "safety": null,
+  "baseline": "68 °C 22 h (listad som 'Bringa med ben (short ribs)')",
+  "flag": "55–57 °C 48–72 h ej verifierat mot Serious Eats/Anova-sida (404/blockerad); bygger på ChefSteps tough cuts och Baldwins 55–57 °C för sega bitar.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-flankstek",
+  "animal": "not",
+  "sv": "Flankstek",
+  "en": "Flank steak",
+  "cutId": "not-flankstek",
+  "thickness": "2–3 cm",
+  "options": [
+   {
+    "label": "Rosa, tuggmotstånd",
+    "tempC": 55,
+    "time": "2–4 h",
+    "note": null
+   },
+   {
+    "label": "Rosa, mörare",
+    "tempC": 55,
+    "time": "8–12 h",
+    "note": "Grova fibrer mjuknar med tid"
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "2–4 h",
+    "note": "Kenji: grova bitar bäst åt medium"
+   }
+  ],
+  "finish": "Grilla hårt 1 min/sida, skär tvärs fibrerna",
+  "safety": null,
+  "baseline": "54 °C 9 h; 54 °C 3 h",
+  "flag": null,
+  "sources": [
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-picanha",
+  "animal": "not",
+  "sv": "Picanha (rostlock med kappa)",
+  "en": "Picanha, rump cap (US top sirloin cap)",
+  "cutId": "not-rostlock",
+  "thickness": "hel bit ca 1–1,5 kg",
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 56,
+    "time": "3–6 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "3–6 h",
+    "note": "Fettkappan smälter bättre vid 57–58"
+   },
+   {
+    "label": "Mörare",
+    "tempC": 56,
+    "time": "8–12 h",
+    "note": null
+   }
+  ],
+  "finish": "Skåra fettkappan, stek kappan krispig först i panna eller på grill",
+  "safety": null,
+  "baseline": "Picanha: tom rad i baslinjen",
+  "flag": "Baslinjen saknar värde. Svenskt Kött: picanha = rostlock med kappa (= rumpstek), inte rostas. Tider från ChefSteps roast/steak.",
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/not/rostlock-med-kappa/",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak"
+  ]
+ },
+ {
+  "id": "not-rostas",
+  "animal": "not",
+  "sv": "Rostas",
+  "en": "Rump heart / eye of rump (ungefärligt)",
+  "cutId": "not-rostas",
+  "thickness": "hel bit 5–7 cm",
+  "options": [
+   {
+    "label": "Blodig",
+    "tempC": 52,
+    "time": "2–2,5 h",
+    "note": "Max 2,5 h under 54,5 °C"
+   },
+   {
+    "label": "Rosa",
+    "tempC": 55,
+    "time": "2,5–5 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "2,5–5 h",
+    "note": null
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "55 °C 5 h",
+  "flag": null,
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/not/rostas/",
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-hamburgare",
+  "animal": "not",
+  "sv": "Hamburgare",
+  "en": "Burger",
+  "cutId": null,
+  "thickness": "2–3 cm",
+  "options": [
+   {
+    "label": "Genomstekt (Livsmedelsverkets råd)",
+    "tempC": 70,
+    "time": "45 min–1,5 h",
+    "note": "Säkert för köpt färs"
+   },
+   {
+    "label": "Medium, egenmald färs",
+    "tempC": 57,
+    "time": "1–2 h",
+    "note": "Endast färs du malt själv av hel bit direkt före; ej pastöriserad på 30 min"
+   }
+  ],
+  "finish": "Stek eller grilla hårt 1 min/sida",
+  "safety": "Livsmedelsverket: köttfärs ska nå 70 °C. Bakterier från ytan finns i hela färsen.",
+  "baseline": "57 °C 1 h; 56,5 °C 30 min",
+  "flag": "Baslinjens 56,5 °C 30 min uppfyller inte Livsmedelsverkets råd för färs (70 °C). Behållet som frivilligt alternativ med tydlig varning.",
+  "sources": [
+   "https://www.livsmedelsverket.se/livsmedel-och-innehall/tillagning-forvaring-hallbarhet/tillagning/grilla-sakert/",
+   "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "not-innanlar",
+  "animal": "not",
+  "sv": "Innanlår",
+  "en": "Top round (UK topside)",
+  "cutId": "not-innanlar",
+  "thickness": "hel bit",
+  "options": [
+   {
+    "label": "Rosa, mör",
+    "tempC": 55,
+    "time": "24 h",
+    "note": "Baldwin: top round 55 °C 24–48 h"
+   }
+  ],
+  "finish": "Bryn runt om",
+  "safety": null,
+  "baseline": "55 °C 24 h",
+  "flag": null,
+  "sources": [
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gris-flaskfile",
+  "animal": "gris",
+  "sv": "Fläskfilé",
+  "en": "Pork tenderloin",
+  "cutId": "gris-file",
+  "thickness": "hel filé",
+  "options": [
+   {
+    "label": "Rosa, saftig",
+    "tempC": 60,
+    "time": "1,5–3 h",
+    "note": "Svenskt Kött medium 60–62 °C"
+   },
+   {
+    "label": "Ljust rosa",
+    "tempC": 62,
+    "time": "1,5–3 h",
+    "note": "ChefSteps chop 62 °C"
+   },
+   {
+    "label": "Genomstekt",
+    "tempC": 66,
+    "time": "1,5–3 h",
+    "note": "Svenskt Kött well done 65–70 °C"
+   }
+  ],
+  "finish": "Bryn snabbt i het panna 1–2 min totalt",
+  "safety": null,
+  "baseline": "61 °C 2 h",
+  "flag": null,
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/gris/file/",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gris-karre",
+  "animal": "gris",
+  "sv": "Fläskkarré",
+  "en": "Pork collar / neck (Boston butt, övre del)",
+  "cutId": "gris-karre",
+  "thickness": "skivor 2–3 cm eller hel",
+  "options": [
+   {
+    "label": "Saftig, skivbar",
+    "tempC": 60,
+    "time": "2,5–4 h",
+    "note": "Skivor, baslinjens tid"
+   },
+   {
+    "label": "Mör, skivbar (hel bit)",
+    "tempC": 62,
+    "time": "16–24 h",
+    "note": "ChefSteps pork tough cuts"
+   },
+   {
+    "label": "Pulled-lik",
+    "tempC": 74,
+    "time": "18–24 h",
+    "note": null
+   }
+  ],
+  "finish": "Grilla eller stek hårt 1 min/sida",
+  "safety": null,
+  "baseline": "Skivad 60 °C 2,5 h",
+  "flag": "Svenskt Kött anger 68–85 °C innertemp för karré vid vanlig tillagning; sous vide vid 60 °C ger rosa, fastare karré. Båda med.",
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/gris/karre/",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://anovaculinary.com/pages/sous-vide-pork-shoulder-guide",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gris-kotlett",
+  "animal": "gris",
+  "sv": "Fläskkotlett",
+  "en": "Pork chop",
+  "cutId": "gris-kotlettrad",
+  "thickness": "2–3 cm",
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 58,
+    "time": "1–2,5 h",
+    "note": "ChefSteps chop rare"
+   },
+   {
+    "label": "Ljust rosa",
+    "tempC": 62,
+    "time": "1–2 h",
+    "note": "ChefSteps chop medium rare"
+   },
+   {
+    "label": "Genomstekt",
+    "tempC": 66,
+    "time": "1–2 h",
+    "note": null
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": null,
+  "baseline": "60 °C 2 h",
+  "flag": null,
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/styckdetaljer/gris/kotlettrad/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gris-revben",
+  "animal": "gris",
+  "sv": "Revbensspjäll",
+  "en": "Pork ribs (spare ribs / St Louis)",
+  "cutId": "gris-revben",
+  "thickness": null,
+  "options": [
+   {
+    "label": "Köttiga, biffiga",
+    "tempC": 63,
+    "time": "24–36 h",
+    "note": "Anova; baslinje 'tjocka' 63 °C 24–36 h"
+   },
+   {
+    "label": "Klassisk BBQ-textur",
+    "tempC": 74,
+    "time": "6–12 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Faller från benet",
+    "tempC": 85,
+    "time": "4–8 h",
+    "note": "ChefSteps pork tough cuts 85 °C"
+   }
+  ],
+  "finish": "Glasera och grilla eller gratinera under grill 5–10 min",
+  "safety": null,
+  "baseline": "Tjocka/kamben 63 °C 24–36 h; tunna 72 °C 4 h, 85 °C 4 h, 57 °C 24 h",
+  "flag": "72 °C 4 h (tunna) är kortare än Anovas 74 °C 6–12 h; valde Anova. Baslinjens 57 °C 24 h saknar stöd i källorna.",
+  "sources": [
+   "https://anovaculinary.com/pages/sous-vide-pork-rib-guide",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gris-sidflask",
+  "animal": "gris",
+  "sv": "Sidfläsk (bit)",
+  "en": "Pork belly",
+  "cutId": "gris-sida",
+  "thickness": "hel bit",
+  "options": [
+   {
+    "label": "Fast, skivbar",
+    "tempC": 63,
+    "time": "24–36 h",
+    "note": null
+   },
+   {
+    "label": "Mör, smältande",
+    "tempC": 74,
+    "time": "12–24 h",
+    "note": null
+   },
+   {
+    "label": "Mycket mör",
+    "tempC": 80,
+    "time": "8–12 h",
+    "note": "Baldwin: pork 80 °C 8–12 h"
+   }
+  ],
+  "finish": "Pressa kallt, skiva och stek svålen/ytan krispig",
+  "safety": null,
+  "baseline": null,
+  "flag": "Ej i baslinjen. ChefSteps listar sida bland 'tough cuts' (62/68/85 °C); tider ungefärliga.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://anovaculinary.com/pages/sous-vide-pork-shoulder-guide"
+  ]
+ },
+ {
+  "id": "gris-julskinka",
+  "animal": "gris",
+  "sv": "Julskinka (rimmad)",
+  "en": "Cured Christmas ham",
+  "cutId": "gris-skinka",
+  "thickness": "3–4 kg",
+  "options": [
+   {
+    "label": "Saftig",
+    "tempC": 65,
+    "time": "12–16 h",
+    "note": "Baslinje 65 °C 12 h (3,5 kg)"
+   },
+   {
+    "label": "Traditionell",
+    "tempC": 70,
+    "time": "12 h",
+    "note": null
+   }
+  ],
+  "finish": "Griljera: pensla senap, strö ströbröd, 225 °C 10 min",
+  "safety": "ICA anger 72 °C innertemp vid ugnstillagning. Rimmad (saltad) skinka.",
+  "baseline": "'65h 12h' (skrivfel, avser 65 °C 12 h); 70 °C 12 h",
+  "flag": "Ingen högtrovärdig källa för sous vide julskinka hittad. Baslinjens skrivfel rättat. Osäker post.",
+  "sources": [
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo",
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://svensktkott.se/om-kott/styckdetaljer/gris/skinka/"
+  ]
+ },
+ {
+  "id": "gris-bog",
+  "animal": "gris",
+  "sv": "Fläskbog / pulled pork",
+  "en": "Pork shoulder (Boston butt + picnic)",
+  "cutId": "gris-bog",
+  "thickness": "hel bit 1,5–3 kg",
+  "options": [
+   {
+    "label": "Skivbar, extra saftig",
+    "tempC": 63,
+    "time": "18–24 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Pulled pork, saftig",
+    "tempC": 74,
+    "time": "18–24 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Pulled pork (Baldwin)",
+    "tempC": 68,
+    "time": "24 h",
+    "note": "Baldwin 68 °C 24 h"
+   },
+   {
+    "label": "Pulled pork snabbare",
+    "tempC": 80,
+    "time": "8–12 h",
+    "note": "Baldwin"
+   }
+  ],
+  "finish": "Rimma, torka och lägg i 230 °C ugn eller på grill för skorpa",
+  "safety": null,
+  "baseline": "Porchetta 69 °C 36 h",
+  "flag": "Anova: längre än 24 h ger mosig textur; baslinjens porchetta 36 h ligger över. Behåll som eget recept om så önskas.",
+  "sources": [
+   "https://anovaculinary.com/pages/sous-vide-pork-shoulder-guide",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf"
+  ]
+ },
+ {
+  "id": "lamm-racks",
+  "animal": "lamm",
+  "sv": "Lammracks",
+  "en": "Rack of lamb",
+  "cutId": "lamm-racks",
+  "thickness": null,
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 55,
+    "time": "1–2,5 h",
+    "note": "Svenskt Kött rare 54–58"
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "1–3 h",
+    "note": "Svenskt Kött medium 58–65"
+   },
+   {
+    "label": "Genomstekt",
+    "tempC": 65,
+    "time": "1–3 h",
+    "note": null
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "55 °C 1,5 h",
+  "flag": null,
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/lamm/racks/",
+   "https://www.seriouseats.com/food-lab-complete-guide-to-sous-vide-steak",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "lamm-stek",
+  "animal": "lamm",
+  "sv": "Lammstek",
+  "en": "Leg of lamb",
+  "cutId": "lamm-stek",
+  "thickness": "hel eller urbenad",
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 55,
+    "time": "8–12 h",
+    "note": "Svenskt Kött rare 54–56"
+   },
+   {
+    "label": "Medium",
+    "tempC": 57,
+    "time": "8–12 h",
+    "note": "Svenskt Kött medium 56–58"
+   },
+   {
+    "label": "Mör, rosa",
+    "tempC": 57,
+    "time": "18–24 h",
+    "note": null
+   }
+  ],
+  "finish": "Bryn runt om i het panna",
+  "safety": null,
+  "baseline": "54,5 °C 12 h ('lite oklart hur länge')",
+  "flag": "Baslinjen osäker på tid; valde 8–12 h för hel stek (ChefSteps roast 6–14 h), längre för mörare.",
+  "sources": [
+   "https://svensktkott.se/om-kott/styckdetaljer/lamm/stek/",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "lamm-lagg",
+  "animal": "lamm",
+  "sv": "Lammlägg",
+  "en": "Lamb shank",
+  "cutId": "lamm-lagg",
+  "thickness": null,
+  "options": [
+   {
+    "label": "Mör, saftig",
+    "tempC": 63,
+    "time": "24 h",
+    "note": "Baslinje"
+   },
+   {
+    "label": "Mycket mör",
+    "tempC": 62,
+    "time": "48 h",
+    "note": "Baslinje"
+   },
+   {
+    "label": "Bräserad känsla",
+    "tempC": 75,
+    "time": "12–24 h",
+    "note": "ChefSteps tough cuts 65–85 °C"
+   }
+  ],
+  "finish": "Glasera i ugn 220 °C eller servera i skyn",
+  "safety": null,
+  "baseline": "63 °C 24 h; 62 °C 48 h; 'dåligt vid 56–57 °C 24 h'",
+  "flag": "Ingen enskild högtrovärdig lammlägg-tabell hittad; baslinjen ligger inom ChefSteps ramar för sega bitar.",
+  "sources": [
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://svensktkott.se/om-kott/styckdetaljer/lamm/lagg/"
+  ]
+ },
+ {
+  "id": "fagel-kycklingbrost",
+  "animal": "fagel",
+  "sv": "Kycklingbröst (filé)",
+  "en": "Chicken breast",
+  "cutId": "kyckling-brost",
+  "thickness": "2–3 cm",
+  "options": [
+   {
+    "label": "Mycket saftig",
+    "tempC": 60,
+    "time": "2–3,5 h",
+    "note": "Pastöriserad efter ca 2 h vid 30 mm (Baldwin)"
+   },
+   {
+    "label": "Saftig, fast",
+    "tempC": 63,
+    "time": "1,5–4 h",
+    "note": "Kenjis favorit"
+   },
+   {
+    "label": "Traditionell",
+    "tempC": 66,
+    "time": "1–2 h",
+    "note": "ChefSteps 65 °C 1–2 h"
+   }
+  ],
+  "finish": "Stek skinnsidan krispig 2 min, eller skiva kall",
+  "safety": "Säkert under 70 °C bara med tillräcklig hålltid: 60 °C kräver ca 1¼ h (20 mm) till 2 h (30 mm) från kyl (Baldwins pastöriseringstabell för fågel). Livsmedelsverket: fågel ska vara genomstekt, lägre temp ok med längre tid.",
+  "baseline": "60 °C 1,5–2 h",
+  "flag": "1,5 h vid 60 °C räcker bara för tunna filéer (≤20 mm). Valde minst 2 h.",
+  "sources": [
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://www.seriouseats.com/the-food-lab-complete-guide-to-sous-vide-chicken-breast",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://anovaculinary.com/pages/sous-vide-chicken-guide",
+   "https://fragor.livsmedelsverket.se/org/livsmedelsverket/d/campylobacter-i-anka-som-oftast-serveras-rosaej-ge/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fagel-kycklinglar",
+  "animal": "fagel",
+  "sv": "Kycklinglår",
+  "en": "Chicken thigh/leg",
+  "cutId": "kyckling-overlar",
+  "thickness": null,
+  "options": [
+   {
+    "label": "Fast, mycket saftig",
+    "tempC": 66,
+    "time": "1–4 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Mör",
+    "tempC": 74,
+    "time": "1–4 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Faller från benet",
+    "tempC": 75,
+    "time": "4–8 h",
+    "note": "Anova/ChefSteps"
+   }
+  ],
+  "finish": "Stek skinnet krispigt i panna under tyngd",
+  "safety": null,
+  "baseline": null,
+  "flag": "Ej i baslinjen.",
+  "sources": [
+   "https://anovaculinary.com/pages/sous-vide-chicken-guide",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf"
+  ]
+ },
+ {
+  "id": "fagel-ankbrost",
+  "animal": "fagel",
+  "sv": "Ankbröst",
+  "en": "Duck breast (magret)",
+  "cutId": null,
+  "thickness": "2–2,5 cm",
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 57,
+    "time": "2–3 h",
+    "note": "Nära Baldwins pastörisering (58 °C ca 2 h vid 20 mm)"
+   },
+   {
+    "label": "Rosa, säkrare",
+    "tempC": 60,
+    "time": "1,5–3 h",
+    "note": null
+   }
+  ],
+  "finish": "Stek skinnsidan i kall panna upp till medelhög värme 5–8 min tills krispig",
+  "safety": "Livsmedelsverket: fågel ska vara genomstekt, t.ex. kort tid vid 70 °C eller längre tid vid lägre temp med sous vide.",
+  "baseline": "57 °C 2 h",
+  "flag": "Kenjis ursprungsrecept (samma länk som baslinjen) anger 54 °C 45 min–4 h, inte 57 °C. Valde baslinjens 57 °C eftersom det ligger nära pastörisering.",
+  "sources": [
+   "https://www.seriouseats.com/recipes/2010/09/sous-vide-101-duck-breast-recipe.html",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://fragor.livsmedelsverket.se/org/livsmedelsverket/d/campylobacter-i-anka-som-oftast-serveras-rosaej-ge/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fagel-kalkonbrost",
+  "animal": "fagel",
+  "sv": "Kalkonbröst",
+  "en": "Turkey breast",
+  "cutId": "kyckling-brost",
+  "thickness": "hopbundet ca 10 cm",
+  "options": [
+   {
+    "label": "Ljust rosa, mjuk",
+    "tempC": 58,
+    "time": "3 h",
+    "note": "Serious Eats"
+   },
+   {
+    "label": "Vit, mör, saftig",
+    "tempC": 63,
+    "time": "2,5 h",
+    "note": "Serious Eats, rekommenderad"
+   },
+   {
+    "label": "Traditionell",
+    "tempC": 66,
+    "time": "2 h",
+    "note": null
+   }
+  ],
+  "finish": "Stek skinnet separat i ugn 200 °C",
+  "safety": "Serious Eats: tiderna inkluderar hålltid för säkerhet vid respektive temp.",
+  "baseline": "63 °C 2,5 h",
+  "flag": null,
+  "sources": [
+   "https://www.seriouseats.com/recipes/2014/11/sous-vide-turkey-breast-crispy-skin-recipe-thanksgiving.html",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "vilt-algfile",
+  "animal": "vilt",
+  "sv": "Älgfilé",
+  "en": "Moose tenderloin",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 55,
+    "time": "1–2 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "1–2 h",
+    "note": "ICA 56–70 °C"
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": "Under 54,5 °C: max ca 2,5 h totalt i badet (Serious Eats/Baldwin), annars hinner bakterier växa.",
+  "baseline": "56 °C 2 h",
+  "flag": null,
+  "sources": [
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "vilt-algstek",
+  "animal": "vilt",
+  "sv": "Älgstek",
+  "en": "Moose roast (leg)",
+  "cutId": null,
+  "thickness": "hel bit",
+  "options": [
+   {
+    "label": "Rosa, mör",
+    "tempC": 57,
+    "time": "8–12 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 60,
+    "time": "8–12 h",
+    "note": null
+   }
+  ],
+  "finish": "Bryn runt om",
+  "safety": null,
+  "baseline": "58 °C 10 h; innanlår 55–57 °C 5 h",
+  "flag": "ICA anger 75 °C för älgstek/fransyska vid vanlig tillagning (bräsering). Sous vide-tiderna är bara baslinje + ChefSteps roast-logik.",
+  "sources": [
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo",
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf"
+  ]
+ },
+ {
+  "id": "vilt-hjort",
+  "animal": "vilt",
+  "sv": "Hjort (filé/stek)",
+  "en": "Venison",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Filé rosa",
+    "tempC": 55,
+    "time": "1–2 h",
+    "note": null
+   },
+   {
+    "label": "Stek rosa",
+    "tempC": 57,
+    "time": "6–10 h",
+    "note": "Baslinje 58 °C 8 h, 'behöver mer info'"
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": null,
+  "baseline": "Filé 55 °C 1 h 40 min; stek 58 °C 8 h",
+  "flag": "Stek: osäker i baslinjen, ingen bättre källa hittad.",
+  "sources": [
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "vilt-vildsvin",
+  "animal": "vilt",
+  "sv": "Vildsvin (stek/ytterfilé)",
+  "en": "Wild boar",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Rosa (ytterfilé)",
+    "tempC": 60,
+    "time": "2,5–3 h",
+    "note": null
+   },
+   {
+    "label": "Stek, mör",
+    "tempC": 63,
+    "time": "6–10 h",
+    "note": null
+   }
+  ],
+  "finish": "Bryn runt om",
+  "safety": "Trikiner: Livsmedelsverket anger att 3 h vid 52 °C räcker för att inaktivera trikinlarver. Trikintesta helst eget jaktkött. ICA anger 72 °C vid vanlig tillagning.",
+  "baseline": "Stek 63 °C 6 h; ytterfilé 500 g 60 °C 2 h 45 min",
+  "flag": "ICA (72 °C) och Livsmedelsverket (tid/temp) skiljer sig; valde Livsmedelsverkets tid-temp-logik för sous vide.",
+  "sources": [
+   "https://fragor.livsmedelsverket.se/org/livsmedelsverket/d/tillaga-vildsvinskott-med-sous-vide-metoden/",
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "vilt-radjurssadel",
+  "animal": "vilt",
+  "sv": "Rådjurssadel",
+  "en": "Roe deer saddle",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Rosa",
+    "tempC": 56,
+    "time": "1,5–2 h",
+    "note": null
+   },
+   {
+    "label": "Medium",
+    "tempC": 58,
+    "time": "1,5–2 h",
+    "note": "ICA 56–70 °C"
+   }
+  ],
+  "finish": "Torka ytan, bränn av i rykande het panna eller på grill ca 1 min/sida",
+  "safety": null,
+  "baseline": "57 °C 1,5 h",
+  "flag": null,
+  "sources": [
+   "https://www.ica.se/artikel/innertemperatur/",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fisk-lax",
+  "animal": "fisk",
+  "sv": "Lax",
+  "en": "Salmon",
+  "cutId": null,
+  "thickness": "2–4 cm",
+  "options": [
+   {
+    "label": "Sashimi-lik, kyls",
+    "tempC": 41,
+    "time": "30–45 min",
+    "note": "Kyl direkt efteråt"
+   },
+   {
+    "label": "Mycket saftig",
+    "tempC": 46,
+    "time": "30–45 min",
+    "note": "Kenjis favorit"
+   },
+   {
+    "label": "Saftig, flagnar",
+    "tempC": 50,
+    "time": "40–60 min",
+    "note": "ChefSteps standard för fisk"
+   },
+   {
+    "label": "Fast, flagnar",
+    "tempC": 54,
+    "time": "30–45 min",
+    "note": null
+   }
+  ],
+  "finish": "Stek skinnsidan krispig 1–2 min eller servera direkt",
+  "safety": "Ej pastöriserad under 54 °C: servera direkt, max ca 3 h från start (Serious Eats).",
+  "baseline": "48 °C 30 min; 40 °C 60 min, kyl 6 h",
+  "flag": null,
+  "sources": [
+   "https://www.seriouseats.com/sous-vide-salmon-recipe",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fisk-torsk",
+  "animal": "fisk",
+  "sv": "Torsk (filé/rygg)",
+  "en": "Cod",
+  "cutId": null,
+  "thickness": "2–4 cm",
+  "options": [
+   {
+    "label": "Saftig, glansig",
+    "tempC": 48,
+    "time": "30–45 min",
+    "note": null
+   },
+   {
+    "label": "Flagnar",
+    "tempC": 52,
+    "time": "30–60 min",
+    "note": "ChefSteps 50 °C"
+   }
+  ],
+  "finish": "Hanteras varsamt, stek ev. kort i smör",
+  "safety": "Ej pastöriserad under 54 °C: servera direkt, max ca 3 h från start (Serious Eats).",
+  "baseline": "Filé 48–52 °C 30–35 min; rygg 49,5 °C 30 min",
+  "flag": null,
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fisk-roding",
+  "animal": "fisk",
+  "sv": "Röding",
+  "en": "Arctic char",
+  "cutId": null,
+  "thickness": "2–3 cm",
+  "options": [
+   {
+    "label": "Saftig",
+    "tempC": 48,
+    "time": "25–40 min",
+    "note": null
+   },
+   {
+    "label": "Flagnar",
+    "tempC": 50,
+    "time": "30–45 min",
+    "note": "ChefSteps 50 °C"
+   }
+  ],
+  "finish": "Stek skinnsidan krispig",
+  "safety": "Ej pastöriserad under 54 °C: servera direkt, max ca 3 h från start (Serious Eats).",
+  "baseline": "50 °C 30 min",
+  "flag": null,
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "fisk-halleflundra",
+  "animal": "fisk",
+  "sv": "Hälleflundra",
+  "en": "Halibut",
+  "cutId": null,
+  "thickness": "2–4 cm",
+  "options": [
+   {
+    "label": "Saftig",
+    "tempC": 50,
+    "time": "30–45 min",
+    "note": "ChefSteps nämner halibut vid 50 °C"
+   },
+   {
+    "label": "Fastare",
+    "tempC": 55,
+    "time": "30–45 min",
+    "note": "Baslinje"
+   }
+  ],
+  "finish": "Stek kort i smör",
+  "safety": "Ej pastöriserad under 54 °C: servera direkt, max ca 3 h från start (Serious Eats).",
+  "baseline": "55 °C 30 min",
+  "flag": null,
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "ovrigt-agg",
+  "animal": "ovrigt",
+  "sv": "Ägg (i skal)",
+  "en": "Egg",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Pastöriserat, som rått",
+    "tempC": 57,
+    "time": "1 h 15 min–2 h",
+    "note": "Baldwin; Anova 54 °C 45 min–4 h"
+   },
+   {
+    "label": "63-gradersägg (löst)",
+    "tempC": 63,
+    "time": "45 min–1 h",
+    "note": "Anova: vita precis stelnat, rinnig gula"
+   },
+   {
+    "label": "Krämig gula",
+    "tempC": 64.5,
+    "time": "45 min–1 h",
+    "note": "Baldwin"
+   },
+   {
+    "label": "Medium",
+    "tempC": 66,
+    "time": "45 min–1 h",
+    "note": "Anova"
+   },
+   {
+    "label": "Hårdkokt",
+    "tempC": 74,
+    "time": "45 min",
+    "note": "Anova"
+   },
+   {
+    "label": "Snabbt löskokt (baslinje)",
+    "tempC": 70,
+    "time": "20 min",
+    "note": "Overifierad"
+   }
+  ],
+  "finish": "Knäck direkt i skål; 63-gradersägg kan hållas varma",
+  "safety": null,
+  "baseline": "70 °C 20 min (ChefSteps äggkalkylator länkad)",
+  "flag": "70 °C 20 min finns inte i de källor som kunde läsas (ChefSteps kalkylator är JS och gick ej att verifiera). Behålls som snabbt alternativ, osäkert.",
+  "sources": [
+   "https://douglasbaldwin.com/sous-vide.html",
+   "https://anovaculinary.com/pages/sous-vide-egg-guide",
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "ovrigt-omelett",
+  "animal": "ovrigt",
+  "sv": "Omelett i påse",
+  "en": "Sous vide omelette",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Krämig",
+    "tempC": 75,
+    "time": "20–25 min",
+    "note": "Baslinje, laborera"
+   }
+  ],
+  "finish": null,
+  "safety": null,
+  "baseline": "75 °C 25 min",
+  "flag": "Endast baslinje.",
+  "sources": [
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gronsak-potatis",
+  "animal": "gronsak",
+  "sv": "Potatis",
+  "en": "Potato",
+  "cutId": null,
+  "thickness": "hel eller bitar",
+  "options": [
+   {
+    "label": "Mör",
+    "tempC": 85,
+    "time": "1–3 h",
+    "note": "ChefSteps; mindre bitar 45 min–1,5 h"
+   }
+  ],
+  "finish": "Stek eller rosta för yta",
+  "safety": null,
+  "baseline": "85 °C 1 h 15 min",
+  "flag": null,
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gronsak-morot",
+  "animal": "gronsak",
+  "sv": "Morötter",
+  "en": "Carrots",
+  "cutId": null,
+  "thickness": "hela eller stavar",
+  "options": [
+   {
+    "label": "Mör med tuggmotstånd",
+    "tempC": 84,
+    "time": "45 min–1,5 h",
+    "note": null
+   },
+   {
+    "label": "Helt mjuk",
+    "tempC": 85,
+    "time": "1,5–3 h",
+    "note": "ChefSteps rotfrukter 85 °C 1–3 h"
+   }
+  ],
+  "finish": "Glasera i panna med smör",
+  "safety": null,
+  "baseline": null,
+  "flag": "Pektin bryts ned först kring 84 °C (Anova), därför ingen lägre temp.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf"
+  ]
+ },
+ {
+  "id": "gronsak-sparris",
+  "animal": "gronsak",
+  "sv": "Sparris (grön)",
+  "en": "Green asparagus",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Krispig",
+    "tempC": 85,
+    "time": "5–10 min",
+    "note": "ChefSteps gröna grönsaker 5–20 min"
+   },
+   {
+    "label": "Mjukare",
+    "tempC": 85,
+    "time": "15–25 min",
+    "note": "Tappar grön färg efter ca 20 min"
+   }
+  ],
+  "finish": "Kyl i isvatten om den ska serveras kall",
+  "safety": null,
+  "baseline": "85 °C 25 min",
+  "flag": "ChefSteps: optimal textur vid 5 min, färgen mörknar efter ca 20 min. Baslinjens 25 min ligger i överkant.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gronsak-majs",
+  "animal": "gronsak",
+  "sv": "Majs (kolv)",
+  "en": "Corn on the cob",
+  "cutId": null,
+  "thickness": null,
+  "options": [
+   {
+    "label": "Mör, krispig",
+    "tempC": 84,
+    "time": "30 min",
+    "note": "Anova"
+   }
+  ],
+  "finish": "Grilla kort för färg",
+  "safety": null,
+  "baseline": "84 °C 30 min; 86 °C 30 min",
+  "flag": null,
+  "sources": [
+   "https://recipes.anovaculinary.com/recipe/sous-vide-corn",
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ },
+ {
+  "id": "gronsak-rodbeta",
+  "animal": "gronsak",
+  "sv": "Rödbetor",
+  "en": "Beetroot",
+  "cutId": null,
+  "thickness": "hela medelstora",
+  "options": [
+   {
+    "label": "Mör",
+    "tempC": 85,
+    "time": "1,5–3 h",
+    "note": "ChefSteps rotfrukter, större betor i överkant"
+   }
+  ],
+  "finish": "Skala efteråt, skalet glider av",
+  "safety": null,
+  "baseline": null,
+  "flag": "Ej i baslinjen; tid från ChefSteps rotfrukter, inte en betspecifik källa.",
+  "sources": [
+   "https://s3.amazonaws.com/chefsteps/static/ChefSteps-SousVideReference.pdf"
+  ]
+ },
+ {
+  "id": "gronsak-rabarber",
+  "animal": "gronsak",
+  "sv": "Rabarber",
+  "en": "Rhubarb",
+  "cutId": null,
+  "thickness": "bitar",
+  "options": [
+   {
+    "label": "Mjuk men hel",
+    "tempC": 61,
+    "time": "35 min",
+    "note": "Baslinje"
+   },
+   {
+    "label": "Mjuk, för kompott",
+    "tempC": 68,
+    "time": "1 h 45 min–2,5 h",
+    "note": "ChefSteps frukt 'warm & ripe'"
+   }
+  ],
+  "finish": "Servera till dessert",
+  "safety": null,
+  "baseline": "61 °C 35 min",
+  "flag": "Endast baslinje. ChefSteps frukt 68 °C (varm/mogen) respektive 85 °C (mos) är närmaste källa.",
+  "sources": [
+   "https://docs.google.com/spreadsheets/d/1xjKgH4qNDTMBjOQyrdTjKiEjzJcp0gpS2T7Ha0j3mWo"
+  ]
+ }
+]

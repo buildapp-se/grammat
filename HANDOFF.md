@@ -11,6 +11,23 @@ reviewedAt: 2026-09-30
 
 # Handoff
 
+## 2026-09-30: Guide, femte fliken
+
+- Ny flik **Guide** (`#/guide/sousvide|ugn|styckning|matt`), publik, data i `guide.json`
+  (72 kB, hämtas vid första besöket). 44 sous vide-rader, 43 ugnsrader, 44 styckdetaljer
+  (nöt 18, gris 11, lamm 9, kyckling 6) med svenska, engelska och andra namn, samt
+  omvandlare, 42 densiteter, gasugn och gamla svenska mått.
+- Research mot Baldwin, Serious Eats, ChefSteps, Svenskt Kött och Livsmedelsverket, med
+  Patriks länkade crowdsourcade ark som utgångspunkt. Avvikelser från arket, t.ex.
+  picanha = rostlock (inte rostas), short ribs = revbensstek, hamburgare 70 °C enligt
+  Livsmedelsverket, står i `docs/guide-research/SOURCES.md`. Råsocker och panko uteslöts
+  eftersom källa saknades.
+- Styckningsschemat är schematiskt: polygoner klippta mot en siluett, vald del via URL
+  (`location.replace`, så bakåtknappen inte stegar genom varje del). Delkortet visar tider
+  för sous vide och ugn direkt.
+- Verifierat: `node test.js` (omvandling och datakontroll), `node test-ui.cjs` (guiderutter),
+  Playwright 375, 720 och 1280 px, utan horisontell scroll i någon vy.
+
 ## 2026-09-30: inloggning max 400 px på dator
 
 - `#view` breddas till 920 px från 1000 px (receptgriden), vilket drog ut Google-knappen och

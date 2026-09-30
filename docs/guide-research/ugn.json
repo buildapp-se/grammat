@@ -1,0 +1,1042 @@
+{
+ "note": "Ugnstemperaturer gäller över- och undervärme. Varmluft: sänk ca 25 °C (Svenskt Kött). coreC är uttagstemperatur; större bitar stiger 2–4 °C under vila (Svenskt Kött). Alla tider är ungefärliga, termometern avgör.",
+ "items": [
+  {
+   "id": "not-entrecote",
+   "animal": "not",
+   "sv": "Entrecôte (hel bit)",
+   "en": "Ribeye roast",
+   "cutId": "not-entrecote",
+   "ovenC": 150,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 59
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 67
+    }
+   ],
+   "timeHint": "ca 1,5–2 h för hel bit vid 150 °C (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött: rare 54–56, medium 58–60, well done 65–70 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/not/entrecote/"
+   ]
+  },
+  {
+   "id": "not-ryggbiff",
+   "animal": "not",
+   "sv": "Ryggbiff (hel bit)",
+   "en": "Striploin roast",
+   "cutId": "not-ryggbiff",
+   "ovenC": 125,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 50
+    },
+    {
+     "label": "Medium",
+     "coreC": 57
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 65
+    }
+   ],
+   "timeHint": "ca 45–60 min/kg vid 125 °C (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött: rare 48–50, medium 54–60, well done 60–70 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/biff/",
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/"
+   ]
+  },
+  {
+   "id": "not-oxfile",
+   "animal": "not",
+   "sv": "Oxfilé (hel)",
+   "en": "Whole tenderloin",
+   "cutId": "not-oxfile",
+   "ovenC": 125,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 50
+    },
+    {
+     "label": "Medium",
+     "coreC": 57
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 69
+    }
+   ],
+   "timeHint": "ca 30–45 min för hel filé vid 125 °C (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött: rare 48–50, medium 56–58, well done 68–70 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/oxfile/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "not-rostbiff",
+   "animal": "not",
+   "sv": "Rostbiff",
+   "en": "Top sirloin roast",
+   "cutId": "not-rostbiff",
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 58
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 69
+    }
+   ],
+   "timeHint": "fransk rostbiff ca 1,5 h vid 125 °C; engelsk ca 1 h vid 175 °C (Svenskt Kött, ca 1 kg)",
+   "restMin": 15,
+   "note": "Svenskt Kött per bit: rare 48–50, medium 56–58; ICA rostbiff 58–70 °C. Valde 55 för 'rosa' som kompromiss.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/not/rostbiff/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "not-fransyska",
+   "animal": "not",
+   "sv": "Fransyska / nötstek",
+   "en": "Knuckle roast",
+   "cutId": "not-fransyska",
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 58
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "nötstek 2–2,25 h vid 125 °C (Svenskt Kött); som grytstek ca 1 h/kg",
+   "restMin": 15,
+   "note": "ICA anger 75 °C (bräserad). Vid ugnsstek till rosa gäller Svenskt Kötts 56–58 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/not/fransyska/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "not-hogrev",
+   "animal": "not",
+   "sv": "Högrev (grytstek)",
+   "en": "Chuck pot roast",
+   "cutId": "not-hogrev",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Mör, skivbar",
+     "coreC": 80
+    },
+    {
+     "label": "Sönderfallande",
+     "coreC": 90
+    }
+   ],
+   "timeHint": "2–3 h sjudning eller bräsering under lock (ungefärligt)",
+   "restMin": 15,
+   "note": "ICA högrev 80 °C. Mörheten styrs av tid, inte innertemp.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/hogrev/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "not-bringa",
+   "animal": "not",
+   "sv": "Oxbringa",
+   "en": "Brisket",
+   "cutId": "not-bringa",
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Skivbar",
+     "coreC": 85
+    },
+    {
+     "label": "Sönderfallande",
+     "coreC": 92
+    }
+   ],
+   "timeHint": "kokning: ca 2 h utan ben, ca 3 h med ben (Svenskt Kött); ugn under lock 4–6 h (ungefärligt)",
+   "restMin": 20,
+   "note": "ICA nötbringa 85–90 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/bringa/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "not-revbensstek",
+   "animal": "not",
+   "sv": "Revbensstek (short ribs)",
+   "en": "Short ribs",
+   "cutId": "not-revbensstek",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Mör, bräserad",
+     "coreC": 90
+    }
+   ],
+   "timeHint": "bräsera under lock 3–4 h (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött anger även 54–60 °C för grillad rosa revbensstek; bräserad kräver lång tid.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/revbensstek/"
+   ]
+  },
+  {
+   "id": "not-picanha",
+   "animal": "not",
+   "sv": "Picanha (rostlock med kappa)",
+   "en": "Picanha",
+   "cutId": "not-rostlock",
+   "ovenC": 150,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 60
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 45–60 min för 1–1,5 kg efter bryning (ungefärligt)",
+   "restMin": 10,
+   "note": null,
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/rostlock-med-kappa/"
+   ]
+  },
+  {
+   "id": "not-rostas",
+   "animal": "not",
+   "sv": "Rostas",
+   "en": "Rump heart",
+   "cutId": "not-rostas",
+   "ovenC": 125,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 52
+    },
+    {
+     "label": "Medium",
+     "coreC": 60
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 69
+    }
+   ],
+   "timeHint": "ca 30–45 min vid 125 °C (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött: 50–55 riktigt rött, 60 medium.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/rostas/"
+   ]
+  },
+  {
+   "id": "not-flankstek",
+   "animal": "not",
+   "sv": "Flankstek",
+   "en": "Flank steak",
+   "cutId": "not-flankstek",
+   "ovenC": 225,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Rosa/blodig",
+     "coreC": 50
+    },
+    {
+     "label": "Medium",
+     "coreC": 57
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 69
+    }
+   ],
+   "timeHint": "grill/het ugnsgrill 3–5 min/sida (ungefärligt)",
+   "restMin": 5,
+   "note": "Svenskt Kött: rare 48–52, medium 56–58.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/not/flankstek/"
+   ]
+  },
+  {
+   "id": "not-hamburgare",
+   "animal": "not",
+   "sv": "Hamburgare / köttfärs",
+   "en": "Burger / ground beef",
+   "cutId": null,
+   "ovenC": 200,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 15–20 min vid 200 °C för 2 cm biffar (ungefärligt)",
+   "restMin": 3,
+   "note": "Livsmedelsverket: färs ska nå 70 °C, färgen räcker inte som mått.",
+   "sources": [
+    "https://www.livsmedelsverket.se/livsmedel-och-innehall/tillagning-forvaring-hallbarhet/tillagning/grilla-sakert/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-flaskfile",
+   "animal": "gris",
+   "sv": "Fläskfilé",
+   "en": "Pork tenderloin",
+   "cutId": "gris-file",
+   "ovenC": 125,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 61
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 67
+    }
+   ],
+   "timeHint": "ca 20–30 min vid 125 °C efter bryning (ungefärligt)",
+   "restMin": 5,
+   "note": "Svenskt Kött: medium 60–62, hel filé 65–68, well done 65–70 °C. ICA anger 70 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/file/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-karre",
+   "animal": "gris",
+   "sv": "Fläskkarré",
+   "en": "Pork collar roast",
+   "cutId": "gris-karre",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Saftig, skivbar",
+     "coreC": 69
+    },
+    {
+     "label": "Faller isär",
+     "coreC": 85
+    }
+   ],
+   "timeHint": "ca 1,75–2 h vid 150 °C (Svenskt Kött)",
+   "restMin": 15,
+   "note": "Svenskt Kött: medium 68–70, well done 75–80, 'faller isär' 85 °C. ICA 80–85 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/karre/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-kotlettrad",
+   "animal": "gris",
+   "sv": "Kotlettrad / kotlett",
+   "en": "Pork loin roast / chop",
+   "cutId": "gris-kotlettrad",
+   "ovenC": 150,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Ljust rosa",
+     "coreC": 65
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 72
+    }
+   ],
+   "timeHint": "kotlettrad ca 1,5–2 h vid 150 °C (Svenskt Kött); skivor 1,5–2 cm ca 3 min/sida i panna",
+   "restMin": 10,
+   "note": "Svenskt Kött kotlettrad 65–70 °C; benfri/putsad räcker 65 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/kotlettrad/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-revben",
+   "animal": "gris",
+   "sv": "Revbensspjäll",
+   "en": "Pork ribs",
+   "cutId": "gris-revben",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 70
+    },
+    {
+     "label": "Mör, lossnar från ben",
+     "coreC": 90
+    }
+   ],
+   "timeHint": "Svenskt Kött: hel bit 1–1,5 h till 70 °C; mörare efter 2,5–3 h vid 125–150 °C under folie (ungefärligt)",
+   "restMin": 10,
+   "note": "Svenskt Kött anger 70 °C för tjocka revben; högre innertemp ger lösare kött.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/revbensspjall/"
+   ]
+  },
+  {
+   "id": "gris-sidflask",
+   "animal": "gris",
+   "sv": "Sidfläsk (hel bit)",
+   "en": "Pork belly roast",
+   "cutId": "gris-sida",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 80
+    }
+   ],
+   "timeHint": "ca 2–2,5 h vid 150 °C, sedan 225–250 °C tills svålen poppar (ungefärligt)",
+   "restMin": 10,
+   "note": "ICA sidfläsk 80 °C; Svenskt Kött 75–80 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/sida/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-julskinka",
+   "animal": "gris",
+   "sv": "Julskinka (rimmad)",
+   "en": "Christmas ham",
+   "cutId": "gris-skinka",
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 72
+    },
+    {
+     "label": "Lång hållbarhet",
+     "coreC": 80
+    }
+   ],
+   "timeHint": "ca 1 h 15 min/kg vid 125 °C (Svenskt Kött), ICA ca 1,5–2 h/kg",
+   "restMin": 15,
+   "note": "Svenskt Kött: 70 °C, 80 °C för stor skinka som ska räcka länge; ICA 72 °C.",
+   "sources": [
+    "https://svensktkott.se/recept/ugnsbakad-stor-julskinka-med-ben/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gris-bog",
+   "animal": "gris",
+   "sv": "Fläskbog / pulled pork",
+   "en": "Pork shoulder",
+   "cutId": "gris-bog",
+   "ovenC": 110,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Fläskstek, skivbar",
+     "coreC": 70
+    },
+    {
+     "label": "Pulled pork",
+     "coreC": 92
+    }
+   ],
+   "timeHint": "pulled pork ca 1,5–2 h/kg vid 110–125 °C (ungefärligt, tumregel); bogbladsstek 1–1,5 h vid 150 °C (Svenskt Kött)",
+   "restMin": 20,
+   "note": "92 °C för pulled pork är vedertagen tumregel, ej från myndighetskälla.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://svensktkott.se/om-kott/styckdetaljer/gris/flaskbog/"
+   ]
+  },
+  {
+   "id": "lamm-racks",
+   "animal": "lamm",
+   "sv": "Lammracks",
+   "en": "Rack of lamb",
+   "cutId": "lamm-racks",
+   "ovenC": 200,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 56
+    },
+    {
+     "label": "Medium",
+     "coreC": 61
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 10–15 min vid 200 °C efter bryning (ungefärligt)",
+   "restMin": 5,
+   "note": "Svenskt Kött: rare 54–58, medium 58–65.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/lamm/racks/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "lamm-stek",
+   "animal": "lamm",
+   "sv": "Lammstek",
+   "en": "Leg of lamb",
+   "cutId": "lamm-stek",
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 57
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 1 h/kg vid 125 °C (Svenskt Kött); 1,5–2 h vid 150 °C",
+   "restMin": 15,
+   "note": "Svenskt Kött: rare 54–56, medium 56–58; ICA 58–70 °C.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/lamm/stek/",
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "lamm-sadel",
+   "animal": "lamm",
+   "sv": "Lammsadel",
+   "en": "Saddle of lamb",
+   "cutId": "lamm-sadel",
+   "ovenC": 175,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 55
+    },
+    {
+     "label": "Medium",
+     "coreC": 59
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "45 min–1 h 15 min vid ca 175 °C (Svenskt Kött)",
+   "restMin": 10,
+   "note": null,
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/lamm/sadel/"
+   ]
+  },
+  {
+   "id": "lamm-lagg",
+   "animal": "lamm",
+   "sv": "Lammlägg",
+   "en": "Lamb shank",
+   "cutId": "lamm-lagg",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Mör, lossnar från ben",
+     "coreC": 85
+    }
+   ],
+   "timeHint": "bräsera under lock 2,5–3,5 h vid 150 °C (ungefärligt); Svenskt Kött anger 70–150 °C lång tid",
+   "restMin": 10,
+   "note": "Svenskt Kött anger innertemp 60–70 °C men mörheten kräver lång tid; 85 °C är tumregel för sönderfallande.",
+   "sources": [
+    "https://svensktkott.se/om-kott/styckdetaljer/lamm/lagg/"
+   ]
+  },
+  {
+   "id": "fagel-helkyckling",
+   "animal": "fagel",
+   "sv": "Hel kyckling",
+   "en": "Whole chicken",
+   "cutId": "kyckling-skrov",
+   "ovenC": 175,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Klar (vid benet)",
+     "coreC": 82
+    }
+   ],
+   "timeHint": "ca 1–1,5 h vid 175–200 °C för 1,2–1,5 kg (ungefärligt)",
+   "restMin": 10,
+   "note": "ICA: 82 °C vid benet i lårets tjockaste del.",
+   "sources": [
+    "https://www.ica.se/artikel/kyckling-innertemperatur/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fagel-kycklingbrost",
+   "animal": "fagel",
+   "sv": "Kycklingbröst",
+   "en": "Chicken breast",
+   "cutId": "kyckling-brost",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 72
+    }
+   ],
+   "timeHint": "ca 20–30 min vid 150–175 °C (ungefärligt); ta ut vid 70 °C, stiger",
+   "restMin": 5,
+   "note": "ICA: 72 °C; låg värme 125–150 °C ger saftigare filé.",
+   "sources": [
+    "https://www.ica.se/artikel/kyckling-innertemperatur/"
+   ]
+  },
+  {
+   "id": "fagel-kycklinglar",
+   "animal": "fagel",
+   "sv": "Kycklinglår / klubbor",
+   "en": "Chicken thigh / drumstick",
+   "cutId": "kyckling-overlar",
+   "ovenC": 200,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Klar (vid benet)",
+     "coreC": 82
+    }
+   ],
+   "timeHint": "ca 35–45 min vid 175–200 °C (ungefärligt)",
+   "restMin": 5,
+   "note": "Lårfilé utan ben: 72 °C (ICA).",
+   "sources": [
+    "https://www.ica.se/artikel/kyckling-innertemperatur/",
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fagel-ankbrost",
+   "animal": "fagel",
+   "sv": "Ankbröst",
+   "en": "Duck breast",
+   "cutId": null,
+   "ovenC": 200,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa (restaurang)",
+     "coreC": 58
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "stek skinnsidan 5–8 min, sedan 5–10 min vid 200 °C (ungefärligt)",
+   "restMin": 8,
+   "note": "Livsmedelsverket: allt fågelkött ska vara genomstekt, ankbröst kan vara aningen rosa men ändå genomstekt. 58 °C är vanligt restaurangvärde, inte myndighetsråd.",
+   "sources": [
+    "https://fragor.livsmedelsverket.se/org/livsmedelsverket/d/campylobacter-i-anka-som-oftast-serveras-rosaej-ge/"
+   ]
+  },
+  {
+   "id": "fagel-kalkonbrost",
+   "animal": "fagel",
+   "sv": "Kalkonbröst",
+   "en": "Turkey breast",
+   "cutId": "kyckling-brost",
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 72
+    }
+   ],
+   "timeHint": "ca 1–1,5 h/kg vid 150 °C (ungefärligt)",
+   "restMin": 15,
+   "note": "ICA: kalkonbröst 72 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "vilt-algfile",
+   "animal": "vilt",
+   "sv": "Älgfilé",
+   "en": "Moose tenderloin",
+   "cutId": null,
+   "ovenC": 125,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 56
+    },
+    {
+     "label": "Medium",
+     "coreC": 60
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 20–30 min vid 125 °C (ungefärligt)",
+   "restMin": 5,
+   "note": "ICA 56–70 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "vilt-algstek",
+   "animal": "vilt",
+   "sv": "Älgstek",
+   "en": "Moose roast",
+   "cutId": null,
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 58
+    },
+    {
+     "label": "Bräserad",
+     "coreC": 75
+    }
+   ],
+   "timeHint": "ca 1–1,5 h/kg vid 125 °C (ungefärligt)",
+   "restMin": 15,
+   "note": "ICA: älgstek/fransyska 75 °C (bräserad). Rosa ugnsstek enligt ICA:s vilt-intervall 58–70 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "vilt-hjortstek",
+   "animal": "vilt",
+   "sv": "Hjortstek",
+   "en": "Venison roast",
+   "cutId": null,
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 58
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 1 h/kg vid 125 °C (ungefärligt)",
+   "restMin": 15,
+   "note": "ICA hjortstek 58–70 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "vilt-vildsvin",
+   "animal": "vilt",
+   "sv": "Vildsvinsstek",
+   "en": "Wild boar roast",
+   "cutId": null,
+   "ovenC": 125,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Genomstekt",
+     "coreC": 72
+    }
+   ],
+   "timeHint": "ca 1,5 h/kg vid 125 °C (ungefärligt)",
+   "restMin": 15,
+   "note": "ICA 72 °C. Trikintesta eget jaktkött (Livsmedelsverket).",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/",
+    "https://fragor.livsmedelsverket.se/org/livsmedelsverket/d/tillaga-vildsvinskott-med-sous-vide-metoden/"
+   ]
+  },
+  {
+   "id": "vilt-radjurssadel",
+   "animal": "vilt",
+   "sv": "Rådjurssadel",
+   "en": "Roe deer saddle",
+   "cutId": null,
+   "ovenC": 175,
+   "method": "stek + ugn",
+   "coreC": [
+    {
+     "label": "Rosa",
+     "coreC": 56
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 70
+    }
+   ],
+   "timeHint": "ca 20–30 min vid 175 °C (ungefärligt)",
+   "restMin": 10,
+   "note": "ICA 56–70 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fisk-lax",
+   "animal": "fisk",
+   "sv": "Lax (filé)",
+   "en": "Salmon fillet",
+   "cutId": null,
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Saftig",
+     "coreC": 52
+    },
+    {
+     "label": "Genomstekt",
+     "coreC": 56
+    }
+   ],
+   "timeHint": "ca 15–25 min vid 125–150 °C (ungefärligt)",
+   "restMin": 2,
+   "note": "ICA lax 52–56 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fisk-torsk",
+   "animal": "fisk",
+   "sv": "Torsk (rygg/filé)",
+   "en": "Cod",
+   "cutId": null,
+   "ovenC": 175,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 56
+    }
+   ],
+   "timeHint": "ca 12–20 min vid 175 °C (ungefärligt)",
+   "restMin": 2,
+   "note": "ICA torsk/torskrygg 56 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fisk-roding",
+   "animal": "fisk",
+   "sv": "Röding",
+   "en": "Arctic char",
+   "cutId": null,
+   "ovenC": 150,
+   "method": "lågtemp",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 54
+    }
+   ],
+   "timeHint": "ca 12–18 min vid 150 °C (ungefärligt)",
+   "restMin": 2,
+   "note": "Ingen rödingspecifik temp i källorna; ICA hel fisk 56 °C, lax 52–56 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "fisk-halleflundra",
+   "animal": "fisk",
+   "sv": "Hälleflundra",
+   "en": "Halibut",
+   "cutId": null,
+   "ovenC": 175,
+   "method": "hög värme",
+   "coreC": [
+    {
+     "label": "Klar",
+     "coreC": 56
+    }
+   ],
+   "timeHint": "ca 12–20 min vid 175 °C (ungefärligt)",
+   "restMin": 2,
+   "note": "ICA hälleflundra 56 °C.",
+   "sources": [
+    "https://www.ica.se/artikel/innertemperatur/"
+   ]
+  },
+  {
+   "id": "gronsak-rotfrukter",
+   "animal": "gronsak",
+   "sv": "Rostade rotfrukter",
+   "en": "Roasted root vegetables",
+   "cutId": null,
+   "ovenC": 225,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 30 min vid 225 °C (ICA), bitar ca 2–3 cm",
+   "restMin": 0,
+   "note": "Varmluft: ca 200 °C.",
+   "sources": [
+    "https://www.ica.se/recept/ugnsrostade-rotfrukter-695683/"
+   ]
+  },
+  {
+   "id": "gronsak-potatisklyftor",
+   "animal": "gronsak",
+   "sv": "Potatisklyftor",
+   "en": "Potato wedges",
+   "cutId": null,
+   "ovenC": 225,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 25–35 min vid 225 °C, vänd en gång (ungefärligt)",
+   "restMin": 0,
+   "note": "Tumregel, ej verifierad mot källa.",
+   "sources": []
+  },
+  {
+   "id": "gronsak-morotter",
+   "animal": "gronsak",
+   "sv": "Morötter (hela, rostade)",
+   "en": "Roasted carrots",
+   "cutId": null,
+   "ovenC": 200,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 30–40 min vid 200–225 °C (ungefärligt)",
+   "restMin": 0,
+   "note": "Samma logik som rotfrukter.",
+   "sources": [
+    "https://www.ica.se/recept/ugnsrostade-rotfrukter-695683/"
+   ]
+  },
+  {
+   "id": "gronsak-rodbetor",
+   "animal": "gronsak",
+   "sv": "Rödbetor (hela i folie)",
+   "en": "Whole beets in foil",
+   "cutId": null,
+   "ovenC": 200,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 45–75 min vid 200 °C beroende på storlek, klara när en sticka går lätt in (ungefärligt)",
+   "restMin": 0,
+   "note": "Tumregel, ej verifierad mot källa.",
+   "sources": []
+  },
+  {
+   "id": "gronsak-sparris",
+   "animal": "gronsak",
+   "sv": "Grön sparris",
+   "en": "Green asparagus",
+   "cutId": null,
+   "ovenC": 225,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 8–12 min vid 225 °C (ungefärligt)",
+   "restMin": 0,
+   "note": "Tumregel, ej verifierad mot källa.",
+   "sources": []
+  },
+  {
+   "id": "gronsak-majs",
+   "animal": "gronsak",
+   "sv": "Majskolv",
+   "en": "Corn on the cob",
+   "cutId": null,
+   "ovenC": 200,
+   "method": "hög värme",
+   "coreC": [],
+   "timeHint": "ca 25–35 min vid 200 °C, i folie eller skal (ungefärligt)",
+   "restMin": 0,
+   "note": "Tumregel, ej verifierad mot källa.",
+   "sources": []
+  }
+ ]
+}

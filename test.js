@@ -219,3 +219,47 @@ assert.strictEqual(COURSES[0], 'testa', 'Att testa står först');
 import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.deepStrictEqual(sanitizeIndexed({ labels: ['vegetariskt', '<img onerror=x>'], ingredients: [] }).labels, ['vegetariskt'], 'workern vitlistar taggar');
 });
+
+// Guide: måttomvandling
+{
+  const { parseAmount, fmtAmount, convertUnit, cToF, fToC } = require('./app.js');
+  assert.strictEqual(parseAmount('1,5'), 1.5);
+  assert.strictEqual(parseAmount('1 1/2'), 1.5);
+  assert.strictEqual(parseAmount('3/4'), 0.75);
+  assert.throws(() => parseAmount('abc'));
+  assert.throws(() => parseAmount(''));
+  assert.strictEqual(fmtAmount(236.588), '237');
+  assert.strictEqual(fmtAmount(1.4786), '1,48');
+  assert.strictEqual(fmtAmount(12500), '12 500');
+  const dl = { ml: 100 }, msk = { ml: 15 }, g = { g: 1 }, cup = { ml: 236.588 };
+  assert.strictEqual(convertUnit(1, dl, msk), 100 / 15);
+  assert.strictEqual(fmtAmount(convertUnit(1, cup, dl)), '2,37');
+  assert.strictEqual(convertUnit(2, dl, g, 60), 120, '2 dl vetemjöl = 120 g');
+  assert.strictEqual(convertUnit(120, g, dl, 60), 2, 'och tillbaka');
+  assert.throws(() => convertUnit(1, dl, g), 'volym till vikt utan densitet kastar');
+  assert.strictEqual(cToF(180), 356);
+  assert.strictEqual(fToC(212), 100);
+}
+
+// Guide: datakontroll av guide.json (svensk text, kopplingar, enheter)
+{
+  const g = JSON.parse(fs.readFileSync(__dirname + '/guide.json', 'utf8'));
+  const bad = [];
+  const walk = (v, path) => {
+    if (typeof v === 'string') {
+      if (/—/.test(v)) bad.push(path + ': tankstreck');
+      if (!/^(sources|url|svg|body|viewBox|d)\b|\.(en|url|id|cutId|animal|viewBox|body)$|\.svg\.|\.sources\./.test(path) && /\d\.\d/.test(v)) bad.push(path + ': decimalpunkt i "' + v + '"');
+    } else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) walk(x, path + '.' + k);
+  };
+  walk(g, 'guide');
+  const cutIds = new Set(g.cuts.animals.flatMap(a => a.regions.map(r => r.id)));
+  for (const x of [...g.sousvide, ...g.ugn]) if (x.cutId && !cutIds.has(x.cutId)) bad.push(x.id + ': okänd cutId ' + x.cutId);
+  for (const a of g.cuts.animals) if (a.svg) {
+    for (const id of Object.keys(a.svg.regions)) if (!a.regions.some(r => r.id === id)) bad.push(a.id + ': svg-region utan del ' + id);
+    for (const r of a.regions) if (!a.svg.regions[r.id]) bad.push(a.id + ': del utan svg-region ' + r.id);
+  }
+  for (const u of [...g.matt.volume, ...g.matt.weight]) if (!(u.ml > 0) === !(u.g > 0)) bad.push(u.id + ': enhet behöver ml eller g');
+  for (const d of g.matt.density) if (!(d.gPerDl > 0)) bad.push(d.id + ': gPerDl saknas');
+  if (new Set(g.sousvide.map(x => x.id)).size !== g.sousvide.length || new Set(g.ugn.map(x => x.id)).size !== g.ugn.length) bad.push('dubbla id i tider');
+  assert.deepStrictEqual(bad, [], 'guide.json:\n' + bad.join('\n'));
+}

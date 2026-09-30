@@ -360,7 +360,32 @@ Regler:
 Recept:
 `;
 
-if (typeof module !== 'undefined') { module.exports = { ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+// ---------- guide: måttomvandling ----------
+// "1,5", "1.5", "1/2" och "1 1/2" blir tal. Tomt eller skräp kastar, UI:t visar då inget resultat.
+function parseAmount(s) {
+  const t = String(s).trim().replace(',', '.');
+  const m = t.match(/^(?:(\d+(?:\.\d+)?)\s+)?(\d+)\/(\d+)$/);
+  const n = m ? (m[1] ? Number(m[1]) : 0) + Number(m[2]) / Number(m[3]) : t === '' ? NaN : Number(t);
+  if (!Number.isFinite(n) || n < 0) throw new Error('Ogiltig mängd: ' + s);
+  return n;
+}
+// Tre värdesiffror, heltal från 100, decimalkomma och mellanslag (fmtNum avrundar för grovt för mått).
+function fmtAmount(n) {
+  const r = n >= 100 ? Math.round(n) : Number(n.toPrecision(3));
+  const [int, dec] = String(r).split('.');
+  return int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (dec ? ',' + dec : '');
+}
+// Enheter har antingen ml eller g. Mellan volym och vikt krävs ingrediensens g per dl.
+function convertUnit(amount, from, to, gPerDl) {
+  if (from.ml && to.ml) return amount * from.ml / to.ml;
+  if (from.g && to.g) return amount * from.g / to.g;
+  if (!gPerDl) throw new Error('Volym och vikt kräver en ingrediens');
+  return from.ml ? amount * from.ml / 100 * gPerDl / to.g : amount * from.g / gPerDl * 100 / to.ml;
+}
+const cToF = c => c * 9 / 5 + 32;
+const fToC = f => (f - 32) * 5 / 9;
+
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -1332,7 +1357,7 @@ if (typeof document !== 'undefined') (async function () {
   document.addEventListener('visibilitychange', syncWakeLock);
 
   // De fyra flikarna. Senaste flik sparas så att appen öppnar där man var, i butiken alltså listan.
-  const TABS = ['#/', '#/lista', '#/vanner', '#/allas'];
+  const TABS = ['#/', '#/lista', '#/vanner', '#/allas', '#/guide'];
   function rememberRoute(h) {
     if (!TABS.includes(h)) return;
     try { localStorage.setItem('grammat:lastRoute', h); } catch (e) { /* privat läge */ }
@@ -1363,11 +1388,172 @@ if (typeof document !== 'undefined') (async function () {
         active = mine ? m === '#/' : (friendList || []).some(x => publicRowKey(x) === id) ? m === '#/vanner' : m === '#/allas';
       } else {
         active = m === '#/'
-          ? !h.startsWith('#/lista') && !h.startsWith('#/konto') && !h.startsWith('#/allas') && !h.startsWith('#/anvandare') && !h.startsWith('#/vanner') && !h.startsWith('#/join') && !h.startsWith('#/hej/')
+          ? !h.startsWith('#/lista') && !h.startsWith('#/konto') && !h.startsWith('#/allas') && !h.startsWith('#/anvandare') && !h.startsWith('#/vanner') && !h.startsWith('#/join') && !h.startsWith('#/hej/') && !h.startsWith('#/guide')
           : (m === '#/allas' ? h.startsWith('#/allas') || h.startsWith('#/anvandare') : h.startsWith(m));
       }
       a.classList.toggle('active', active);
     });
+  }
+
+  // ---------- Guide: tider, styckning, mått. Statisk data i guide.json, hämtas första gången. ----------
+  const GUIDE_V = '20260930'; // höj när guide.json ändras, edgen cachar annars gammal data
+  let guide = null, guideLoading = false, guideError = false;
+  let guideAnimal = '', guideQuery = '', densQuery = '';
+  const conv = { amount: '1', unit: 'dl', ing: '' };
+  function loadGuide() {
+    if (guide || guideLoading) return;
+    guideLoading = true;
+    fetch('guide.json?v=' + GUIDE_V).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(d => { guide = d; guideError = false; })
+      .catch(() => { guideError = true; })
+      .finally(() => { guideLoading = false; if (location.hash.startsWith('#/guide')) render(); });
+  }
+  const GUIDE_TABS = [['sousvide', 'Sous vide'], ['ugn', 'Ugn'], ['styckning', 'Styckning'], ['matt', 'Mått']];
+  const deg = n => fmtAmount(n) + ' °C';
+  const SYSTEMS = { svensk: 'svenska', metrisk: 'metriska', us: 'amerikanska (US)', uk: 'brittiska (UK)', 'historisk svensk': 'gamla svenska' };
+  const SYS_TAG = { us: 'US', uk: 'UK' };
+
+  function viewGuide(sub, a, b) {
+    const tabs = `<nav class="gtabs" aria-label="Guide">${GUIDE_TABS.map(([k, t]) => `<a href="#/guide/${k}"${k === sub ? ' class="is-on" aria-current="page"' : ''}>${t}</a>`).join('')}</nav>`;
+    const head = `<div class="view-head"><h1>Guide</h1></div>${tabs}`;
+    if (!guide) {
+      loadGuide();
+      return head + (guideError ? '<p class="warn">Kunde inte hämta guiden. Kontrollera nätet och ladda om.</p>' : '<p class="empty">Hämtar …</p>');
+    }
+    if (sub === 'styckning') return head + viewCuts(a, b);
+    if (sub === 'matt') return head + viewMeasures();
+    return head + viewTimes(sub === 'ugn' ? 'ugn' : 'sousvide', a);
+  }
+
+  const cutOf = id => { for (const an of guide.cuts.animals) { const c = an.regions.find(r => r.id === id); if (c) return { animal: an, cut: c }; } return null; };
+  const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/styckning/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
+
+  function timeRows(item, mode) {
+    if (mode === 'sousvide') return item.options.map(o => `<tr><th>${esc(o.label)}</th><td>${deg(o.tempC)}</td><td>${esc(o.time)}</td></tr>${o.note ? `<tr class="gnote"><td colspan="3">${esc(o.note)}</td></tr>` : ''}`).join('');
+    return (item.coreC || []).map(o => `<tr><th>${esc(o.label)}</th><td colspan="2">${deg(o.coreC)} inuti</td></tr>`).join('');
+  }
+  function timeCard(item, mode) {
+    const meta = mode === 'sousvide'
+      ? [item.thickness].filter(Boolean)
+      : [item.ovenC ? 'Ugn ' + (typeof item.ovenC === 'number' ? deg(item.ovenC) : esc(item.ovenC) + ' °C') : '', item.method, item.timeHint, item.restMin ? 'vila ' + item.restMin + ' min' : ''].filter(Boolean);
+    return `<article class="gcard" id="g-${esc(item.id)}">
+      <h3>${esc(item.sv)}${item.en ? ` <span class="gen">${esc(item.en)}</span>` : ''}</h3>
+      ${meta.length ? `<p class="gmeta">${meta.map(esc).join(' · ')}</p>` : ''}
+      ${(mode === 'sousvide' ? item.options : item.coreC || []).length ? `<table class="gtab">${timeRows(item, mode)}</table>` : ''}
+      ${item.finish ? `<p class="gfinish">${esc(item.finish)}</p>` : ''}
+      ${item.note ? `<p class="gnote">${esc(item.note)}</p>` : ''}
+      ${item.safety ? `<p class="gsafety">${esc(item.safety)}</p>` : ''}
+      ${cutLink(item.cutId)}
+    </article>`;
+  }
+
+  const ANIMALS = [['', 'Alla'], ['not', 'Nöt'], ['gris', 'Gris'], ['lamm', 'Lamm'], ['fagel', 'Fågel'], ['vilt', 'Vilt'], ['fisk', 'Fisk'], ['gronsak', 'Grönsaker'], ['ovrigt', 'Övrigt']];
+  function viewTimes(mode, only) {
+    const list = guide[mode];
+    if (only) {
+      const hit = list.filter(x => x.id === only || x.cutId === only);
+      return (hit.length ? `<div class="gcards">${hit.map(x => timeCard(x, mode)).join('')}</div>` : '<p class="empty">Hittade ingen tid för den delen.</p>')
+        + `<p><a class="btn btn-ghost" href="#/guide/${mode}">Alla tider</a></p>`;
+    }
+    const q = guideQuery.trim().toLowerCase();
+    const shown = list.filter(x => (!guideAnimal || x.animal === guideAnimal)
+      && (!q || [x.sv, x.en, ...(x.cutId && cutOf(x.cutId) ? cutOf(x.cutId).cut.aka || [] : [])].join(' ').toLowerCase().includes(q)));
+    const present = new Set(list.map(x => x.animal));
+    const intro = mode === 'sousvide'
+      ? 'Tiderna är total tid i vattenbadet och gäller angiven tjocklek. Kortaste tiden räcker för att bitens mitt ska nå temperaturen, längre tid ger mörare kött men mjukare textur.'
+      : 'Stektermometern bestämmer, inte klockan. ' + guide.ugnNote;
+    return `<p class="gintro">${intro}</p>
+      <div class="search"><input type="search" id="gq" placeholder="Sök, t.ex. entrecôte eller ribeye" value="${esc(guideQuery)}" aria-label="Sök i tiderna"></div>
+      <div class="gchips" role="group" aria-label="Filtrera">${ANIMALS.filter(([k]) => !k || present.has(k)).map(([k, t]) => `<button type="button" class="gchip${k === guideAnimal ? ' is-on' : ''}" data-ganimal="${k}" aria-pressed="${k === guideAnimal}">${t}</button>`).join('')}</div>
+      ${shown.length ? `<div class="gcards">${shown.map(x => timeCard(x, mode)).join('')}</div>` : '<p class="empty">Inget matchar.</p>'}
+      <p class="hint gsrc">Sammanställt från bl.a. Douglas Baldwin, Serious Eats, ChefSteps och Livsmedelsverket. Riktvärden, inte garantier.</p>`;
+  }
+
+  function viewCuts(animalId, cutId) {
+    const animals = guide.cuts.animals;
+    const an = animals.find(x => x.id === animalId) || animals[0];
+    const cut = an.regions.find(r => r.id === cutId);
+    const sv = guide.sousvide.filter(x => x.cutId && cut && x.cutId === cut.id);
+    const ov = guide.ugn.filter(x => x.cutId && cut && x.cutId === cut.id);
+    const svg = an.svg ? `<svg class="gsvg" viewBox="${esc(an.svg.viewBox)}" role="img" aria-label="Styckningsschema ${esc(an.sv)}">
+        <defs><clipPath id="clip-${an.id}"><path d="${esc(an.svg.body)}"/></clipPath></defs>
+        <path class="gbody" d="${esc(an.svg.body)}"/>
+        <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => an.svg.regions[r.id]).map(r => `<a href="#/guide/styckning/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${cut && cut.id === r.id ? ' is-on' : ''}" d="${esc(an.svg.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
+        <path class="gout" d="${esc(an.svg.body)}"/>
+        ${an.regions.filter(r => an.svg.labels && an.svg.labels[r.id]).map(r => `<text class="glabel${cut && cut.id === r.id ? ' is-on' : ''}" x="${Number(an.svg.labels[r.id][0])}" y="${Number(an.svg.labels[r.id][1])}">${esc(r.short || r.sv)}</text>`).join('')}
+      </svg>` : '';
+    const detail = cut ? `<article class="gcard gcut">
+        <h3>${esc(cut.sv)} <span class="gen">${esc(cut.en)}</span></h3>
+        ${cut.aka && cut.aka.length ? `<p class="gmeta">Kallas också: ${cut.aka.map(esc).join(', ')}</p>` : ''}
+        <p>${esc(cut.description)}</p>
+        ${cut.bestFor && cut.bestFor.length ? `<p class="gtags">${cut.bestFor.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</p>` : ''}
+        ${sv.length ? `<h4>Sous vide</h4><table class="gtab">${sv.map(x => timeRows(x, 'sousvide')).join('')}</table>` : ''}
+        ${ov.length ? `<h4>Ugn, innertemperatur</h4><table class="gtab">${ov.map(x => timeRows(x, 'ugn')).join('')}</table>` : ''}
+        ${sv.length ? `<a class="glink" href="#/guide/sousvide/${cut.id}">Alla sous vide-detaljer ›</a>` : ''}
+      </article>` : '<p class="hint">Tryck på en del av djuret, eller välj i listan.</p>';
+    return `<div class="gchips" role="group" aria-label="Djur">${animals.map(x => `<a class="gchip${x.id === an.id ? ' is-on' : ''}" href="#/guide/styckning/${x.id}" data-greplace${x.id === an.id ? ' aria-current="page"' : ''}>${esc(x.sv)}</a>`).join('')}</div>
+      <div class="gcutgrid"><div>${svg}</div><div id="gcutdetail">${detail}</div></div>
+      <h2>Alla delar, ${esc(an.sv.toLowerCase())}</h2>
+      <div class="gparts">${an.regions.map(r => `<a class="gpart${cut && cut.id === r.id ? ' is-on' : ''}" href="#/guide/styckning/${an.id}/${r.id}" data-greplace><b>${esc(r.sv)}</b><span>${esc(r.en)}</span></a>`).join('')}</div>`;
+  }
+
+  function convResult() {
+    const units = [...guide.matt.volume, ...guide.matt.weight];
+    const from = units.find(u => u.id === conv.unit);
+    let amount;
+    try { amount = parseAmount(conv.amount); } catch (e) { return '<p class="hint">Skriv en mängd, t.ex. 1,5 eller 1/2.</p>'; }
+    const ing = guide.matt.density.find(d => d.id === conv.ing);
+    const targets = units.filter(u => u.id !== from.id && u.common && (ing || !!u.ml === !!from.ml));
+    return `<table class="gtab gconv">${targets.map(u => `<tr><th>${fmtAmount(convertUnit(amount, from, u, ing && ing.gPerDl))}</th><td>${esc(u.sv)}${u.ml && SYS_TAG[u.system] && !/US|UK/.test(u.sv) ? ` <span class="gen">${SYS_TAG[u.system]}</span>` : ''}</td></tr>`).join('')}</table>
+      ${!ing && from.g ? '<p class="hint">Välj en ingrediens för att se vikten som volym.</p>' : ''}${!ing && from.ml ? '<p class="hint">Välj en ingrediens för att se volymen i gram.</p>' : ''}`;
+  }
+  function densRows() {
+    const q = densQuery.trim().toLowerCase();
+    return guide.matt.density.filter(d => !q || (d.sv + ' ' + (d.en || '')).toLowerCase().includes(q))
+      .map(d => `<tr><th>${esc(d.sv)}</th><td>${fmtAmount(d.gPerDl)} g</td><td>${fmtAmount(d.gPerMsk || d.gPerDl * 0.15)} g</td><td>${fmtAmount(d.gPerTsk || d.gPerDl * 0.05)} g</td></tr>`).join('');
+  }
+  function viewMeasures() {
+    const m = guide.matt;
+    const groups = {};
+    for (const u of [...m.volume, ...m.weight]) (groups[(u.ml ? 'Volym, ' : 'Vikt, ') + (SYSTEMS[u.system] || u.system) + ' mått'] ||= []).push(u);
+    const unitTable = list => `<table class="gtab">${list.map(u => `<tr><th>1 ${esc(u.sv)}${u.en && u.en !== u.sv ? ` <span class="gen">${esc(u.en)}</span>` : ''}</th><td>${u.ml ? fmtAmount(u.ml) + ' ml' : fmtAmount(u.g) + ' g'}</td><td class="gnote">${esc(u.note || '')}</td></tr>`).join('')}</table>`;
+    return `<section class="gconvbox">
+        <h2>Räkna om</h2>
+        <div class="gconvform">
+          <label>Mängd <input id="convAmount" inputmode="decimal" value="${esc(conv.amount)}" autocomplete="off"></label>
+          <label>Enhet <select id="convUnit">${Object.entries(groups).map(([g, us]) => `<optgroup label="${esc(g)}">${us.map(u => `<option value="${esc(u.id)}"${u.id === conv.unit ? ' selected' : ''}>${esc(u.sv)}</option>`).join('')}</optgroup>`).join('')}</select></label>
+          <label class="gconv-ing">Ingrediens <select id="convIng"><option value="">Ingen (bara ${'volym ↔ volym, vikt ↔ vikt'})</option>${m.density.map(d => `<option value="${esc(d.id)}"${d.id === conv.ing ? ' selected' : ''}>${esc(d.sv)}</option>`).join('')}</select></label>
+        </div>
+        <div id="convOut">${convResult()}</div>
+      </section>
+      <h2>Temperatur</h2>
+      <div class="gconvform gtemp"><label>°C <input id="tempC" inputmode="decimal" value="180"></label><label>°F <input id="tempF" inputmode="decimal" value="356"></label></div>
+      ${m.temperature && m.temperature.gas ? `<table class="gtab">${m.temperature.gas.map(r => `<tr><th>Gas ${esc(r.mark)}</th><td>${deg(r.c)}</td><td>${fmtAmount(r.f)} °F</td></tr>`).join('')}</table>` : ''}
+      ${m.temperature && m.temperature.fan ? `<p class="hint">${esc(m.temperature.fan)}</p>` : ''}
+      <h2>Gram per mått</h2>
+      <div class="search"><input type="search" id="densq" placeholder="Sök ingrediens" value="${esc(densQuery)}" aria-label="Sök ingrediens"></div>
+      <table class="gtab gdens"><thead><tr><th></th><td>1 dl</td><td>1 msk</td><td>1 tsk</td></tr></thead><tbody id="densBody">${densRows()}</tbody></table>
+      ${Object.entries(groups).map(([g, us]) => `<h2>${esc(g)}</h2>${unitTable(us)}`).join('')}
+      ${m.misc && m.misc.length ? `<h2>Bra att veta</h2><table class="gtab">${m.misc.map(x => `<tr><th>${esc(x.sv)}</th><td class="gwrap">${esc(x.value)}</td></tr>`).join('')}</table>` : ''}
+      <p class="hint gsrc">Mått per dl varierar med hur hårt man packar. Väg när det spelar roll, som vid bakning.</p>`;
+  }
+
+  function bindGuide(view) {
+    view.querySelectorAll('[data-greplace]').forEach(a => a.onclick = e => { e.preventDefault(); location.replace(a.getAttribute('href')); });
+    view.querySelectorAll('[data-ganimal]').forEach(b => b.onclick = () => { guideAnimal = b.dataset.ganimal; render(); });
+    const gq = $('#gq');
+    if (gq) gq.oninput = () => { guideQuery = gq.value; render(); const n = $('#gq'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); };
+    const out = () => { $('#convOut').innerHTML = convResult(); };
+    const a = $('#convAmount'), u = $('#convUnit'), i = $('#convIng');
+    if (a) { a.oninput = () => { conv.amount = a.value; out(); }; u.onchange = () => { conv.unit = u.value; out(); }; i.onchange = () => { conv.ing = i.value; out(); }; }
+    const c = $('#tempC'), f = $('#tempF');
+    if (c) {
+      const num = v => { const n = Number(v.trim().replace(',', '.').replace('−', '-')); return v.trim() && Number.isFinite(n) ? n : null; }; // minusgrader tillåtna
+      c.oninput = () => { const n = num(c.value); f.value = n === null ? '' : String(Math.round(cToF(n))); };
+      f.oninput = () => { const n = num(f.value); c.value = n === null ? '' : String(Math.round(fToC(n))); };
+    }
+    const dq = $('#densq');
+    if (dq) dq.oninput = () => { densQuery = dq.value; $('#densBody').innerHTML = densRows(); };
   }
 
   // Vyn som ritas kan lägga sina sekundära val (Kopiera, Töm …) bakom ··· i headern.
@@ -1382,6 +1568,7 @@ if (typeof document !== 'undefined') (async function () {
     const userMatch = h.match(/^#\/anvandare\/(\d+)$/);
     const joinMatch = h.match(/^#\/join\/([A-Z0-9]{6,16})$/);
     const inviteMatch = h.match(/^#\/hej\/([^/]+)$/);
+    const guideMatch = h.match(/^#\/guide(?:\/([a-z]+))?(?:\/([^/]+))?(?:\/([^/]+))?$/);
     if (TABS.includes(h)) lastTab = h;
     document.body.classList.toggle('is-cooking', !!cook);
     let html;
@@ -1404,6 +1591,7 @@ if (typeof document !== 'undefined') (async function () {
     else if (h === '#/konto') html = viewAccount();
     else if (h === '#/vanner') html = viewFriends();
     else if (h === '#/allas') html = viewAllasRecept();
+    else if (guideMatch) html = viewGuide(guideMatch[1] || 'sousvide', guideMatch[2] && decodeURIComponent(guideMatch[2]), guideMatch[3] && decodeURIComponent(guideMatch[3]));
     else html = viewCatalog();
     $('#view').innerHTML = html;
     renderNav();
@@ -1414,6 +1602,7 @@ if (typeof document !== 'undefined') (async function () {
 
   function bind() {
     const view = $('#view');
+    bindGuide(view);
 
     const q = $('#q');
     if (q) q.oninput = () => {

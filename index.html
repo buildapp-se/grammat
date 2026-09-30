@@ -56,7 +56,7 @@ header.brand{padding:.4rem 0 0}
 .head-more{width:var(--tap);height:var(--tap);display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--card);font-size:18px;letter-spacing:.1em;padding-left:.1em}
 .head-user{display:inline-flex;align-items:center;justify-content:center;min-width:var(--tap);height:var(--tap);padding:0 12px;border-radius:var(--r);background:var(--ink);color:var(--card);font-family:var(--mono);font-size:14px;text-decoration:none}
 .head-user.is-guest{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);font-family:var(--sans);font-weight:600;padding:0 14px}
-.nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--card);border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--card);border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
 .nav a{height:52px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;color:#3A372F;text-decoration:none;white-space:nowrap;border-radius:var(--r)}
 .nav a.active{background:var(--ink);color:var(--card)}
 .nav-badge{background:var(--accent);color:var(--card);border-radius:999px;font-family:var(--mono);font-weight:400;font-size:11px;line-height:1.4;padding:1px 7px}
@@ -310,6 +310,65 @@ label.tag-pick{display:inline-flex;align-items:center;gap:8px;min-height:var(--t
 .linkrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:15px;color:var(--muted)}
 .btn-link{background:none;border:none;color:var(--ink);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 6px;text-decoration:underline;text-underline-offset:3px}
 .wide{display:none}
+/* ---- guide: tider, styckning, mått ---- */
+.gtabs{display:flex;gap:4px;background:var(--card);border-radius:var(--r);padding:4px;margin:-.2rem 0 1.2rem;overflow-x:auto}
+.gtabs a{flex:1;display:flex;align-items:center;justify-content:center;min-height:40px;padding:0 10px;border-radius:9px;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;color:#3A372F}
+.gtabs a.is-on{background:var(--ink);color:var(--card)}
+.gintro{color:#3A372F;margin:0 0 1rem;max-width:62ch}
+.gchips{display:flex;gap:8px;overflow-x:auto;margin:0 -1.25rem 1rem;padding:2px 1.25rem;scrollbar-width:none}
+.gchip{flex:none;display:inline-flex;align-items:center;min-height:var(--tap);padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;font-weight:600;text-decoration:none}
+.gchip.is-on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.gcards{display:grid;gap:10px}
+.gcard{background:var(--card);border-radius:14px;padding:14px 16px}
+.gcard h3{margin:0;font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.2}
+.gcard h4{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+.gen{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--muted);margin-left:4px}
+.gmeta{font-size:13px;color:var(--muted);margin-top:4px}
+.gtab{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+.gtab th,.gtab td{text-align:left;padding:7px 8px 7px 0;border-top:1px dashed var(--line);vertical-align:top}
+.gtab tr:first-child th,.gtab tr:first-child td{border-top:0}
+.gtab th{font-weight:600}
+.gtab td{font-family:var(--mono);font-size:14px;white-space:nowrap}
+.gtab td.gnote,.gtab .gnote td{font-family:var(--sans);font-size:13px;color:var(--muted);white-space:normal;border-top:0;padding-top:0}
+.gfinish{margin-top:8px;font-size:15px}
+p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
+.gtab td.gwrap{white-space:normal;font-family:var(--sans);font-size:14px}
+.gsafety{margin-top:8px;font-size:14px;color:var(--accent)}
+.glink{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:4px;color:var(--accent);font-weight:600;font-size:14px;text-decoration:none}
+.gsrc{margin-top:1.4rem}
+.gsvg{width:100%;height:auto;display:block;background:var(--card);border-radius:14px;padding:8px}
+.gbody{fill:var(--bg)}
+.greg{fill:var(--card);stroke:var(--ink);stroke-width:1.2;cursor:pointer;transition:fill .15s}
+.greg:hover{fill:#E6E2D0}
+.greg.is-on{fill:var(--accent)}
+.gout{fill:none;stroke:var(--ink);stroke-width:2.2;pointer-events:none}
+.glabel{font-family:var(--sans);font-size:10px;font-weight:600;fill:var(--ink);text-anchor:middle;pointer-events:none}
+.glabel.is-on{fill:var(--card)}
+.gcutgrid{display:grid;gap:12px}
+.gcut{margin-top:0}
+.gtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.gtags .tag{display:inline-flex;align-items:center;min-height:32px;font-size:13px}
+.gparts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.gpart{display:flex;flex-direction:column;justify-content:center;min-height:56px;padding:8px 12px;background:var(--card);border:1.5px solid transparent;border-radius:var(--r);text-decoration:none}
+.gpart b{font-weight:600;font-size:15px;line-height:1.25}
+.gpart span{font-size:12px;color:var(--muted)}
+.gpart.is-on{border-color:var(--accent)}
+.gconvbox{background:var(--card);border-radius:14px;padding:4px 16px 12px}
+.gconvbox h2{margin-top:12px}
+.gconvform{display:grid;grid-template-columns:1fr 1.4fr;gap:0 10px}
+.gconvform label{margin:.3rem 0}
+.gconv-ing{grid-column:1/-1}
+.gconv th{font-family:var(--mono);font-size:17px;text-align:right;width:40%;padding-right:14px}
+.gconv td{font-family:var(--sans);font-size:15px;white-space:normal}
+.gtemp{max-width:400px}
+.gdens thead td{font-size:11px;color:var(--muted);border-top:0}
+@media(min-width:700px){
+  .gchips{margin:0 0 1rem;padding:2px 0;flex-wrap:wrap}
+  .gcards{grid-template-columns:1fr 1fr}
+  .gcutgrid{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}
+  .gcutgrid>div:first-child{position:sticky;top:24px}
+  .gconvbox{max-width:560px}
+}
 /* ---- desktop från 700 px: sidhuvud på en rad, listorna som innehållsförteckning (AP8, mockup H) ---- */
 @media(min-width:700px){
   .wrap{max-width:1040px;padding:22px 40px 3rem} /* 960 px innehåll + 40 px på var sida */
@@ -393,6 +452,7 @@ label.tag-pick{display:inline-flex;align-items:center;gap:8px;min-height:var(--t
       <a href="#/lista" data-match="#/lista">Lista<span class="nav-badge" id="navListCount" hidden></span></a>
       <a href="#/vanner" data-match="#/vanner">V&auml;nner</a>
       <a href="#/allas" data-match="#/allas">Allas</a>
+      <a href="#/guide" data-match="#/guide">Guide</a>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
@@ -418,6 +478,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=login400-20260930"></script>
+<script src="app.js?v=guide-20260930"></script>
 </body>
 </html>

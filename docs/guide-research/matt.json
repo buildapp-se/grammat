@@ -1,0 +1,1350 @@
+{
+ "volume": [
+  {
+   "id": "krm",
+   "sv": "kryddmått",
+   "en": "spice measure",
+   "aka": [
+    "krm"
+   ],
+   "ml": 1,
+   "system": "svensk",
+   "note": null,
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "tsk",
+   "sv": "tesked",
+   "en": "teaspoon (SE)",
+   "aka": [
+    "tsk"
+   ],
+   "ml": 5,
+   "system": "svensk",
+   "note": null,
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "msk",
+   "sv": "matsked",
+   "en": "tablespoon (SE)",
+   "aka": [
+    "msk"
+   ],
+   "ml": 15,
+   "system": "svensk",
+   "note": "1 msk = 3 tsk",
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "ml",
+   "sv": "milliliter",
+   "en": "millilitre",
+   "aka": [
+    "ml"
+   ],
+   "ml": 1,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "cl",
+   "sv": "centiliter",
+   "en": "centilitre",
+   "aka": [
+    "cl"
+   ],
+   "ml": 10,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "dl",
+   "sv": "deciliter",
+   "en": "decilitre",
+   "aka": [
+    "dl"
+   ],
+   "ml": 100,
+   "system": "metrisk",
+   "note": null,
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "l",
+   "sv": "liter",
+   "en": "litre",
+   "aka": [
+    "l",
+    "liter"
+   ],
+   "ml": 1000,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "kaffekopp",
+   "sv": "kaffekopp",
+   "en": "coffee cup (Swedish recipes)",
+   "aka": [
+    "kopp",
+    "1 kopp"
+   ],
+   "ml": 150,
+   "system": "svensk",
+   "note": "Ingen officiell definition. Livsmedelsverkets vikttabell räknar en kopp bryggkaffe som 150 g (ca 1,5 dl). Äldre recept varierar.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "tekopp",
+   "sv": "tekopp",
+   "en": "teacup",
+   "aka": [
+    "tekopp"
+   ],
+   "ml": 200,
+   "system": "svensk",
+   "note": "Ingen definierad storlek hittad; ca 2 dl är en uppskattning. Flagga i UI som ungefärligt.",
+   "sources": []
+  },
+  {
+   "id": "us-cup",
+   "sv": "kopp (US)",
+   "en": "US cup",
+   "aka": [
+    "cup",
+    "c",
+    "US customary cup"
+   ],
+   "ml": 236.59,
+   "system": "us",
+   "note": "US legal cup (näringsmärkning) = 240 ml.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Cup_(unit)"
+   ]
+  },
+  {
+   "id": "us-legal-cup",
+   "sv": "kopp (US, näringsmärkning)",
+   "en": "US legal cup",
+   "aka": [
+    "legal cup"
+   ],
+   "ml": 240,
+   "system": "us",
+   "note": null,
+   "sources": [
+    "https://en.wikipedia.org/wiki/Cup_(unit)"
+   ]
+  },
+  {
+   "id": "metric-cup",
+   "sv": "kopp (UK/AU/NZ/CA, metrisk)",
+   "en": "metric cup",
+   "aka": [
+    "cup (UK)",
+    "cup (AU)"
+   ],
+   "ml": 250,
+   "system": "uk",
+   "note": "Används i Storbritannien, Australien, Nya Zeeland, Kanada.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Cup_(unit)"
+   ]
+  },
+  {
+   "id": "us-tbsp",
+   "sv": "matsked (US)",
+   "en": "US tablespoon",
+   "aka": [
+    "tbsp",
+    "T",
+    "Tbsp"
+   ],
+   "ml": 14.79,
+   "system": "us",
+   "note": "Praktiskt och i US-näringsmärkning = 15 ml.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Tablespoon"
+   ]
+  },
+  {
+   "id": "au-tbsp",
+   "sv": "matsked (AU)",
+   "en": "Australian tablespoon",
+   "aka": [
+    "tbsp (AU)"
+   ],
+   "ml": 20,
+   "system": "metrisk",
+   "note": "Australisk msk = 4 tsk = 20 ml. Viktigt i australiska recept.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Tablespoon"
+   ]
+  },
+  {
+   "id": "us-tsp",
+   "sv": "tesked (US)",
+   "en": "US teaspoon",
+   "aka": [
+    "tsp",
+    "t"
+   ],
+   "ml": 4.93,
+   "system": "us",
+   "note": "Praktiskt = 5 ml.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Tablespoon"
+   ]
+  },
+  {
+   "id": "us-floz",
+   "sv": "vätskeounce (US)",
+   "en": "US fluid ounce",
+   "aka": [
+    "fl oz"
+   ],
+   "ml": 29.57,
+   "system": "us",
+   "note": null,
+   "sources": [
+    "https://en.wikipedia.org/wiki/Cup_(unit)"
+   ]
+  },
+  {
+   "id": "uk-floz",
+   "sv": "vätskeounce (UK)",
+   "en": "Imperial fluid ounce",
+   "aka": [
+    "fl oz (UK)",
+    "imp fl oz"
+   ],
+   "ml": 28.41,
+   "system": "uk",
+   "note": null,
+   "sources": [
+    "https://en.wikipedia.org/wiki/Cup_(unit)"
+   ]
+  },
+  {
+   "id": "us-pint",
+   "sv": "pint (US)",
+   "en": "US pint",
+   "aka": [
+    "pt"
+   ],
+   "ml": 473.18,
+   "system": "us",
+   "note": "= 2 US cups",
+   "sources": []
+  },
+  {
+   "id": "uk-pint",
+   "sv": "pint (UK)",
+   "en": "Imperial pint",
+   "aka": [
+    "pt (UK)"
+   ],
+   "ml": 568.26,
+   "system": "uk",
+   "note": "= 20 imp fl oz",
+   "sources": []
+  },
+  {
+   "id": "us-quart",
+   "sv": "quart (US)",
+   "en": "US quart",
+   "aka": [
+    "qt"
+   ],
+   "ml": 946.35,
+   "system": "us",
+   "note": "= 4 US cups",
+   "sources": []
+  },
+  {
+   "id": "uk-quart",
+   "sv": "quart (UK)",
+   "en": "Imperial quart",
+   "aka": [
+    "qt (UK)"
+   ],
+   "ml": 1136.52,
+   "system": "uk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "us-gallon",
+   "sv": "gallon (US)",
+   "en": "US gallon",
+   "aka": [
+    "gal"
+   ],
+   "ml": 3785.41,
+   "system": "us",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "uk-gallon",
+   "sv": "gallon (UK)",
+   "en": "Imperial gallon",
+   "aka": [
+    "gal (UK)"
+   ],
+   "ml": 4546.09,
+   "system": "uk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "pinch",
+   "sv": "nypa",
+   "en": "pinch",
+   "aka": [
+    "en nypa",
+    "pinch"
+   ],
+   "ml": 0.3,
+   "system": "us",
+   "note": "Ungefärligt, ingen officiell definition; ofta 1/16 tsk (ca 0,3 ml).",
+   "sources": []
+  },
+  {
+   "id": "dash",
+   "sv": "skvätt / stänk",
+   "en": "dash",
+   "aka": [
+    "dash",
+    "en skvätt"
+   ],
+   "ml": 0.6,
+   "system": "us",
+   "note": "Ungefärligt, ingen officiell definition; ofta 1/8 tsk (ca 0,6 ml).",
+   "sources": []
+  },
+  {
+   "id": "kanna",
+   "sv": "kanna",
+   "en": "kanna (old Swedish)",
+   "aka": [
+    "kanna"
+   ],
+   "ml": 2617,
+   "system": "historisk svensk",
+   "note": "1 kanna = 2 stop = 8 kvarter = 32 jungfrur (1665 och 1855 års regler).",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Kanna_(m%C3%A5tt)"
+   ]
+  },
+  {
+   "id": "stop",
+   "sv": "stop",
+   "en": "stop (old Swedish)",
+   "aka": [
+    "stop"
+   ],
+   "ml": 1308.5,
+   "system": "historisk svensk",
+   "note": "1/2 kanna.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Stop_(m%C3%A5tt)"
+   ]
+  },
+  {
+   "id": "kvarter",
+   "sv": "kvarter",
+   "en": "kvarter (old Swedish)",
+   "aka": [
+    "kvarter"
+   ],
+   "ml": 327.1,
+   "system": "historisk svensk",
+   "note": "1/4 stop = 1/8 kanna (härlett ur kanna-definitionen).",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Kanna_(m%C3%A5tt)"
+   ]
+  },
+  {
+   "id": "jungfru",
+   "sv": "jungfru (ort)",
+   "en": "jungfru (old Swedish gill)",
+   "aka": [
+    "jungfru",
+    "junfru",
+    "ort"
+   ],
+   "ml": 81.78,
+   "system": "historisk svensk",
+   "note": "1/4 kvarter = 1/32 kanna. Officiellt namn 'ort'. Mest för brännvin.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Jungfru_(m%C3%A5tt)"
+   ]
+  }
+ ],
+ "weight": [
+  {
+   "id": "g",
+   "sv": "gram",
+   "en": "gram",
+   "aka": [
+    "g"
+   ],
+   "g": 1,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "hg",
+   "sv": "hektogram",
+   "en": "hectogram",
+   "aka": [
+    "hg",
+    "hekto"
+   ],
+   "g": 100,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "kg",
+   "sv": "kilogram",
+   "en": "kilogram",
+   "aka": [
+    "kg",
+    "kilo"
+   ],
+   "g": 1000,
+   "system": "metrisk",
+   "note": null,
+   "sources": []
+  },
+  {
+   "id": "oz",
+   "sv": "ounce",
+   "en": "ounce (avoirdupois)",
+   "aka": [
+    "oz"
+   ],
+   "g": 28.35,
+   "system": "us",
+   "note": "Samma i US och UK.",
+   "sources": []
+  },
+  {
+   "id": "lb",
+   "sv": "pund",
+   "en": "pound",
+   "aka": [
+    "lb",
+    "lbs"
+   ],
+   "g": 453.59,
+   "system": "us",
+   "note": "= 16 oz",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Sk%C3%A5lpund"
+   ]
+  },
+  {
+   "id": "stick-butter",
+   "sv": "stick smör (US)",
+   "en": "stick of butter",
+   "aka": [
+    "1 stick"
+   ],
+   "g": 113,
+   "system": "us",
+   "note": "= 1/2 US cup = 8 tbsp = 4 oz",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "skalpund",
+   "sv": "skålpund",
+   "en": "skålpund (old Swedish pound)",
+   "aka": [
+    "skålpund",
+    "℔"
+   ],
+   "g": 425.08,
+   "system": "historisk svensk",
+   "note": "Viktualievikt, 1600-tal till 1889. 425 g och multipler i gamla recept kommer härifrån.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Sk%C3%A5lpund"
+   ]
+  },
+  {
+   "id": "lod",
+   "sv": "lod",
+   "en": "lod",
+   "aka": [
+    "lod"
+   ],
+   "g": 13.28,
+   "system": "historisk svensk",
+   "note": "1/32 skålpund.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Sk%C3%A5lpund"
+   ]
+  },
+  {
+   "id": "mark",
+   "sv": "mark",
+   "en": "mark (old Swedish weight)",
+   "aka": [
+    "mark",
+    "markpund (annat!)"
+   ],
+   "g": 212.5,
+   "system": "historisk svensk",
+   "note": "Osäker: medeltida skålpund = 2 mark; senare användes mark och skålpund nästan synonymt. Visa med varning.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Sk%C3%A5lpund"
+   ]
+  },
+  {
+   "id": "ort-vikt",
+   "sv": "ort (vikt, 1855)",
+   "en": "ort (1855 decimal weight)",
+   "aka": [
+    "ort"
+   ],
+   "g": 0.425,
+   "system": "historisk svensk",
+   "note": "1/1000 skålpund i 1855 års decimalsystem. Ej samma som ort (rymdmått) = jungfru.",
+   "sources": [
+    "https://sv.wikipedia.org/wiki/Sk%C3%A5lpund"
+   ]
+  }
+ ],
+ "temperature": {
+  "formula": {
+   "cToF": "°F = °C × 9/5 + 32",
+   "fToC": "°C = (°F − 32) × 5/9"
+  },
+  "gasMark": [
+   {
+    "gasMark": 0.25,
+    "c": 110,
+    "f": 225
+   },
+   {
+    "gasMark": 0.5,
+    "c": 120,
+    "f": 250
+   },
+   {
+    "gasMark": 1,
+    "c": 140,
+    "f": 275
+   },
+   {
+    "gasMark": 2,
+    "c": 150,
+    "f": 300
+   },
+   {
+    "gasMark": 3,
+    "c": 170,
+    "f": 325
+   },
+   {
+    "gasMark": 4,
+    "c": 180,
+    "f": 350
+   },
+   {
+    "gasMark": 5,
+    "c": 190,
+    "f": 375
+   },
+   {
+    "gasMark": 6,
+    "c": 200,
+    "f": 400
+   },
+   {
+    "gasMark": 7,
+    "c": 220,
+    "f": 425
+   },
+   {
+    "gasMark": 8,
+    "c": 230,
+    "f": 450
+   },
+   {
+    "gasMark": 9,
+    "c": 240,
+    "f": 475
+   }
+  ],
+  "gasMarkSource": "https://en.wikipedia.org/wiki/Gas_Mark",
+  "fanOven": {
+   "rule": "Varmluft/fläktugn: sänk ca 25 °C jämfört med över- och undervärme.",
+   "deltaC": -25,
+   "note": "Svenskt Kötts siffra. Många tillverkare anger 20 °C; behandla som tumregel.",
+   "sources": [
+    "https://svensktkott.se/om-kott/kopa-laga-och-forvara/laga-kott/temperaturer/"
+   ]
+  }
+ },
+ "density": [
+  {
+   "id": "vetemjol",
+   "sv": "Vetemjöl",
+   "en": "All-purpose / plain flour",
+   "gPerDl": 60,
+   "gPerMsk": 9,
+   "gPerTsk": 3,
+   "range": "51–67",
+   "note": "LV 60. King Arthur 51 g/dl (sked-och-stryk, luftigare). Svenska recept utgår från 60.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "grahamsmjol",
+   "sv": "Grahamsmjöl",
+   "en": "Graham / whole wheat flour",
+   "gPerDl": 60,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "ragmjol",
+   "sv": "Rågmjöl (fullkorn)",
+   "en": "Rye flour (whole)",
+   "gPerDl": 55,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "50–60",
+   "note": "LV 50–55, Köket 60; fint rågmjöl ca 50.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "dinkelmjol",
+   "sv": "Dinkelmjöl (sikt)",
+   "en": "Spelt flour",
+   "gPerDl": 60,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "42–60",
+   "note": "Köket 60 (dinkelsikt). King Arthur 42 g/dl. Stor skillnad, osäkert.",
+   "sources": [
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "mannagryn",
+   "sv": "Mannagryn",
+   "en": "Semolina",
+   "gPerDl": 75,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "strosocker",
+   "sv": "Strösocker",
+   "en": "Granulated sugar",
+   "gPerDl": 85,
+   "gPerMsk": null,
+   "gPerTsk": 4,
+   "range": "84–90",
+   "note": "LV 85, Köket 90, King Arthur 84.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "florsocker",
+   "sv": "Florsocker",
+   "en": "Icing / confectioners' sugar",
+   "gPerDl": 60,
+   "gPerMsk": null,
+   "gPerTsk": 3,
+   "range": "48–60",
+   "note": "LV och Köket 60; King Arthur 48 (osiktat, sked-och-stryk).",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "farinsocker-lost",
+   "sv": "Farinsocker (löst)",
+   "en": "Brown sugar (loose)",
+   "gPerDl": 70,
+   "gPerMsk": null,
+   "gPerTsk": 4,
+   "range": "70–80",
+   "note": "LV 70, Köket 80.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "farinsocker-packat",
+   "sv": "Farinsocker (packat)",
+   "en": "Brown sugar (packed)",
+   "gPerDl": 90,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "King Arthur packad 213 g/cup. US-recept menar nästan alltid packad.",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "rasocker",
+   "sv": "Råsocker",
+   "en": "Raw / demerara sugar",
+   "gPerDl": null,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "Ingen källa hittad. Muscovado 80 g/dl (Köket) är närmast.",
+   "sources": [
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "salt-fint",
+   "sv": "Salt (fint)",
+   "en": "Table salt",
+   "gPerDl": 125,
+   "gPerMsk": 18,
+   "gPerTsk": 6,
+   "range": "120–125",
+   "note": "LV 125, Köket 120, King Arthur 18 g/msk.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "salt-grovt",
+   "sv": "Salt (grovt)",
+   "en": "Coarse salt",
+   "gPerDl": 95,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "95–100",
+   "note": "LV 95; Köket havssalt 100.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "flingsalt",
+   "sv": "Flingsalt",
+   "en": "Flaky salt",
+   "gPerDl": 53,
+   "gPerMsk": 8,
+   "gPerTsk": null,
+   "range": null,
+   "note": "Ingen svensk källa. Närmast: King Arthur Diamond Crystal kosher 8 g/msk. Ungefärligt.",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "bakpulver",
+   "sv": "Bakpulver",
+   "en": "Baking powder",
+   "gPerDl": 80,
+   "gPerMsk": null,
+   "gPerTsk": 5,
+   "range": "60–100",
+   "note": "LV 5 g/tsk, King Arthur 4 g/tsk, Köket 60 g/dl. Stor spridning; använd tsk-värdet.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "kakao",
+   "sv": "Kakao",
+   "en": "Cocoa powder",
+   "gPerDl": 40,
+   "gPerMsk": null,
+   "gPerTsk": 2,
+   "range": "35–40",
+   "note": "LV 40, Köket 40, King Arthur 35.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "havregryn",
+   "sv": "Havregryn",
+   "en": "Rolled oats",
+   "gPerDl": 35,
+   "gPerMsk": 5,
+   "gPerTsk": null,
+   "range": "35–38",
+   "note": "LV 35, King Arthur 38.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "ris",
+   "sv": "Ris (okokt)",
+   "en": "Rice, uncooked",
+   "gPerDl": 85,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "84–85",
+   "note": "LV polerat ris 85, King Arthur 84.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "matvete",
+   "sv": "Matvete (okokt)",
+   "en": "Wheat berries (pearled)",
+   "gPerDl": 80,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "Endast sekundärkälla.",
+   "sources": [
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "couscous",
+   "sv": "Couscous",
+   "en": "Couscous",
+   "gPerDl": 75,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "75–80",
+   "note": "LV 75, Receptfavoriter 80.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "quinoa",
+   "sv": "Quinoa (okokt)",
+   "en": "Quinoa, uncooked",
+   "gPerDl": 75,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "King Arthur 177 g/cup.",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "linser",
+   "sv": "Linser (torkade)",
+   "en": "Dried lentils",
+   "gPerDl": 75,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "75–90",
+   "note": "LV 75; röda linser ca 90 (Receptfavoriter).",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "riven-ost",
+   "sv": "Riven ost",
+   "en": "Grated cheese",
+   "gPerDl": 40,
+   "gPerMsk": 6,
+   "gPerTsk": null,
+   "range": "40–50",
+   "note": "LV 40, Köket 50, King Arthur 48.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "parmesan",
+   "sv": "Parmesan (riven)",
+   "en": "Grated Parmesan",
+   "gPerDl": 42,
+   "gPerMsk": 6,
+   "gPerTsk": null,
+   "range": null,
+   "note": "LV 42, King Arthur 42.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "smor",
+   "sv": "Smör",
+   "en": "Butter",
+   "gPerDl": 95,
+   "gPerMsk": 14,
+   "gPerTsk": null,
+   "range": "95–100",
+   "note": "LV 95, King Arthur 95, Köket 100.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "olja",
+   "sv": "Olja (raps/oliv)",
+   "en": "Vegetable / olive oil",
+   "gPerDl": 90,
+   "gPerMsk": 14,
+   "gPerTsk": null,
+   "range": "84–90",
+   "note": "LV 90, Köket 90, King Arthur 84–85.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "sirap",
+   "sv": "Sirap (ljus)",
+   "en": "Golden syrup",
+   "gPerDl": 140,
+   "gPerMsk": null,
+   "gPerTsk": 7,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "honung",
+   "sv": "Honung",
+   "en": "Honey",
+   "gPerDl": 140,
+   "gPerMsk": 21,
+   "gPerTsk": 7,
+   "range": null,
+   "note": "LV 140, King Arthur 21 g/msk.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "mjolk",
+   "sv": "Mjölk",
+   "en": "Milk",
+   "gPerDl": 103,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "gradde",
+   "sv": "Grädde",
+   "en": "Cream",
+   "gPerDl": 100,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "99–100",
+   "note": "LV vispgrädde 99, matlagningsgrädde 100.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "vatten",
+   "sv": "Vatten",
+   "en": "Water",
+   "gPerDl": 100,
+   "gPerMsk": 15,
+   "gPerTsk": 5,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "kokosflingor",
+   "sv": "Kokosflingor",
+   "en": "Desiccated coconut",
+   "gPerDl": 35,
+   "gPerMsk": 5,
+   "gPerTsk": null,
+   "range": "22–61",
+   "note": "LV och Köket 35; Receptfavoriter 61; King Arthur 22. Stor spridning.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "mandelmjol",
+   "sv": "Mandelmjöl",
+   "en": "Almond flour",
+   "gPerDl": 50,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "41–50",
+   "note": "Köket 50, King Arthur 41.",
+   "sources": [
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "mandel",
+   "sv": "Mandel (hel)",
+   "en": "Whole almonds",
+   "gPerDl": 65,
+   "gPerMsk": 10,
+   "gPerTsk": null,
+   "range": null,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "hackade-notter",
+   "sv": "Hackade nötter",
+   "en": "Chopped nuts",
+   "gPerDl": 50,
+   "gPerMsk": 8,
+   "gPerTsk": null,
+   "range": "48–51",
+   "note": "LV hasselnöt 49, valnöt 51; King Arthur valnöt 48.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "russin",
+   "sv": "Russin",
+   "en": "Raisins",
+   "gPerDl": 61,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": "60–63",
+   "note": "LV 61, Köket 60, King Arthur 63.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "potatismjol",
+   "sv": "Potatismjöl",
+   "en": "Potato starch",
+   "gPerDl": 80,
+   "gPerMsk": 12,
+   "gPerTsk": null,
+   "range": "64–80",
+   "note": "LV 80, Köket 75, King Arthur 64.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "majsstarkelse",
+   "sv": "Majsstärkelse (Maizena)",
+   "en": "Cornstarch / cornflour",
+   "gPerDl": 55,
+   "gPerMsk": 8,
+   "gPerTsk": null,
+   "range": "47–55",
+   "note": "Maizena är varumärke för majsstärkelse. LV 55, King Arthur 47.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "strobrod",
+   "sv": "Ströbröd",
+   "en": "Breadcrumbs",
+   "gPerDl": 50,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "Endast sekundärkälla.",
+   "sources": [
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "panko",
+   "sv": "Panko",
+   "en": "Panko",
+   "gPerDl": null,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "Ingen källa hittad. Panko är betydligt luftigare än ströbröd.",
+   "sources": []
+  },
+  {
+   "id": "torrjast",
+   "sv": "Torrjäst",
+   "en": "Instant / dry yeast",
+   "gPerDl": null,
+   "gPerMsk": 9,
+   "gPerTsk": 3,
+   "range": null,
+   "note": "King Arthur: 9 g/msk, 3 g/tsk. Receptfavoriter anger 15 g/msk, troligen för högt.",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart",
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html"
+   ]
+  },
+  {
+   "id": "chiafron",
+   "sv": "Chiafrön",
+   "en": "Chia seeds",
+   "gPerDl": 63,
+   "gPerMsk": null,
+   "gPerTsk": null,
+   "range": null,
+   "note": "King Arthur 37 g per 1/4 cup.",
+   "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "sesamfron",
+   "sv": "Sesamfrön",
+   "en": "Sesame seeds",
+   "gPerDl": 65,
+   "gPerMsk": 8,
+   "gPerTsk": null,
+   "range": "60–70",
+   "note": "LV 8 g/msk, Köket 70, King Arthur 60.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av",
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+   ]
+  },
+  {
+   "id": "linfro",
+   "sv": "Linfrö",
+   "en": "Flaxseed",
+   "gPerDl": 65,
+   "gPerMsk": 10,
+   "gPerTsk": null,
+   "range": "65–70",
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf",
+    "https://www.koket.se/sa-mycket-vager-1-dl-av"
+   ]
+  },
+  {
+   "id": "kaffe-malet",
+   "sv": "Kaffe (malet, brygg)",
+   "en": "Ground coffee",
+   "gPerDl": 38,
+   "gPerMsk": 5,
+   "gPerTsk": null,
+   "range": "35–38",
+   "note": "Receptfavoriter 38; LV kaffepulver 35 (oklart om snabbkaffe).",
+   "sources": [
+    "https://receptfavoriter.se/matartiklar/matt-och-vikt-pa-olika-livsmedel.html",
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  }
+ ],
+ "misc": [
+  {
+   "id": "agg-s",
+   "sv": "Ägg S",
+   "en": "Egg small",
+   "gWithShell": "under 53",
+   "gWithoutShellApprox": 43,
+   "note": "Utan skal ≈ 90 % av vikten (skal ca 10 %, Kronägg). Beräknat.",
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "agg-m",
+   "sv": "Ägg M",
+   "en": "Egg medium",
+   "gWithShell": "53–62",
+   "gWithoutShellApprox": 52,
+   "note": "Kronägg: medelägg 58 g med skal, 52 g utan; vita 34 g, gula 18 g. 1 ägg ≈ 0,5 dl. Svenska recept utgår från M.",
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "agg-l",
+   "sv": "Ägg L",
+   "en": "Egg large",
+   "gWithShell": "63–72",
+   "gWithoutShellApprox": 61,
+   "note": "Beräknat (90 %).",
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "agg-xl",
+   "sv": "Ägg XL",
+   "en": "Egg extra large",
+   "gWithShell": "73 och uppåt",
+   "gWithoutShellApprox": 68,
+   "note": "Beräknat (90 %).",
+   "sources": [
+    "https://www.kronagg.se/media/zkvbet4j/4-omvandlings-och-n%C3%A4ringsdata.pdf"
+   ]
+  },
+  {
+   "id": "smorpaket",
+   "sv": "Smörpaket",
+   "en": "Butter pack (SE)",
+   "g": 500,
+   "note": "Vanliga förpackningar 500 g och 250 g. Ej verifierat mot källa, men standard i svensk handel.",
+   "sources": []
+  },
+  {
+   "id": "jast-farsk",
+   "sv": "Jästpaket (färsk)",
+   "en": "Fresh yeast cake",
+   "g": 50,
+   "note": "Standardpaket i Sverige.",
+   "sources": []
+  },
+  {
+   "id": "jast-torr",
+   "sv": "Torrjäst (påse)",
+   "en": "Dry yeast sachet",
+   "g": 11,
+   "note": "1 påse (ca 11–12 g) motsvarar 50 g färsk jäst enligt svenska recept- och baksajter; tillverkarsida ej verifierad.",
+   "sources": [
+    "https://www.recepten.se/info/torrjaest.html"
+   ]
+  },
+  {
+   "id": "gelatinblad",
+   "sv": "Gelatinblad",
+   "en": "Gelatin leaf",
+   "g": 2,
+   "note": "LV: 2 g/blad; gelatinpulver 3 g/tsk.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "buljongtarning",
+   "sv": "Buljongtärning",
+   "en": "Stock cube",
+   "g": 10,
+   "note": "Ungefärligt, varierar per märke; oftast för 5 dl vatten. Ej verifierat. LV: buljongpulver 4 g/tsk.",
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "sockerbit",
+   "sv": "Sockerbit",
+   "en": "Sugar cube",
+   "g": 3,
+   "note": null,
+   "sources": [
+    "https://surdegsmakarn.wordpress.com/wp-content/uploads/2012/06/vikttabell.pdf"
+   ]
+  },
+  {
+   "id": "knippe",
+   "sv": "En knippe",
+   "en": "A bunch",
+   "g": null,
+   "note": "Vagt mått. Örtknippe i butik ofta ca 20–30 g, rädisor/morötter mer. Visa som 'ungefärligt'.",
+   "sources": []
+  },
+  {
+   "id": "nave",
+   "sv": "En näve",
+   "en": "A handful",
+   "g": null,
+   "note": "Vagt mått, ca 0,5–1 dl beroende på vara och hand.",
+   "sources": []
+  }
+ ],
+ "note": "LV = Livsmedelsverkets vikttabell (senast uppdaterad 2001), läst via spegling. King Arthur använder 1 cup = 236,6 ml och mäter med sked-och-stryk, därför ofta lägre än svenska värden."
+}
