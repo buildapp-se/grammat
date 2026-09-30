@@ -6,10 +6,16 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-09-25
+reviewedAt: 2026-09-30
 ---
 
 # Handoff
+
+## 2026-09-30: inloggning max 400 px på dator
+
+- `#view` breddas till 920 px från 1000 px (receptgriden), vilket drog ut Google-knappen och
+  e-postfälten. Nu wrappas `loginForms` i `.login{max-width:400px}` och `.invite-actions` har
+  samma tak. Mobil oförändrad. Verifierat i Playwright 375 och 1280 px, live på buildapp.se.
 
 ## 2026-09-25: Att testa och egna kategorier
 
