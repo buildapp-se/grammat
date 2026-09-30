@@ -336,6 +336,19 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gsafety{margin-top:8px;font-size:14px;color:var(--accent)}
 .glink{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:4px;color:var(--accent);font-weight:600;font-size:14px;text-decoration:none}
 .gsrc{margin-top:1.4rem}
+.gtable-wrap{background:var(--card);border-radius:14px;padding:4px 12px;overflow-x:auto}
+.gtable{width:100%;border-collapse:collapse;font-size:14px}
+.gtable thead th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px 6px 0}
+.gtable td,.gtable tbody th{text-align:left;vertical-align:top;padding:6px 6px 6px 0;border-top:1px dashed var(--line)}
+.gtable tr.gfirst>*{border-top:1.5px solid var(--line)}
+.gtable tbody tr:first-child>*{border-top:0}
+.gtable tbody th{width:32%;font-weight:600;line-height:1.25}
+.gtable tbody th a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.gtable tbody th small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
+.gtable tbody th small.gwarn{color:var(--accent)}
+.gtable .gnum{font-family:var(--mono);font-size:13px;white-space:nowrap;padding-right:10px}
+.gtable tr>:last-child{padding-right:0}
+.gtable td.gnum:last-child{white-space:normal;min-width:4.5em}
 .gsvg{width:100%;height:auto;display:block;background:var(--card);border-radius:14px;padding:8px}
 .gbody{fill:var(--bg)}
 .greg{fill:var(--card);stroke:var(--ink);stroke-width:1.2;cursor:pointer;transition:fill .15s}
@@ -344,6 +357,11 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gout{fill:none;stroke:var(--ink);stroke-width:2.2;pointer-events:none}
 .glabel{font-family:var(--sans);font-size:10px;font-weight:600;fill:var(--ink);text-anchor:middle;pointer-events:none}
 .glabel.is-on{fill:var(--card)}
+.gcall circle{fill:var(--ink)}
+.gcall line{stroke:var(--ink);stroke-width:1}
+.gcall text{font-family:var(--sans);font-size:11px;font-weight:600;fill:var(--ink)}
+.gcall.is-on text,.gcall.is-on circle{fill:var(--accent)}
+.gcall.is-on line{stroke:var(--accent)}
 .gcutgrid{display:grid;gap:12px}
 .gcut{margin-top:0}
 .gtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
@@ -478,6 +496,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide-20260930"></script>
+<script src="app.js?v=guide2-20260930"></script>
 </body>
 </html>

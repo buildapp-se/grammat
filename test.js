@@ -257,6 +257,7 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   for (const a of g.cuts.animals) if (a.svg) {
     for (const id of Object.keys(a.svg.regions)) if (!a.regions.some(r => r.id === id)) bad.push(a.id + ': svg-region utan del ' + id);
     for (const r of a.regions) if (!a.svg.regions[r.id]) bad.push(a.id + ': del utan svg-region ' + r.id);
+    for (const r of a.regions) if (!(a.svg.labels[r.id] || (a.svg.callouts || {})[r.id])) bad.push(a.id + ': del utan text i bilden ' + r.id);
   }
   for (const u of [...g.matt.volume, ...g.matt.weight]) if (!(u.ml > 0) === !(u.g > 0)) bad.push(u.id + ': enhet behöver ml eller g');
   for (const d of g.matt.density) if (!(d.gPerDl > 0)) bad.push(d.id + ': gPerDl saknas');

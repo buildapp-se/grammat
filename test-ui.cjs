@@ -138,9 +138,11 @@ async function until(check, label) {
   assert.ok(text(guest).includes('gamla gruppinbjudan'));
   await navigate(guest,'#/vanner','a[href="#/konto"]');
   assert.ok(text(guest).includes('Logga in för att lägga till vänner'));
-  await navigate(guest,'#/guide','.gcard'); // guiden är publik, sous vide förvalt
+  await navigate(guest,'#/guide','.gtable tbody th a'); // guiden är publik, sous vide förvalt, tabeller
   assert.ok(guest.document.querySelector('.nav a[data-match="#/guide"]').classList.contains('active'));
-  await navigate(guest,'#/guide/styckning/not','.gsvg .greg');
+  await navigate(guest,'#/guide/styckning/not','.gsvg .greg'); // gammal adress fungerar
+  await navigate(guest,'#/guide/ugn','.gtable');
+  await navigate(guest,'#/guide/kottbitar/not','.gsvg .greg');
   const firstCut=guest.document.querySelector('.gpart').getAttribute('href');
   await navigate(guest,firstCut,'.gcut');
   assert.ok(guest.document.querySelector('.gpart.is-on'),'vald del markerad');

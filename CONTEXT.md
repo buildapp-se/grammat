@@ -17,10 +17,11 @@ inte att vara en fullödig matportal.
 - Hela användarens tillstånd sparas som en blob per konto. `recipes_index` är ett
   härlett index för det publika flödet och byggs om vid behov.
 
-- Guiden (`#/guide`: sous vide, ugn, styckning, mått) är ren statisk data i `guide.json`,
+- Guiden (`#/guide`: sous vide, ugn, köttbitar, mått) är ren statisk data i `guide.json`,
   hämtad första gången fliken öppnas. Publik, rör inte workern. `guide.json` redigeras
   direkt, inklusive SVG-geometrin: varje styckdetalj är en polygon som klipps mot djurets
-  siluett (`clipPath`), så bara siluetten behöver vara snygg. Råresearchen med källor per
+  siluett (`clipPath`), så bara siluetten behöver vara snygg. Varje del har text i bilden:
+  `labels` inuti, eller `callouts` (streck + text utanför) där texten inte ryms. Råresearchen med källor per
   rad och avvikelser från det crowdsourcade arket ligger i `docs/guide-research/`.
   `node test.js` kontrollerar datan (svensk decimal, inga tankstreck, kopplingar
   tider ↔ delar, enheter). Höj `GUIDE_V` i `app.js` när `guide.json` ändras.

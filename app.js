@@ -1395,8 +1395,8 @@ if (typeof document !== 'undefined') (async function () {
     });
   }
 
-  // ---------- Guide: tider, styckning, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20260930'; // höj när guide.json ändras, edgen cachar annars gammal data
+  // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
+  const GUIDE_V = '20260930b'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
@@ -1408,25 +1408,25 @@ if (typeof document !== 'undefined') (async function () {
       .catch(() => { guideError = true; })
       .finally(() => { guideLoading = false; if (location.hash.startsWith('#/guide')) render(); });
   }
-  const GUIDE_TABS = [['sousvide', 'Sous vide'], ['ugn', 'Ugn'], ['styckning', 'Styckning'], ['matt', 'Mått']];
+  const GUIDE_TABS = [['sousvide', 'Sous vide'], ['ugn', 'Ugn'], ['kottbitar', 'Köttbitar'], ['matt', 'Mått']];
   const deg = n => fmtAmount(n) + ' °C';
   const SYSTEMS = { svensk: 'svenska', metrisk: 'metriska', us: 'amerikanska (US)', uk: 'brittiska (UK)', 'historisk svensk': 'gamla svenska' };
   const SYS_TAG = { us: 'US', uk: 'UK' };
 
   function viewGuide(sub, a, b) {
-    const tabs = `<nav class="gtabs" aria-label="Guide">${GUIDE_TABS.map(([k, t]) => `<a href="#/guide/${k}"${k === sub ? ' class="is-on" aria-current="page"' : ''}>${t}</a>`).join('')}</nav>`;
+    const tabs = `<nav class="gtabs" aria-label="Guide">${GUIDE_TABS.map(([k, t]) => `<a href="#/guide/${k}"${k === (sub === 'styckning' ? 'kottbitar' : sub) ? ' class="is-on" aria-current="page"' : ''}>${t}</a>`).join('')}</nav>`;
     const head = `<div class="view-head"><h1>Guide</h1></div>${tabs}`;
     if (!guide) {
       loadGuide();
       return head + (guideError ? '<p class="warn">Kunde inte hämta guiden. Kontrollera nätet och ladda om.</p>' : '<p class="empty">Hämtar …</p>');
     }
-    if (sub === 'styckning') return head + viewCuts(a, b);
+    if (sub === 'kottbitar' || sub === 'styckning') return head + viewCuts(a, b); // styckning: gammal adress
     if (sub === 'matt') return head + viewMeasures();
     return head + viewTimes(sub === 'ugn' ? 'ugn' : 'sousvide', a);
   }
 
   const cutOf = id => { for (const an of guide.cuts.animals) { const c = an.regions.find(r => r.id === id); if (c) return { animal: an, cut: c }; } return null; };
-  const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/styckning/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
+  const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/kottbitar/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
 
   function timeRows(item, mode) {
     if (mode === 'sousvide') return item.options.map(o => `<tr><th>${esc(o.label)}</th><td>${deg(o.tempC)}</td><td>${esc(o.time)}</td></tr>${o.note ? `<tr class="gnote"><td colspan="3">${esc(o.note)}</td></tr>` : ''}`).join('');
@@ -1448,6 +1448,29 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   const ANIMALS = [['', 'Alla'], ['not', 'Nöt'], ['gris', 'Gris'], ['lamm', 'Lamm'], ['fagel', 'Fågel'], ['vilt', 'Vilt'], ['fisk', 'Fisk'], ['gronsak', 'Grönsaker'], ['ovrigt', 'Övrigt']];
+  // En tabell per djurgrupp, en rad per tillagningsgrad. Namnet länkar till kortet med noter och säkerhet.
+  function timeTables(items, mode) {
+    const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.timeHint].filter(Boolean).join(', ');
+      return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? '<small class="gwarn">Se säkerhet ›</small>' : ''}`; };
+    const oven = x => x.ovenC ? (typeof x.ovenC === 'number' ? fmtAmount(x.ovenC) : esc(x.ovenC)) : '';
+    return ANIMALS.filter(([k]) => k && items.some(x => x.animal === k)).map(([k, title]) => {
+      const group = items.filter(x => x.animal === k);
+      let head, rows;
+      if (mode === 'sousvide') {
+        head = '<th>Detalj</th><th>Grad</th><th>°C</th><th>Tid</th>';
+        rows = group.map(x => x.options.map((o, i) => `<tr${i ? '' : ' class="gfirst"'}>${i ? '' : `<th rowspan="${x.options.length}">${name(x)}</th>`}<td>${esc(o.label)}</td><td class="gnum">${fmtAmount(o.tempC)}</td><td class="gnum">${esc(o.time)}</td></tr>`).join(''));
+      } else if (group.every(x => !(x.coreC || []).length)) {
+        head = '<th>Grönsak</th><th>Ugn °C</th><th>Tid</th>';
+        rows = group.map(x => `<tr class="gfirst"><th>${name(x)}</th><td class="gnum">${oven(x)}</td><td>${esc(x.timeHint || '')}</td></tr>`);
+      } else {
+        head = '<th>Detalj</th><th>Ugn °C</th><th>Grad</th><th>Inner °C</th>';
+        rows = group.map(x => { const c = x.coreC || [], n = Math.max(c.length, 1);
+          return (c.length ? c : [{ label: '', coreC: null }]).map((o, i) => `<tr${i ? '' : ' class="gfirst"'}>${i ? '' : `<th rowspan="${n}">${name(x)}</th><td rowspan="${n}" class="gnum">${oven(x)}</td>`}<td>${esc(o.label)}</td><td class="gnum">${o.coreC == null ? '' : fmtAmount(o.coreC)}</td></tr>`).join(''); });
+      }
+      return `<h2>${title}</h2><div class="gtable-wrap"><table class="gtable"><thead><tr>${head}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+    }).join('') + '<p class="hint">Tryck på en detalj för avslutning, noter och säkerhetsråd.</p>';
+  }
+
   function viewTimes(mode, only) {
     const list = guide[mode];
     if (only) {
@@ -1465,7 +1488,7 @@ if (typeof document !== 'undefined') (async function () {
     return `<p class="gintro">${intro}</p>
       <div class="search"><input type="search" id="gq" placeholder="Sök, t.ex. entrecôte eller ribeye" value="${esc(guideQuery)}" aria-label="Sök i tiderna"></div>
       <div class="gchips" role="group" aria-label="Filtrera">${ANIMALS.filter(([k]) => !k || present.has(k)).map(([k, t]) => `<button type="button" class="gchip${k === guideAnimal ? ' is-on' : ''}" data-ganimal="${k}" aria-pressed="${k === guideAnimal}">${t}</button>`).join('')}</div>
-      ${shown.length ? `<div class="gcards">${shown.map(x => timeCard(x, mode)).join('')}</div>` : '<p class="empty">Inget matchar.</p>'}
+      ${shown.length ? timeTables(shown, mode) : '<p class="empty">Inget matchar.</p>'}
       <p class="hint gsrc">Sammanställt från bl.a. Douglas Baldwin, Serious Eats, ChefSteps och Livsmedelsverket. Riktvärden, inte garantier.</p>`;
   }
 
@@ -1478,9 +1501,10 @@ if (typeof document !== 'undefined') (async function () {
     const svg = an.svg ? `<svg class="gsvg" viewBox="${esc(an.svg.viewBox)}" role="img" aria-label="Styckningsschema ${esc(an.sv)}">
         <defs><clipPath id="clip-${an.id}"><path d="${esc(an.svg.body)}"/></clipPath></defs>
         <path class="gbody" d="${esc(an.svg.body)}"/>
-        <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => an.svg.regions[r.id]).map(r => `<a href="#/guide/styckning/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${cut && cut.id === r.id ? ' is-on' : ''}" d="${esc(an.svg.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
+        <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => an.svg.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${cut && cut.id === r.id ? ' is-on' : ''}" d="${esc(an.svg.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
         <path class="gout" d="${esc(an.svg.body)}"/>
         ${an.regions.filter(r => an.svg.labels && an.svg.labels[r.id]).map(r => `<text class="glabel${cut && cut.id === r.id ? ' is-on' : ''}" x="${Number(an.svg.labels[r.id][0])}" y="${Number(an.svg.labels[r.id][1])}">${esc(r.short || r.sv)}</text>`).join('')}
+        ${Object.entries(an.svg.callouts || {}).map(([id, c]) => `<a href="#/guide/kottbitar/${an.id}/${esc(id)}" data-greplace class="gcall${cut && cut.id === id ? ' is-on' : ''}"><circle cx="${Number(c.a[0])}" cy="${Number(c.a[1])}" r="2.2"/><line x1="${Number(c.a[0])}" y1="${Number(c.a[1])}" x2="${Number(c.e[0])}" y2="${Number(c.e[1])}"/><text x="${Number(c.t[0])}" y="${Number(c.t[1])}" text-anchor="${c.anchor === 'start' ? 'start' : 'middle'}">${esc(c.text)}</text></a>`).join('')}
       </svg>` : '';
     const detail = cut ? `<article class="gcard gcut">
         <h3>${esc(cut.sv)} <span class="gen">${esc(cut.en)}</span></h3>
@@ -1491,10 +1515,10 @@ if (typeof document !== 'undefined') (async function () {
         ${ov.length ? `<h4>Ugn, innertemperatur</h4><table class="gtab">${ov.map(x => timeRows(x, 'ugn')).join('')}</table>` : ''}
         ${sv.length ? `<a class="glink" href="#/guide/sousvide/${cut.id}">Alla sous vide-detaljer ›</a>` : ''}
       </article>` : '<p class="hint">Tryck på en del av djuret, eller välj i listan.</p>';
-    return `<div class="gchips" role="group" aria-label="Djur">${animals.map(x => `<a class="gchip${x.id === an.id ? ' is-on' : ''}" href="#/guide/styckning/${x.id}" data-greplace${x.id === an.id ? ' aria-current="page"' : ''}>${esc(x.sv)}</a>`).join('')}</div>
+    return `<div class="gchips" role="group" aria-label="Djur">${animals.map(x => `<a class="gchip${x.id === an.id ? ' is-on' : ''}" href="#/guide/kottbitar/${x.id}" data-greplace${x.id === an.id ? ' aria-current="page"' : ''}>${esc(x.sv)}</a>`).join('')}</div>
       <div class="gcutgrid"><div>${svg}</div><div id="gcutdetail">${detail}</div></div>
       <h2>Alla delar, ${esc(an.sv.toLowerCase())}</h2>
-      <div class="gparts">${an.regions.map(r => `<a class="gpart${cut && cut.id === r.id ? ' is-on' : ''}" href="#/guide/styckning/${an.id}/${r.id}" data-greplace><b>${esc(r.sv)}</b><span>${esc(r.en)}</span></a>`).join('')}</div>`;
+      <div class="gparts">${an.regions.map(r => `<a class="gpart${cut && cut.id === r.id ? ' is-on' : ''}" href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace><b>${esc(r.sv)}</b><span>${esc(r.en)}</span></a>`).join('')}</div>`;
   }
 
   function convResult() {

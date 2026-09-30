@@ -11,6 +11,15 @@ reviewedAt: 2026-09-30
 
 # Handoff
 
+## 2026-09-30 kväll: Guide v2
+
+- Sous vide och ugn visas som tabeller, en per djurgrupp, en rad per tillagningsgrad.
+  Detaljnamnet länkar till kortet med noter och säkerhet. Ugnstiden står under namnet.
+- "Styckning" heter nu **Köttbitar** (`#/guide/kottbitar`), gamla adressen fungerar.
+- De 17 delar som saknade etikett i bilden har streck + text utanför. `node test.js`
+  failar om en del saknar text i bilden.
+- Verifierat: tester gröna, Playwright 375 och 1280 px, ingen horisontell scroll.
+
 ## 2026-09-30: Guide, femte fliken
 
 - Ny flik **Guide** (`#/guide/sousvide|ugn|styckning|matt`), publik, data i `guide.json`
