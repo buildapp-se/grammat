@@ -1396,7 +1396,7 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20260930b'; // höj när guide.json ändras, edgen cachar annars gammal data
+  const GUIDE_V = '20261002'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
@@ -1506,13 +1506,14 @@ if (typeof document !== 'undefined') (async function () {
     const cut = an.regions.find(r => r.id === cutId);
     const sv = guide.sousvide.filter(x => x.cutId && cut && x.cutId === cut.id);
     const ov = guide.ugn.filter(x => x.cutId && cut && x.cutId === cut.id);
-    const svg = an.svg ? `<svg class="gsvg" viewBox="${esc(an.svg.viewBox)}" role="img" aria-label="Styckningsschema ${esc(an.sv)}">
-        <defs><clipPath id="clip-${an.id}"><path d="${esc(an.svg.body)}"/></clipPath></defs>
-        <path class="gbody" d="${esc(an.svg.body)}"/>
-        <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => an.svg.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${cut && cut.id === r.id ? ' is-on' : ''}" d="${esc(an.svg.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
-        <path class="gout" d="${esc(an.svg.body)}"/>
-        ${an.regions.filter(r => an.svg.labels && an.svg.labels[r.id]).map(r => `<text class="glabel${cut && cut.id === r.id ? ' is-on' : ''}" x="${Number(an.svg.labels[r.id][0])}" y="${Number(an.svg.labels[r.id][1])}">${esc(r.short || r.sv)}</text>`).join('')}
-        ${Object.entries(an.svg.callouts || {}).map(([id, c]) => `<a href="#/guide/kottbitar/${an.id}/${esc(id)}" data-greplace class="gcall${cut && cut.id === id ? ' is-on' : ''}"><circle cx="${Number(c.a[0])}" cy="${Number(c.a[1])}" r="2.2"/><line x1="${Number(c.a[0])}" y1="${Number(c.a[1])}" x2="${Number(c.e[0])}" y2="${Number(c.e[1])}"/><text x="${Number(c.t[0])}" y="${Number(c.t[1])}" text-anchor="${c.anchor === 'start' ? 'start' : 'middle'}">${esc(c.text)}</text></a>`).join('')}
+    // Codex-bilden underst, snitten klipps mot dess kontur, etiketter och streck ovanpå (koordinater i bildpixlar).
+    const g = an.svg, on = id => cut && cut.id === id;
+    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="img" aria-label="Köttbitar ${esc(an.sv)}">
+        <defs><clipPath id="clip-${an.id}"><path d="${esc(g.body)}"/></clipPath></defs>
+        <image href="${esc(g.image)}" width="${Number(g.w)}" height="${Number(g.h)}"/>
+        <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => g.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${on(r.id) ? ' is-on' : ''}" d="${esc(g.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
+        ${an.regions.filter(r => g.labels[r.id]).map(r => `<text class="glabel${on(r.id) ? ' is-on' : ''}" x="${Number(g.labels[r.id][0])}" y="${Number(g.labels[r.id][1])}">${esc(r.short || r.sv)}</text>`).join('')}
+        ${Object.entries(g.callouts || {}).map(([id, c]) => `<a href="#/guide/kottbitar/${an.id}/${esc(id)}" data-greplace class="gcall${on(id) ? ' is-on' : ''}"><circle cx="${Number(c.a[0])}" cy="${Number(c.a[1])}" r="6"/><line x1="${Number(c.a[0])}" y1="${Number(c.a[1])}" x2="${Number(c.e[0])}" y2="${Number(c.e[1])}"/><text x="${Number(c.t[0])}" y="${Number(c.t[1])}" text-anchor="${c.anchor === 'start' ? 'start' : 'middle'}">${esc(c.text)}</text></a>`).join('')}
       </svg>` : '';
     const detail = cut ? `<article class="gcard gcut">
         <h3>${esc(cut.sv)} <span class="gen">${esc(cut.en)}</span></h3>

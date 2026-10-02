@@ -19,9 +19,12 @@ inte att vara en fullödig matportal.
 
 - Guiden (`#/guide`: sous vide, ugn, köttbitar, mått) är ren statisk data i `guide.json`,
   hämtad första gången fliken öppnas. Publik, rör inte workern. `guide.json` redigeras
-  direkt, inklusive SVG-geometrin: varje styckdetalj är en polygon som klipps mot djurets
-  siluett (`clipPath`), så bara siluetten behöver vara snygg. Varje del har text i bilden:
-  `labels` inuti, eller `callouts` (streck + text utanför) där texten inte ryms. Råresearchen med källor per
+  direkt, utom `cuts.animals[].svg` som skrivs av `docs/guide-art/geometry.py`. Köttbitarna
+  är Codex-genererade illustrationer (`guide-img/*.webp`, prompt och original i
+  `docs/guide-art/`); `prepare.py` gör WebP och spårar konturen, `geometry.py` har snitten
+  i bildpixlar. Snitten klipps mot konturen. Varje del har text i bilden: `labels` inuti,
+  eller `callouts` (streck + text utanför) där texten inte ryms. Handskriven SVG av djuren
+  prövades först och blev för ful (beslut 2026-10-02). Råresearchen med källor per
   rad och avvikelser från det crowdsourcade arket ligger i `docs/guide-research/`.
   `node test.js` kontrollerar datan (svensk decimal, inga tankstreck, kopplingar
   tider ↔ delar, enheter). Höj `GUIDE_V` i `app.js` när `guide.json` ändras.

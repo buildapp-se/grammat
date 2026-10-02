@@ -353,17 +353,16 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gtable .gnum{font-family:var(--mono);font-size:13px;white-space:nowrap}
 .gsub{font-size:13px;color:var(--muted);margin:14px 0 6px}
 .gsvg{width:100%;height:auto;display:block;background:var(--card);border-radius:14px;padding:8px}
-.gbody{fill:var(--bg)}
-.greg{fill:var(--card);stroke:var(--ink);stroke-width:1.2;cursor:pointer;transition:fill .15s}
-.greg:hover{fill:#E6E2D0}
-.greg.is-on{fill:var(--accent)}
-.gout{fill:none;stroke:var(--ink);stroke-width:2.2;pointer-events:none}
-.glabel{font-family:var(--sans);font-size:10px;font-weight:600;fill:var(--ink);text-anchor:middle;pointer-events:none}
-.glabel.is-on{fill:var(--card)}
-.gcall circle{fill:var(--ink)}
-.gcall line{stroke:var(--ink);stroke-width:1}
-.gcall text{font-family:var(--sans);font-size:11px;font-weight:600;fill:var(--ink)}
-.gcall.is-on text,.gcall.is-on circle{fill:var(--accent)}
+.greg{fill:transparent;stroke:var(--ink);stroke-width:2.5;stroke-opacity:.6;cursor:pointer;transition:fill .15s}
+.greg:hover{fill:rgba(154,42,58,.14)}
+.greg.is-on{fill:rgba(154,42,58,.5);stroke-opacity:1}
+.glabel,.gcall text{font-family:var(--sans);font-size:var(--fs);font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:7px;stroke-linejoin:round;pointer-events:none}
+.glabel{text-anchor:middle}
+.gcall text{pointer-events:auto;cursor:pointer}
+.gcall circle{fill:var(--ink);stroke:var(--card);stroke-width:3}
+.gcall line{stroke:var(--ink);stroke-width:2.5}
+.gcall.is-on text{fill:var(--accent)}
+.gcall.is-on circle{fill:var(--accent)}
 .gcall.is-on line{stroke:var(--accent)}
 .gcutgrid{display:grid;gap:12px}
 .gcut{margin-top:0}
@@ -499,6 +498,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide3-20261002"></script>
+<script src="app.js?v=guide4-20261002"></script>
 </body>
 </html>

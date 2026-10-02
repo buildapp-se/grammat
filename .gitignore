@@ -13,3 +13,7 @@ graft/
 # egna instruktioner, och halls darfor lokalt. Skriver du riktiga instruktioner:
 # ta bort raden nedan forst, annars hamnar de aldrig i git.
 AGENTS.md
+
+# guide-art: rutnät och Codex-logg är arbetsfiler
+docs/guide-art/grid-*.png
+docs/guide-art/codex.log
