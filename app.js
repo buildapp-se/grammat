@@ -1448,26 +1448,34 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   const ANIMALS = [['', 'Alla'], ['not', 'Nöt'], ['gris', 'Gris'], ['lamm', 'Lamm'], ['fagel', 'Fågel'], ['vilt', 'Vilt'], ['fisk', 'Fisk'], ['gronsak', 'Grönsaker'], ['ovrigt', 'Övrigt']];
-  // En tabell per djurgrupp, en rad per tillagningsgrad. Namnet länkar till kortet med noter och säkerhet.
+  // Tabeller per djurgrupp, en rad per detalj och alternativen i kolumner bredvid varandra.
+  // Vanliga grader (Rosa, Medium …) står i rubriken; detaljer med egna grader (långkok, pulled pork,
+  // ägg) samlas i en andra tabell där graden står i rutan. Namnet länkar till kortet med noter.
+  const GRADES = ['Blodig', 'Rosa/blodig', 'Rosa', 'Ljust rosa', 'Medium', 'Genomstekt', 'Klar'];
+  const GRADE_ALIAS = { 'Rosa (medium rare)': 'Rosa' };
+  const gradeOf = label => GRADE_ALIAS[label] || (GRADES.includes(label) ? label : null);
   function timeTables(items, mode) {
+    const opts = x => mode === 'sousvide' ? x.options : (x.coreC || []);
+    const temp = o => mode === 'sousvide' ? o.tempC : o.coreC;
     const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.timeHint].filter(Boolean).join(', ');
       return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? '<small class="gwarn">Se säkerhet ›</small>' : ''}`; };
     const oven = x => x.ovenC ? (typeof x.ovenC === 'number' ? fmtAmount(x.ovenC) : esc(x.ovenC)) : '';
+    const cell = (o, withLabel) => o ? `<td>${withLabel ? `<small>${esc(o.label)}</small>` : ''}<b>${fmtAmount(temp(o))} °C</b>${mode === 'sousvide' ? `<span>${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
+    const ovenCol = mode === 'ugn';
+    const table = (headCells, rows) => `<div class="gtable-wrap"><table class="gtable"><thead><tr><th>Detalj</th>${ovenCol ? '<th>Ugn</th>' : ''}${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    const row = (x, cells) => `<tr><th>${name(x)}</th>${ovenCol ? `<td class="gnum">${oven(x)}${x.ovenC ? ' °C' : ''}</td>` : ''}${cells}</tr>`;
     return ANIMALS.filter(([k]) => k && items.some(x => x.animal === k)).map(([k, title]) => {
       const group = items.filter(x => x.animal === k);
-      let head, rows;
-      if (mode === 'sousvide') {
-        head = '<th>Detalj</th><th>Grad</th><th>°C</th><th>Tid</th>';
-        rows = group.map(x => x.options.map((o, i) => `<tr${i ? '' : ' class="gfirst"'}>${i ? '' : `<th rowspan="${x.options.length}">${name(x)}</th>`}<td>${esc(o.label)}</td><td class="gnum">${fmtAmount(o.tempC)}</td><td class="gnum">${esc(o.time)}</td></tr>`).join(''));
-      } else if (group.every(x => !(x.coreC || []).length)) {
-        head = '<th>Grönsak</th><th>Ugn °C</th><th>Tid</th>';
-        rows = group.map(x => `<tr class="gfirst"><th>${name(x)}</th><td class="gnum">${oven(x)}</td><td>${esc(x.timeHint || '')}</td></tr>`);
-      } else {
-        head = '<th>Detalj</th><th>Ugn °C</th><th>Grad</th><th>Inner °C</th>';
-        rows = group.map(x => { const c = x.coreC || [], n = Math.max(c.length, 1);
-          return (c.length ? c : [{ label: '', coreC: null }]).map((o, i) => `<tr${i ? '' : ' class="gfirst"'}>${i ? '' : `<th rowspan="${n}">${name(x)}</th><td rowspan="${n}" class="gnum">${oven(x)}</td>`}<td>${esc(o.label)}</td><td class="gnum">${o.coreC == null ? '' : fmtAmount(o.coreC)}</td></tr>`).join(''); });
-      }
-      return `<h2>${title}</h2><div class="gtable-wrap"><table class="gtable"><thead><tr>${head}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+      if (mode === 'ugn' && group.every(x => !opts(x).length)) // grönsaker: bara ugnsvärme och tid
+        return `<h2>${title}</h2><div class="gtable-wrap"><table class="gtable"><thead><tr><th>Grönsak</th><th>Ugn</th><th>Tid</th></tr></thead><tbody>${group.map(x => `<tr><th><a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${x.en ? `<small>${esc(x.en)}</small>` : ''}</th><td class="gnum">${oven(x)} °C</td><td>${esc(x.timeHint || '')}</td></tr>`).join('')}</tbody></table></div>`;
+      const fits = x => { const g = opts(x).map(o => gradeOf(o.label)); return g.length && g.every(Boolean) && new Set(g).size === g.length; };
+      const std = group.filter(fits), other = group.filter(x => !fits(x));
+      const cols = GRADES.filter(gr => std.some(x => opts(x).some(o => gradeOf(o.label) === gr)));
+      const max = Math.max(0, ...other.map(x => opts(x).length));
+      return `<h2>${title}</h2>`
+        + (std.length ? table(cols.map(c => `<th>${c}</th>`).join(''), std.map(x => row(x, cols.map(c => cell(opts(x).find(o => gradeOf(o.label) === c))).join(''))).join('')) : '')
+        + (other.length ? (std.length ? '<p class="gsub">Långkok och specialfall, graden står i rutan</p>' : '')
+          + table(Array.from({ length: max }, (_, i) => `<th>${i ? 'Alternativ' : 'Förslag'}</th>`).join(''), other.map(x => row(x, Array.from({ length: max }, (_, i) => opts(x)[i] ? cell(opts(x)[i], true) : '<td></td>').join(''))).join('')) : '');
     }).join('') + '<p class="hint">Tryck på en detalj för avslutning, noter och säkerhetsråd.</p>';
   }
 
@@ -1554,11 +1562,12 @@ if (typeof document !== 'undefined') (async function () {
       <div class="gconvform gtemp"><label>°C <input id="tempC" inputmode="decimal" value="180"></label><label>°F <input id="tempF" inputmode="decimal" value="356"></label></div>
       ${m.temperature && m.temperature.gas ? `<table class="gtab">${m.temperature.gas.map(r => `<tr><th>Gas ${esc(r.mark)}</th><td>${deg(r.c)}</td><td>${fmtAmount(r.f)} °F</td></tr>`).join('')}</table>` : ''}
       ${m.temperature && m.temperature.fan ? `<p class="hint">${esc(m.temperature.fan)}</p>` : ''}
-      <h2>Gram per mått</h2>
-      <div class="search"><input type="search" id="densq" placeholder="Sök ingrediens" value="${esc(densQuery)}" aria-label="Sök ingrediens"></div>
-      <table class="gtab gdens"><thead><tr><th></th><td>1 dl</td><td>1 msk</td><td>1 tsk</td></tr></thead><tbody id="densBody">${densRows()}</tbody></table>
       ${Object.entries(groups).map(([g, us]) => `<h2>${esc(g)}</h2>${unitTable(us)}`).join('')}
       ${m.misc && m.misc.length ? `<h2>Bra att veta</h2><table class="gtab">${m.misc.map(x => `<tr><th>${esc(x.sv)}</th><td class="gwrap">${esc(x.value)}</td></tr>`).join('')}</table>` : ''}
+      <h2>Gram per mått, per ingrediens</h2>
+      <p class="gintro">Vad 1 dl, 1 msk och 1 tsk väger av olika ingredienser. Mjöl väger mindre än socker i samma mått.</p>
+      <div class="search"><input type="search" id="densq" placeholder="Sök ingrediens" value="${esc(densQuery)}" aria-label="Sök ingrediens"></div>
+      <table class="gtab gdens"><thead><tr><th>Ingrediens</th><td>1 dl</td><td>1 msk</td><td>1 tsk</td></tr></thead><tbody id="densBody">${densRows()}</tbody></table>
       <p class="hint gsrc">Mått per dl varierar med hur hårt man packar. Väg när det spelar roll, som vid bakning.</p>`;
   }
 

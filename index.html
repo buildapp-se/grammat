@@ -336,19 +336,22 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gsafety{margin-top:8px;font-size:14px;color:var(--accent)}
 .glink{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:4px;color:var(--accent);font-weight:600;font-size:14px;text-decoration:none}
 .gsrc{margin-top:1.4rem}
-.gtable-wrap{background:var(--card);border-radius:14px;padding:4px 12px;overflow-x:auto}
-.gtable{width:100%;border-collapse:collapse;font-size:14px}
-.gtable thead th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px 6px 0}
-.gtable td,.gtable tbody th{text-align:left;vertical-align:top;padding:6px 6px 6px 0;border-top:1px dashed var(--line)}
-.gtable tr.gfirst>*{border-top:1.5px solid var(--line)}
-.gtable tbody tr:first-child>*{border-top:0}
-.gtable tbody th{width:32%;font-weight:600;line-height:1.25}
+.gtable-wrap{background:var(--card);border-radius:14px;overflow-x:auto;margin-bottom:10px}
+.gtable{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+.gtable th,.gtable td{text-align:left;vertical-align:top;padding:9px 10px;border-top:1px dashed var(--line)}
+.gtable thead th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-top:0;white-space:nowrap;padding-top:10px;padding-bottom:6px}
+.gtable tr>:first-child{position:sticky;left:0;z-index:1;background:var(--card);width:28%;min-width:118px;box-shadow:1px 0 0 var(--line)} /* namnet står still när alternativen scrollar i sidled */
+.gtable tbody th{font-weight:600;line-height:1.25}
 .gtable tbody th a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
 .gtable tbody th small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
 .gtable tbody th small.gwarn{color:var(--accent)}
-.gtable .gnum{font-family:var(--mono);font-size:13px;white-space:nowrap;padding-right:10px}
-.gtable tr>:last-child{padding-right:0}
-.gtable td.gnum:last-child{white-space:normal;min-width:4.5em}
+.gtable td{min-width:84px}
+.gtable td small{display:block;font-size:12px;color:var(--muted);line-height:1.25;margin-bottom:2px}
+.gtable td b{display:block;font-family:var(--mono);font-weight:600;font-size:15px;white-space:nowrap}
+.gtable td span{display:block;font-family:var(--mono);font-size:12px;color:#3A372F;white-space:nowrap}
+.gtable td.gempty{color:var(--line)}
+.gtable .gnum{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.gsub{font-size:13px;color:var(--muted);margin:14px 0 6px}
 .gsvg{width:100%;height:auto;display:block;background:var(--card);border-radius:14px;padding:8px}
 .gbody{fill:var(--bg)}
 .greg{fill:var(--card);stroke:var(--ink);stroke-width:1.2;cursor:pointer;transition:fill .15s}
@@ -496,6 +499,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide2-20260930"></script>
+<script src="app.js?v=guide3-20261002"></script>
 </body>
 </html>
