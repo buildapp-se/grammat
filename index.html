@@ -350,6 +350,11 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gtable td b{display:block;font-family:var(--mono);font-weight:600;font-size:15px;white-space:nowrap}
 .gtable td span{display:block;font-family:var(--mono);font-size:12px;color:#3A372F;white-space:nowrap}
 .gtable td.gempty{color:var(--line)}
+.gtable td.is-rec{background:#F3E6E2;box-shadow:inset 0 0 0 1.5px var(--accent);border-radius:8px}
+.gtable td i{display:block;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.grec{display:block;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.gcard .gtab td:last-child{white-space:normal}
+.gdisc{font-size:13px;color:#3A372F;background:var(--card);border-left:3px solid var(--warn);border-radius:8px;padding:8px 12px;margin:0 0 6px}
 .gtable .gnum{font-family:var(--mono);font-size:13px;white-space:nowrap}
 .gsub{font-size:13px;color:var(--muted);margin:14px 0 6px}
 .gsvg{width:100%;height:auto;display:block;background:var(--card);border-radius:14px;padding:8px}
@@ -498,6 +503,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide4-20261002"></script>
+<script src="app.js?v=guide5-20261002"></script>
 </body>
 </html>

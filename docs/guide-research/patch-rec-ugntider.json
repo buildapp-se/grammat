@@ -1,0 +1,1008 @@
+{
+ "sousvide": {
+  "not-entrecote": {
+   "rec": 2,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "not-ryggbiff": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "not-oxfile": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    3,
+    2
+   ]
+  },
+  "not-rostbiff": {
+   "rec": 0,
+   "order": [
+    1,
+    0
+   ]
+  },
+  "not-fransyska": {
+   "rec": 0,
+   "order": [
+    0,
+    2,
+    1
+   ]
+  },
+  "not-hogrev": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "not-bringa": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "not-revbensstek": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "not-flankstek": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "not-picanha": {
+   "rec": 1,
+   "order": [
+    0,
+    2,
+    1
+   ]
+  },
+  "not-rostas": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "not-hamburgare": {
+   "rec": 0,
+   "order": [
+    1,
+    0
+   ]
+  },
+  "not-innanlar": {
+   "rec": 0,
+   "order": [
+    0
+   ]
+  },
+  "gris-flaskfile": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "gris-karre": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "gris-kotlett": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "gris-revben": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "gris-sidflask": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "gris-julskinka": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "gris-bog": {
+   "rec": 1,
+   "order": [
+    0,
+    2,
+    1,
+    3
+   ]
+  },
+  "lamm-racks": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "lamm-stek": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "lamm-lagg": {
+   "rec": 0,
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "fagel-kycklingbrost": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "fagel-kycklinglar": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "fagel-ankbrost": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "fagel-kalkonbrost": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "vilt-algfile": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "vilt-algstek": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "vilt-hjort": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "vilt-vildsvin": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "vilt-radjurssadel": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "fisk-lax": {
+   "rec": 2,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "fisk-torsk": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "fisk-roding": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "fisk-halleflundra": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "ovrigt-agg": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    4
+   ]
+  },
+  "ovrigt-omelett": {
+   "rec": 0,
+   "order": [
+    0
+   ]
+  },
+  "gronsak-potatis": {
+   "rec": 0,
+   "order": [
+    0
+   ]
+  },
+  "gronsak-morot": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "gronsak-sparris": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  },
+  "gronsak-majs": {
+   "rec": 0,
+   "order": [
+    0
+   ]
+  },
+  "gronsak-rodbeta": {
+   "rec": 0,
+   "order": [
+    0
+   ]
+  },
+  "gronsak-rabarber": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ]
+  }
+ },
+ "ugn": {
+  "not-entrecote": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "hel bit ca 1,5 kg, 8–10 cm tjock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1 h 15 min–1,5 h"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 1,5 h–1 h 45 min"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 1 h 45 min–2 h 15 min"
+    }
+   ]
+  },
+  "not-ryggbiff": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 1 kg, 6–8 cm tjock, bryned",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 40–50 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 50–65 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 65–80 min"
+    }
+   ]
+  },
+  "not-oxfile": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "hel filé ca 1 kg, 5–6 cm tjock, bryned",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 25–35 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 35–45 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 50–60 min"
+    }
+   ]
+  },
+  "not-rostbiff": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 1 kg, rund bit 9–10 cm tjock",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 1 h 15 min–1,5 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 1,5 h–1 h 45 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 2–2,5 h"
+    }
+   ]
+  },
+  "not-fransyska": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 1,5–2 kg",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 1 h 45 min–2 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 2–2,5 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 2,5–3 h"
+    }
+   ]
+  },
+  "not-hogrev": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1–1,5 kg, under lock med vätska",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 2–2,5 h"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 3–3,5 h"
+    }
+   ]
+  },
+  "not-bringa": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1,5–2 kg utan ben, under lock",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 4–5 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 5–6 h"
+    }
+   ]
+  },
+  "not-revbensstek": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "ca 1,5 kg med ben, under lock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 3–4 h"
+    }
+   ]
+  },
+  "not-picanha": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "1–1,5 kg, bryned",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 35–45 min"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 45–60 min"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 60–75 min"
+    }
+   ]
+  },
+  "not-rostas": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 700 g, 5–7 cm tjock, bryned",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 30–40 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 40–55 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 55–70 min"
+    }
+   ]
+  },
+  "not-flankstek": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "2–3 cm tjock, under het ugnsgrill",
+   "times": [
+    {
+     "ovenC": 225,
+     "time": "ca 3–4 min per sida"
+    },
+    {
+     "ovenC": 225,
+     "time": "ca 4–5 min per sida"
+    },
+    {
+     "ovenC": 225,
+     "time": "ca 6–8 min per sida"
+    }
+   ]
+  },
+  "not-hamburgare": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "biffar ca 150 g, 2 cm tjocka",
+   "times": [
+    {
+     "ovenC": 200,
+     "time": "ca 15–20 min"
+    }
+   ]
+  },
+  "gris-flaskfile": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "hel filé ca 500 g, bryned",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 20–30 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 30–40 min"
+    }
+   ]
+  },
+  "gris-karre": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1,5 kg benfri",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1 h 45 min–2 h"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 2,5–3 h"
+    }
+   ]
+  },
+  "gris-kotlettrad": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1,5 kg med ben",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1 h 15 min–1 h 45 min"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 1,5–2 h"
+    }
+   ]
+  },
+  "gris-revben": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "hel spjällbit ca 1–1,5 kg",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1–1,5 h"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 2,5–3 h under folie"
+    }
+   ]
+  },
+  "gris-sidflask": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "ca 1–1,5 kg med svål",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 2–2,5 h, sedan 225–250 °C tills svålen poppar"
+    }
+   ]
+  },
+  "gris-julskinka": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "rå rimmad skinka ca 4 kg",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 5–6,5 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 6,5–8 h"
+    }
+   ]
+  },
+  "gris-bog": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 2 kg benfri bog",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1,5–2 h"
+    },
+    {
+     "ovenC": 110,
+     "time": "ca 6–8 h"
+    }
+   ]
+  },
+  "lamm-racks": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "rack ca 400 g, 7–8 ben, bryned",
+   "times": [
+    {
+     "ovenC": 200,
+     "time": "ca 10–12 min"
+    },
+    {
+     "ovenC": 200,
+     "time": "ca 12–15 min"
+    },
+    {
+     "ovenC": 200,
+     "time": "ca 15–20 min"
+    }
+   ]
+  },
+  "lamm-stek": {
+   "rec": 1,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 2 kg med ben",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 1 h 45 min–2 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 2–2,25 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 2,5–3 h"
+    }
+   ]
+  },
+  "lamm-sadel": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ca 1,5 kg med ben",
+   "times": [
+    {
+     "ovenC": 175,
+     "time": "ca 45–55 min"
+    },
+    {
+     "ovenC": 175,
+     "time": "ca 55–65 min"
+    },
+    {
+     "ovenC": 175,
+     "time": "ca 65–75 min"
+    }
+   ]
+  },
+  "lamm-lagg": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "läggar ca 400 g/st, under lock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 2,5–3,5 h"
+    }
+   ]
+  },
+  "fagel-helkyckling": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "hel kyckling ca 1,3 kg",
+   "times": [
+    {
+     "ovenC": 175,
+     "time": "ca 75–90 min"
+    }
+   ]
+  },
+  "fagel-kycklingbrost": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "filé ca 150 g, 2–3 cm tjock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 25–35 min"
+    }
+   ]
+  },
+  "fagel-kycklinglar": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "lårbitar med ben ca 250 g/st",
+   "times": [
+    {
+     "ovenC": 200,
+     "time": "ca 35–45 min"
+    }
+   ]
+  },
+  "fagel-ankbrost": {
+   "rec": 1,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ankbröst ca 350 g, skinnsidan stekt först",
+   "times": [
+    {
+     "ovenC": 200,
+     "time": "ca 5–8 min"
+    },
+    {
+     "ovenC": 200,
+     "time": "ca 10–14 min"
+    }
+   ]
+  },
+  "fagel-kalkonbrost": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "ca 1,5 kg",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 1,5–2 h"
+    }
+   ]
+  },
+  "vilt-algfile": {
+   "rec": 0,
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "refSize": "ytterfilé ca 600 g, bryned",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 20–25 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 25–30 min"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 35–45 min"
+    }
+   ]
+  },
+  "vilt-algstek": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1,5 kg",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 1,5–2 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 3–4 h under lock"
+    }
+   ]
+  },
+  "vilt-hjortstek": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "ca 1,5 kg",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 1 h 15 min–1,5 h"
+    },
+    {
+     "ovenC": 125,
+     "time": "ca 1 h 45 min–2 h 15 min"
+    }
+   ]
+  },
+  "vilt-vildsvin": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "ca 1,5 kg",
+   "times": [
+    {
+     "ovenC": 125,
+     "time": "ca 2–2,5 h"
+    }
+   ]
+  },
+  "vilt-radjurssadel": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "sadel med ben ca 1 kg",
+   "times": [
+    {
+     "ovenC": 175,
+     "time": "ca 20–25 min"
+    },
+    {
+     "ovenC": 175,
+     "time": "ca 30–40 min"
+    }
+   ]
+  },
+  "fisk-lax": {
+   "rec": 0,
+   "order": [
+    0,
+    1
+   ],
+   "refSize": "bit eller sida 2–3 cm tjock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 15–20 min"
+    },
+    {
+     "ovenC": 150,
+     "time": "ca 20–25 min"
+    }
+   ]
+  },
+  "fisk-torsk": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "rygg 2–3 cm tjock",
+   "times": [
+    {
+     "ovenC": 175,
+     "time": "ca 12–20 min"
+    }
+   ]
+  },
+  "fisk-roding": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "filé 1,5–2 cm tjock",
+   "times": [
+    {
+     "ovenC": 150,
+     "time": "ca 12–18 min"
+    }
+   ]
+  },
+  "fisk-halleflundra": {
+   "rec": null,
+   "order": [
+    0
+   ],
+   "refSize": "bit 2–3 cm tjock",
+   "times": [
+    {
+     "ovenC": 175,
+     "time": "ca 12–20 min"
+    }
+   ]
+  }
+ }
+}

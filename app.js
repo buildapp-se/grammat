@@ -1396,7 +1396,7 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20261002'; // höj när guide.json ändras, edgen cachar annars gammal data
+  const GUIDE_V = '20261002b'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
@@ -1429,13 +1429,14 @@ if (typeof document !== 'undefined') (async function () {
   const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/kottbitar/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
 
   function timeRows(item, mode) {
-    if (mode === 'sousvide') return item.options.map(o => `<tr><th>${esc(o.label)}</th><td>${deg(o.tempC)}</td><td>${esc(o.time)}</td></tr>${o.note ? `<tr class="gnote"><td colspan="3">${esc(o.note)}</td></tr>` : ''}`).join('');
-    return (item.coreC || []).map(o => `<tr><th>${esc(o.label)}</th><td colspan="2">${deg(o.coreC)} inuti</td></tr>`).join('');
+    const label = o => `${esc(o.label)}${o.rec ? ' <i class="grec">Rekommenderas</i>' : ''}`;
+    if (mode === 'sousvide') return item.options.map(o => `<tr><th>${label(o)}</th><td>${deg(o.tempC)}</td><td>${esc(o.time)}</td></tr>${o.note ? `<tr class="gnote"><td colspan="3">${esc(o.note)}</td></tr>` : ''}`).join('');
+    return (item.coreC || []).map(o => `<tr><th>${label(o)}</th><td>${deg(o.coreC)} inuti</td><td>${o.time ? (o.ovenC ? `ugn ${deg(o.ovenC)}, ` : '') + esc(o.time) : ''}</td></tr>`).join('');
   }
   function timeCard(item, mode) {
     const meta = mode === 'sousvide'
       ? [item.thickness].filter(Boolean)
-      : [item.ovenC ? 'Ugn ' + (typeof item.ovenC === 'number' ? deg(item.ovenC) : esc(item.ovenC) + ' °C') : '', item.method, item.timeHint, item.restMin ? 'vila ' + item.restMin + ' min' : ''].filter(Boolean);
+      : [item.ovenC ? 'Ugn ' + (typeof item.ovenC === 'number' ? deg(item.ovenC) : esc(item.ovenC) + ' °C') : '', item.method, item.refSize ? 'tider för ' + item.refSize : item.timeHint, item.restMin ? 'vila ' + item.restMin + ' min' : ''].filter(Boolean);
     return `<article class="gcard" id="g-${esc(item.id)}">
       <h3>${esc(item.sv)}${item.en ? ` <span class="gen">${esc(item.en)}</span>` : ''}</h3>
       ${meta.length ? `<p class="gmeta">${meta.map(esc).join(' · ')}</p>` : ''}
@@ -1451,16 +1452,16 @@ if (typeof document !== 'undefined') (async function () {
   // Tabeller per djurgrupp, en rad per detalj och alternativen i kolumner bredvid varandra.
   // Vanliga grader (Rosa, Medium …) står i rubriken; detaljer med egna grader (långkok, pulled pork,
   // ägg) samlas i en andra tabell där graden står i rutan. Namnet länkar till kortet med noter.
-  const GRADES = ['Blodig', 'Rosa/blodig', 'Rosa', 'Ljust rosa', 'Medium', 'Genomstekt', 'Klar'];
-  const GRADE_ALIAS = { 'Rosa (medium rare)': 'Rosa' };
+  const GRADES = ['Blodig', 'Rosa', 'Ljust rosa', 'Medium', 'Genomstekt', 'Klar'];
+  const GRADE_ALIAS = { 'Rosa (medium rare)': 'Rosa', 'Rosa/blodig': 'Rosa' }; // 55 °C ligger i Svenskt Kötts rosa-spann
   const gradeOf = label => GRADE_ALIAS[label] || (GRADES.includes(label) ? label : null);
   function timeTables(items, mode) {
     const opts = x => mode === 'sousvide' ? x.options : (x.coreC || []);
     const temp = o => mode === 'sousvide' ? o.tempC : o.coreC;
-    const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.timeHint].filter(Boolean).join(', ');
+    const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.refSize ? 'tider för ' + x.refSize : x.timeHint].filter(Boolean).join(', ');
       return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? '<small class="gwarn">Se säkerhet ›</small>' : ''}`; };
     const oven = x => x.ovenC ? (typeof x.ovenC === 'number' ? fmtAmount(x.ovenC) : esc(x.ovenC)) : '';
-    const cell = (o, withLabel) => o ? `<td>${withLabel ? `<small>${esc(o.label)}</small>` : ''}<b>${fmtAmount(temp(o))} °C</b>${mode === 'sousvide' ? `<span>${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
+    const cell = (o, withLabel, x) => o ? `<td${o.rec ? ' class="is-rec"' : ''}>${o.rec ? '<i>Rekommenderas</i>' : ''}${withLabel ? `<small>${esc(o.label)}</small>` : ''}<b>${fmtAmount(temp(o))} °C${mode === 'ugn' ? ' inuti' : ''}</b>${o.time ? `<span>${mode === 'ugn' && o.ovenC && o.ovenC !== x.ovenC ? `ugn ${fmtAmount(o.ovenC)} °C, ` : ''}${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
     const ovenCol = mode === 'ugn';
     const table = (headCells, rows) => `<div class="gtable-wrap"><table class="gtable"><thead><tr><th>Detalj</th>${ovenCol ? '<th>Ugn</th>' : ''}${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
     const row = (x, cells) => `<tr><th>${name(x)}</th>${ovenCol ? `<td class="gnum">${oven(x)}${x.ovenC ? ' °C' : ''}</td>` : ''}${cells}</tr>`;
@@ -1473,10 +1474,13 @@ if (typeof document !== 'undefined') (async function () {
       const cols = GRADES.filter(gr => std.some(x => opts(x).some(o => gradeOf(o.label) === gr)));
       const max = Math.max(0, ...other.map(x => opts(x).length));
       return `<h2>${title}</h2>`
-        + (std.length ? table(cols.map(c => `<th>${c}</th>`).join(''), std.map(x => row(x, cols.map(c => cell(opts(x).find(o => gradeOf(o.label) === c))).join(''))).join('')) : '')
+        + (std.length ? table(cols.map(c => `<th>${c}</th>`).join(''), std.map(x => row(x, cols.map(c => cell(opts(x).find(o => gradeOf(o.label) === c), false, x)).join(''))).join('')) : '')
         + (other.length ? (std.length ? '<p class="gsub">Långkok och specialfall, graden står i rutan</p>' : '')
-          + table(Array.from({ length: max }, (_, i) => `<th>${i ? 'Alternativ' : 'Förslag'}</th>`).join(''), other.map(x => row(x, Array.from({ length: max }, (_, i) => opts(x)[i] ? cell(opts(x)[i], true) : '<td></td>').join(''))).join('')) : '');
+          + table(`<th colspan="${max}">Från minst till mest tillagat</th>`, other.map(x => row(x, Array.from({ length: max }, (_, i) => opts(x)[i] ? cell(opts(x)[i], true, x) : '<td></td>').join(''))).join('')) : '');
     }).join('') + '<p class="hint">Tryck på en detalj för avslutning, noter och säkerhetsråd.</p>';
+  }
+  function timesDisclaimer(mode) {
+    return mode === 'ugn' ? '<p class="gdisc">Tiderna är ungefärliga och gäller storleken under namnet. Tjocklek, hur kallt köttet är från början och hur ugnen håller värmen ändrar mycket. Lita på stektermometern.</p>' : '';
   }
 
   function viewTimes(mode, only) {
@@ -1496,7 +1500,7 @@ if (typeof document !== 'undefined') (async function () {
     return `<p class="gintro">${intro}</p>
       <div class="search"><input type="search" id="gq" placeholder="Sök, t.ex. entrecôte eller ribeye" value="${esc(guideQuery)}" aria-label="Sök i tiderna"></div>
       <div class="gchips" role="group" aria-label="Filtrera">${ANIMALS.filter(([k]) => !k || present.has(k)).map(([k, t]) => `<button type="button" class="gchip${k === guideAnimal ? ' is-on' : ''}" data-ganimal="${k}" aria-pressed="${k === guideAnimal}">${t}</button>`).join('')}</div>
-      ${shown.length ? timeTables(shown, mode) : '<p class="empty">Inget matchar.</p>'}
+      ${shown.length ? timesDisclaimer(mode) + timeTables(shown, mode) : '<p class="empty">Inget matchar.</p>'}
       <p class="hint gsrc">Sammanställt från bl.a. Douglas Baldwin, Serious Eats, ChefSteps och Livsmedelsverket. Riktvärden, inte garantier.</p>`;
   }
 

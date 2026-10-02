@@ -6,10 +6,24 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-09-30
+reviewedAt: 2026-10-02
 ---
 
 # Handoff
+
+## 2026-10-02: Guide v3, illustrationer och rekommendationer
+
+- Köttbitar använder Codex-genererade illustrationer (`guide-img/*.webp`) med snitt,
+  etiketter och streck ovanpå. Handskriven SVG gav för fula djur. Pipeline i
+  `docs/guide-art/` (PROMPT.md, prepare.py, geometry.py), beskriven i CONTEXT.
+- Sous vide och ugn: en rad per detalj, alternativen i kolumner. Vanliga grader i rubriken
+  (Blodig, Rosa, Ljust rosa, Medium, Genomstekt, Klar), övriga i en andra tabell sorterad
+  från minst till mest tillagat. Rekommenderat alternativ har ljusröd ruta.
+- Ugn har tid och ugnsvärme per grad för en angiven storlek (`refSize`), med friskrivning.
+  Tiderna är delvis interpolerade, se `docs/guide-research/SOURCES-rec-ugntider.md`.
+  Minst säkra: julskinka sous vide, pulled pork 6–8 h, revbensstek 48–72 h.
+- Mått: "Gram per mått, per ingrediens" ligger sist.
+- Verifierat: tester gröna, Playwright 375 och 1280 px, ingen horisontell scroll.
 
 ## 2026-09-30 kväll: Guide v2
 
