@@ -344,7 +344,11 @@ p.gnote{margin-top:6px;font-size:13px;color:var(--muted)}
 .gtable tbody th{font-weight:600;line-height:1.25}
 .gtable tbody th a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
 .gtable tbody th small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
-.gtable tbody th small.gwarn{color:var(--accent)}
+.gtable tbody th a.gwarn{display:inline-flex;align-items:center;min-height:32px;font-weight:600;font-size:12px;color:var(--accent);text-decoration:none}
+.gsrcs{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:4px;line-height:1.5}
+.gsrcs a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.gtable tbody th .gsrcs a{color:var(--muted);font-weight:400;text-decoration-color:var(--line)}
+.gcard .gsrcs{margin-top:10px;font-size:13px}
 .gtable td{min-width:84px}
 .gtable td small{display:block;font-size:12px;color:var(--muted);line-height:1.25;margin-bottom:2px}
 .gtable td b{display:block;font-family:var(--mono);font-weight:600;font-size:15px;white-space:nowrap}
@@ -503,6 +507,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide5-20261002"></script>
+<script src="app.js?v=guide6-20261002"></script>
 </body>
 </html>

@@ -139,6 +139,8 @@ async function until(check, label) {
   await navigate(guest,'#/vanner','a[href="#/konto"]');
   assert.ok(text(guest).includes('Logga in för att lägga till vänner'));
   await navigate(guest,'#/guide','.gtable tbody th a'); // guiden är publik, sous vide förvalt, tabeller
+  assert.match(guest.document.querySelector('a.gwarn').getAttribute('href'),/^#\/guide\/sousvide\//,'Se säkerhet är en länk till kortet');
+  assert.ok(guest.document.querySelector('.gsrcs a[href^="https://"]'),'källor länkas');
   assert.ok(guest.document.querySelector('.nav a[data-match="#/guide"]').classList.contains('active'));
   await navigate(guest,'#/guide/styckning/not','.gsvg .greg'); // gammal adress fungerar
   await navigate(guest,'#/guide/ugn','.gtable');

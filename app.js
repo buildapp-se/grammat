@@ -1396,7 +1396,7 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20261002b'; // höj när guide.json ändras, edgen cachar annars gammal data
+  const GUIDE_V = '20261002c'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
@@ -1428,6 +1428,19 @@ if (typeof document !== 'undefined') (async function () {
   const cutOf = id => { for (const an of guide.cuts.animals) { const c = an.regions.find(r => r.id === id); if (c) return { animal: an, cut: c }; } return null; };
   const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/kottbitar/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
 
+  // Källa per detalj: domänen blir ett läsbart namn. Arket är crowdsourcat och märks som overifierat.
+  const SOURCE_NAMES = [['seriouseats.com', 'Serious Eats'], ['chefsteps', 'ChefSteps'], ['douglasbaldwin.com', 'Douglas Baldwin'], ['svensktkott.se', 'Svenskt Kött'],
+    ['anovaculinary.com', 'Anova'], ['ica.se', 'ICA'], ['livsmedelsverket.se', 'Livsmedelsverket'], ['docs.google.com', 'Sous vide-arket']];
+  const sourceName = u => (SOURCE_NAMES.find(([k]) => u.includes(k)) || [, new URL(u).hostname.replace(/^www\./, '')])[1];
+  function sourceLinks(item) {
+    const seen = new Set();
+    const links = (item.sources || []).map(safeUrl).filter(Boolean).filter(u => { const n = sourceName(u); return !seen.has(n) && seen.add(n); })
+      .map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(sourceName(u))}</a>`);
+    if (!links.length) return '';
+    const onlySheet = (item.sources || []).every(u => u.includes('docs.google.com'));
+    return `<small class="gsrcs">Källa: ${links.join(', ')}${onlySheet ? ', overifierat' : ''}</small>`;
+  }
+
   function timeRows(item, mode) {
     const label = o => `${esc(o.label)}${o.rec ? ' <i class="grec">Rekommenderas</i>' : ''}`;
     if (mode === 'sousvide') return item.options.map(o => `<tr><th>${label(o)}</th><td>${deg(o.tempC)}</td><td>${esc(o.time)}</td></tr>${o.note ? `<tr class="gnote"><td colspan="3">${esc(o.note)}</td></tr>` : ''}`).join('');
@@ -1444,6 +1457,7 @@ if (typeof document !== 'undefined') (async function () {
       ${item.finish ? `<p class="gfinish">${esc(item.finish)}</p>` : ''}
       ${item.note ? `<p class="gnote">${esc(item.note)}</p>` : ''}
       ${item.safety ? `<p class="gsafety">${esc(item.safety)}</p>` : ''}
+      ${sourceLinks(item)}
       ${cutLink(item.cutId)}
     </article>`;
   }
@@ -1459,7 +1473,7 @@ if (typeof document !== 'undefined') (async function () {
     const opts = x => mode === 'sousvide' ? x.options : (x.coreC || []);
     const temp = o => mode === 'sousvide' ? o.tempC : o.coreC;
     const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.refSize ? 'tider för ' + x.refSize : x.timeHint].filter(Boolean).join(', ');
-      return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? '<small class="gwarn">Se säkerhet ›</small>' : ''}`; };
+      return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? `<a class="gwarn" href="#/guide/${mode}/${esc(x.id)}">Se säkerhet ›</a>` : ''}${sourceLinks(x)}`; };
     const oven = x => x.ovenC ? (typeof x.ovenC === 'number' ? fmtAmount(x.ovenC) : esc(x.ovenC)) : '';
     const cell = (o, withLabel, x) => o ? `<td${o.rec ? ' class="is-rec"' : ''}>${o.rec ? '<i>Rekommenderas</i>' : ''}${withLabel ? `<small>${esc(o.label)}</small>` : ''}<b>${fmtAmount(temp(o))} °C${mode === 'ugn' ? ' inuti' : ''}</b>${o.time ? `<span>${mode === 'ugn' && o.ovenC && o.ovenC !== x.ovenC ? `ugn ${fmtAmount(o.ovenC)} °C, ` : ''}${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
     const ovenCol = mode === 'ugn';
