@@ -66,4 +66,4 @@ Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, hea
 
 Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, npm audit, secrets, Actions, markup, axe). Mätvärdena står som `(automated)`-rader under `## Audits` i CONTEXT.md.
 
-- [ ] `[P3]` npm audit kan inte köras: `worker/` saknar `package-lock.json`. Checka in en låsfil.
+- [x] `[P3]` npm audit kan inte köras: `worker/` saknar `package-lock.json`. Låsfil incheckad 2026-10-06, `npm audit` i `worker/` ger 0 sårbarheter (inga beroenden).
