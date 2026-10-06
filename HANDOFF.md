@@ -25,8 +25,12 @@ Merge till main är deploy av frontend (Pages). Inga ändringar i workerkoden, i
   `loadGuide` försöker inte igen efter ett fel förrän sidan laddas om: tidigare hämtade
   guidefliken om i en slinga utan nät. Adressen städas till `#/guide/matt` när omräknaren
   fyllts i, så bakåt går till receptet.
+- **Egen kategori: byt namn eller ta bort i alla recept.** "Ändra" vid kategorins rubrik i Mina
+  recept (mobil och dator) öppnar ett blad med namnfält och "Ta bort kategorin". `renameTag` i
+  `app.js` ändrar `tags` i alla recept oavsett skiftläge och slår ihop med en kategori som redan
+  finns. Sparas direkt med vanliga `save()`, toast med Ångra i 4 s. Recepten rörs inte i övrigt.
 - `worker/package-lock.json` incheckad (inga beroenden), `npm audit` ger 0 sårbarheter.
-- Versioner: `app.js?v=matt-20261006`, `GUIDE_V = '20261006'`.
+- Versioner: `app.js?v=kategori-20261006`, `GUIDE_V = '20261006'`.
 - Verifierat: `node --check app.js`, `node test.js`, `node test-ui.cjs`, `node test-friends.cjs`,
   Playwright lokalt 375 och 1280 px (länkyta 44×44, radhöjd oförändrad 37 px, ingen sidscroll,
   inga konsolfel). **Inte verifierat:** riktig telefon, inloggat konto i riktig webbläsare.

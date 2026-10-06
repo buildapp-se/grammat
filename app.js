@@ -24,6 +24,18 @@ function normTags(v) {
   }
   return out.slice(0, 10);
 }
+// Byter namn på en egen kategori i alla recept, eller tar bort den (to tomt). Finns det nya namnet
+// redan på receptet slås de ihop. Ändrar recepten på plats och ger [recept, gamla tags] för ångra.
+function renameTag(recipes, from, to) {
+  const f = from.toLowerCase(), changed = [];
+  for (const r of recipes) {
+    if (!(r.tags || []).some(t => t.toLowerCase() === f)) continue;
+    changed.push([r, r.tags]);
+    const tags = normTags(r.tags.map(t => t.toLowerCase() === f ? to : t));
+    if (tags.length) r.tags = tags; else delete r.tags;
+  }
+  return changed;
+}
 
 // Summerar valda recept (skalade till valda portioner) till inköpsrader.
 // struck = { receptId: [ingrediensnyckel, ...] }: bockade ingredienser (har hemma/redan i grytan) utesluts.
@@ -392,7 +404,7 @@ function densityFor(name, density) {
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -679,7 +691,9 @@ if (typeof document !== 'undefined') (async function () {
     return tocRow(r, Number.isInteger(r.ownerId) ? publicRowKey(r) : r.id, saveBtn,
       (r.saves ? ` · sparad av ${fmtNum(r.saves)}` : '') + (showOwner && r._ownerLabel ? ' · från ' + esc(r._ownerLabel) : ''));
   }
-  const tocSection = (id, label, body, accent) => `<section id="toc-${esc(id)}"><h2 class="toc-h${accent ? ' is-accent' : ''}">${esc(label)}</h2>${body}</section>`;
+  const tocSection = (id, label, body, accent, extra) => `<section id="toc-${esc(id)}"><h2 class="toc-h${accent ? ' is-accent' : ''}${extra ? ' h-tag' : ''}">${esc(label)}${extra || ''}</h2>${body}</section>`;
+  // Egen kategori: Ändra vid rubriken byter namn på eller tar bort den i alla recept på en gång
+  const tagEdit = t => `<button type="button" class="btn-link" data-tag-edit="${esc(t)}" aria-label="Ändra kategorin ${esc(t)}">Ändra</button>`;
   // Registret är knappar, inte #-länkar: hashen är appens router, ett ankare hade bytt vy.
   const regRow = (target, label, n, cls) => `<button type="button" class="${cls || ''}" data-toc="${esc(target)}"><span>${esc(label)}</span><span class="n">${n}</span></button>`;
   function tocLayout(title, count, register, main, o = {}) {
@@ -726,7 +740,7 @@ if (typeof document !== 'undefined') (async function () {
       <h2>${esc(COURSE_LABELS[c])}</h2>
       <div class="cards">${byCourse[c].map(recipeCard).join('')}</div>`).join('')
       + tags.map(t => `
-      <h2>${esc(t)}</h2>
+      <h2 class="h-tag">${esc(t)}${tagEdit(t)}</h2>
       <div class="cards">${byTag[t].map(recipeCard).join('')}</div>`).join('');
     const empty = `<div class="empty-state">
       <div class="empty-title">Inga recept ännu</div>
@@ -741,7 +755,7 @@ if (typeof document !== 'undefined') (async function () {
           + tags.map((t, i) => regRow('tag' + i, t, byTag[t].length)).join(''),
         !hits.length ? noMatch() : (inList.length ? tocSection('lista', 'I listan', inList.map(tocOwnRow).join(''), true) : '')
           + courses.map(c => tocSection(c, COURSE_LABELS[c], byCourse[c].map(tocOwnRow).join(''))).join('')
-          + tags.map((t, i) => tocSection('tag' + i, t, byTag[t].map(tocOwnRow).join(''))).join(''));
+          + tags.map((t, i) => tocSection('tag' + i, t, byTag[t].map(tocOwnRow).join(''), false, tagEdit(t))).join(''));
     }
     return `<div class="view-head"><h1>Mina recept</h1></div>
       ${state.recipes.length ? searchBox() : ''}
@@ -1697,6 +1711,7 @@ if (typeof document !== 'undefined') (async function () {
       if (b.closest('.toc').dataset.filter) { tocFilter = b.dataset.toc || null; render(); }
       else document.getElementById('toc-' + b.dataset.toc).scrollIntoView();
     });
+    view.querySelectorAll('[data-tag-edit]').forEach(b => b.onclick = () => openTagSheet(b.dataset.tagEdit));
     view.querySelectorAll('[data-course-pick]').forEach(s => s.onchange = () => {
       const r = state.recipes.find(x => x.id === s.dataset.coursePick);
       if (r) { r.course = normalizeCourse(s.value); save(); render(); }
@@ -2112,6 +2127,28 @@ if (typeof document !== 'undefined') (async function () {
       <button class="sheet-item is-stacked" type="button" id="copyInvite">Kopiera min inbjudningslänk <small>${esc(inviteUrl(authName || '').replace(/^https?:\/\//, ''))}</small></button>
       <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Lägg till vän');
     bindSheet();
+  }
+
+  function openTagSheet(tag) {
+    openSheet(`<form id="tagForm" class="sheet-form">
+        <label for="tagName">Kategorins namn <input id="tagName" type="text" maxlength="30" required autocomplete="off" value="${esc(tag)}"></label>
+        <button class="btn btn-ink btn-block" type="submit">Byt namn i alla recept</button>
+      </form>
+      <button class="sheet-item is-danger" type="button" id="tagRemove">Ta bort kategorin <small>recepten finns kvar</small></button>
+      <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Egen kategori');
+    const apply = (to, msg) => {
+      closeSheet();
+      const changed = renameTag(state.recipes, tag, to);
+      if (!changed.length) return;
+      save();
+      toast(msg, { action: 'Ångra', onAction: () => { for (const [r, tags] of changed) r.tags = tags; save(); } });
+    };
+    $('#tagForm').onsubmit = e => {
+      e.preventDefault();
+      const to = normTags($('#tagName').value)[0]; // komma skiljer kategorier i redigeraren, bara första delen blir namnet
+      if (to && to !== tag) apply(to, 'Kategorin heter nu ' + to); else closeSheet();
+    };
+    $('#tagRemove').onclick = () => apply('', 'Kategorin ' + tag + ' borttagen ur recepten');
   }
 
   // Knapparna i ···-menyn. Töm listan skriver inte mot servern förrän ångra-fönstret (6 s) gått ut.

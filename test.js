@@ -216,6 +216,20 @@ assert.deepStrictEqual(parseImport('{"title":"T","labels":["veganskt","x"],"ingr
 assert.deepStrictEqual(normalizeState({ recipes: [{ title: 'T', ingredients: [{ name: 'salt' }], labels: ['fest'] }] }).recipes[0].labels, ['fest'], 'taggar överlever backup');
 assert.ok(matchesQuery({ title: 'x', ingredients: [], labels: ['vegetariskt'] }, 'vegetar'), 'sök hittar tagg');
 assert.strictEqual(COURSES[0], 'testa', 'Att testa står först');
+// Egen kategori: byta namn och ta bort i alla recept på en gång
+{
+  const { renameTag } = require('./app.js');
+  const rs = [{ id: 'a', tags: ['Vardag', 'Jul'] }, { id: 'b', tags: ['vardag'] }, { id: 'c', tags: ['Jul'] }, { id: 'd' }];
+  const changed = renameTag(rs, 'Vardag', 'Snabbt');
+  assert.deepStrictEqual(rs.map(r => r.tags), [['Snabbt', 'Jul'], ['Snabbt'], ['Jul'], undefined], 'byter namn oavsett skiftläge, rör inget annat');
+  assert.deepStrictEqual(changed.map(([r, old]) => [r.id, old]), [['a', ['Vardag', 'Jul']], ['b', ['vardag']]], 'gamla tags för ångra');
+  renameTag(rs, 'Snabbt', 'Jul');
+  assert.deepStrictEqual(rs.map(r => r.tags), [['Jul'], ['Jul'], ['Jul'], undefined], 'slås ihop med befintlig kategori utan dubblett');
+  rs[0].tags = ['Jul', 'Fest'];
+  renameTag(rs, 'jul', '');
+  assert.deepStrictEqual(rs.map(r => 'tags' in r ? r.tags : null), [['Fest'], null, null, null], 'tar bort kategorin, tomt fält stryks');
+  assert.deepStrictEqual(renameTag(rs, 'finns inte', 'x'), [], 'okänd kategori ändrar inget');
+}
 import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.deepStrictEqual(sanitizeIndexed({ labels: ['vegetariskt', '<img onerror=x>'], ingredients: [] }).labels, ['vegetariskt'], 'workern vitlistar taggar');
 });

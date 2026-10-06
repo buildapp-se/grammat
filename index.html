@@ -309,6 +309,8 @@ label.tag-pick{display:inline-flex;align-items:center;gap:8px;min-height:var(--t
 /* ---- konto: inloggning ---- */
 .btn-block{display:flex;width:100%;min-height:56px;font-size:17px}
 .linkrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:15px;color:var(--muted)}
+.h-tag{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.h-tag .btn-link{margin:-14px 0;font-family:var(--sans);letter-spacing:0;text-transform:none;color:var(--muted)}
 .btn-link{background:none;border:none;color:var(--ink);font-weight:600;font-size:15px;min-height:var(--tap);padding:0 6px;text-decoration:underline;text-underline-offset:3px}
 .wide{display:none}
 /* ---- guide: tider, styckning, mått ---- */
@@ -508,6 +510,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=matt-20261006"></script>
+<script src="app.js?v=kategori-20261006"></script>
 </body>
 </html>

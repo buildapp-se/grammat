@@ -166,6 +166,26 @@ async function until(check, label) {
   assert.equal(conv2.document.querySelector('#convIng').value,'vetemjol');
   assert.match(conv2.document.querySelector('#convOut').textContent,/2,25\s*deciliter/,'135 g vetemjöl är 2,25 dl');
   assert.equal(conv2.location.hash,'#/guide/matt','adressen städas så egna ändringar inte skrivs över');
+  // Egen kategori: byt namn och ta bort i alla recept från rubriken i Mina recept, med ångra
+  await worker.fetch(new Request('https://test.invalid/state',{method:'PUT',headers:{Authorization:'Bearer test-only-session-2'},body:JSON.stringify({recipes:[{...recipe('pasta','Bob pasta'),tags:['Vardag']},{...recipe('soppa','Bob soppa'),tags:['vardag','Jul']}],selections:[],extras:[],checked:[],struck:{}})}),{DB:db});
+  const cat=await open(2,'#/');
+  await until(() => cat.document.querySelector('[data-tag-edit="Vardag"]'),'egen kategori har Ändra');
+  const tagsOf=() => JSON.parse(cat.localStorage.getItem('state')).recipes.map(r => r.tags);
+  cat.document.querySelector('[data-tag-edit="Vardag"]').click();
+  assert.equal(cat.document.querySelector('#tagName').value,'Vardag');
+  cat.document.querySelector('#tagName').value='Snabbt, x';
+  cat.document.querySelector('#tagForm').dispatchEvent(new cat.Event('submit',{bubbles:true,cancelable:true}));
+  assert.deepEqual(tagsOf(),[['Snabbt'],['Snabbt','Jul']],'namnet byts i alla recept, oavsett skiftläge');
+  assert.equal(cat.document.querySelector('#sheet').hidden,true);
+  assert.ok(cat.document.querySelector('[data-tag-edit="Snabbt"]') && !cat.document.querySelector('[data-tag-edit="Vardag"]'),'rubriken följer med');
+  cat.document.querySelector('#toast .toast-action').click();
+  assert.deepEqual(tagsOf(),[['Vardag'],['vardag','Jul']],'Ångra återställer');
+  cat.document.querySelector('[data-tag-edit="Jul"]').click();
+  cat.document.querySelector('#tagRemove').click();
+  assert.deepEqual(tagsOf(),[['Vardag'],['vardag']],'kategorin tas bort, recepten finns kvar');
+  cat.document.querySelector('[data-tag-edit="Vardag"]').click();
+  cat.document.querySelector('#tagForm').dispatchEvent(new cat.Event('submit',{bubbles:true,cancelable:true}));
+  assert.deepEqual(tagsOf(),[['Vardag'],['vardag']],'oförändrat namn ändrar inget');
   await tick();
   assert.deepEqual(errors,[]);
   for (const w of windows) w.close();

@@ -58,8 +58,8 @@ Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, hea
 
 ## Kategorier och taggar
 
-- [ ] `[P3]` Byta namn på eller ta bort en egen kategori i alla recept på en gång. I dag
-  görs det recept för recept i redigeraren.
+- [x] `[P3]` Byta namn på eller ta bort en egen kategori i alla recept på en gång. Byggt
+  2026-10-06: "Ändra" vid kategorins rubrik i Mina recept, med Ångra.
 - [x] Publika taggar, fast lista, sökbara (2026-09-25).
 - [ ] `[P3]` Taggknappar som filter överst i Allas recept, om sökningen inte räcker.
 
