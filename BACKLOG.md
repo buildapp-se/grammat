@@ -61,3 +61,9 @@ Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, hea
   görs det recept för recept i redigeraren.
 - [x] Publika taggar, fast lista, sökbara (2026-09-25).
 - [ ] `[P3]` Taggknappar som filter överst i Allas recept, om sökningen inte räcker.
+
+## Granskning 2026-10-06
+
+Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, npm audit, secrets, Actions, markup, axe). Mätvärdena står som `(automated)`-rader under `## Audits` i CONTEXT.md.
+
+- [ ] `[P3]` npm audit kan inte köras: `worker/` saknar `package-lock.json`. Checka in en låsfil.
