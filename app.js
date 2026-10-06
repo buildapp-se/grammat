@@ -382,10 +382,17 @@ function convertUnit(amount, from, to, gPerDl) {
   if (!gPerDl) throw new Error('Volym och vikt kräver en ingrediens');
   return from.ml ? amount * from.ml / 100 * gPerDl / to.g : amount * from.g / gPerDl * 100 / to.ml;
 }
+// Receptingrediens till rad i guidens densitetstabell. Parentes och allt efter komma räknas inte
+// ("ris (gärna jasmin)", "ingefära, riven"). Exakt namn eller aka, aldrig delsträng: jordnötssmör är inte smör.
+const ingBase = s => keyOf(String(s).replace(/\(.*?\)|,.*$/g, ''));
+function densityFor(name, density) {
+  const k = ingBase(name);
+  return density.find(d => ingBase(d.sv) === k || (d.aka || []).includes(k)) || null;
+}
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
 if (typeof document !== 'undefined') (async function () {
@@ -975,11 +982,18 @@ if (typeof document !== 'undefined') (async function () {
     const struckKeys = state.struck[id] || [];
     let rows = '', lastGroup = null;
     const struckRows = [];
+    if (!guide) loadGuide(); // densiteterna behövs för länken till måttomvandlingen, raderna ritas om när de kommit
+    // Varor som finns i guidens densitetstabell får en länk till omräknaren, förifylld med radens mängd.
+    const convLink = ing => {
+      const unit = ing.unit || 'g';
+      const d = guide && ing.amount > 0 && (unit === 'g' || unit === 'ml') && densityFor(ing.name, guide.matt.density);
+      return d ? ` <a class="ing-conv" href="#/guide/matt/${Number((ing.amount * f).toPrecision(3))}${unit}/${esc(d.id)}" aria-label="Räkna om ${esc(ing.name)} till ${unit === 'g' ? 'dl' : 'gram'}">↔ ${unit === 'g' ? 'dl' : 'g'}</a>` : '';
+    };
     r.ingredients.forEach((ing, i) => {
       const k = keyOf(ing.name);
       const isStruck = mine && struckKeys.includes(k);
       const attr = mine ? ` data-ing="${esc(k)}" style="view-transition-name:ing-${i}"` : '';
-      const row = `<tr class="ing-row${isStruck ? ' struck' : ''}"${attr}><td>${isStruck ? '<span class="tick">✓</span>' : ''}${esc(ing.name)}</td><td class="num">${esc(fmtIngredient(ing, f))}</td></tr>`;
+      const row = `<tr class="ing-row${isStruck ? ' struck' : ''}"${attr}><td>${isStruck ? '<span class="tick">✓</span>' : ''}${esc(ing.name)}</td><td class="num">${esc(fmtIngredient(ing, f))}${convLink(ing)}</td></tr>`;
       if (isStruck) { struckRows.push({ row, order: struckKeys.indexOf(k) }); return; }
       if ((ing.group || null) !== lastGroup) { lastGroup = ing.group || null; if (lastGroup) rows += `<tr class="ing-group"><td colspan="2">${esc(lastGroup)}</td></tr>`; }
       rows += row;
@@ -1396,17 +1410,22 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20261002c'; // höj när guide.json ändras, edgen cachar annars gammal data
+  const GUIDE_V = '20261006'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
   function loadGuide() {
-    if (guide || guideLoading) return;
+    if (guide || guideLoading || guideError) return; // efter ett fel: ladda om sidan, annars hämtar varje omritning igen
     guideLoading = true;
     fetch('guide.json?v=' + GUIDE_V).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(d => { guide = d; guideError = false; })
       .catch(() => { guideError = true; })
-      .finally(() => { guideLoading = false; if (location.hash.startsWith('#/guide')) render(); });
+      .finally(() => {
+        guideLoading = false;
+        const h = location.hash;
+        // Receptvyn ritas om för länkarna till måttomvandlingen, men inte mitt i ett fält (timerns minuter).
+        if (h.startsWith('#/guide') || (guide && /^#\/recept\/[^/]+$/.test(h) && !/^(INPUT|SELECT|TEXTAREA)$/.test((document.activeElement || {}).tagName))) render();
+      });
   }
   const GUIDE_TABS = [['sousvide', 'Sous vide'], ['ugn', 'Ugn'], ['kottbitar', 'Köttbitar'], ['matt', 'Mått']];
   const deg = n => fmtAmount(n) + ' °C';
@@ -1421,7 +1440,17 @@ if (typeof document !== 'undefined') (async function () {
       return head + (guideError ? '<p class="warn">Kunde inte hämta guiden. Kontrollera nätet och ladda om.</p>' : '<p class="empty">Hämtar …</p>');
     }
     if (sub === 'kottbitar' || sub === 'styckning') return head + viewCuts(a, b); // styckning: gammal adress
-    if (sub === 'matt') return head + viewMeasures();
+    if (sub === 'matt') {
+      // #/guide/matt/180g/vetemjol från en receptrad: fyll i omräknaren en gång och städa adressen,
+      // annars skriver nästa omritning över det man själv ändrat.
+      const m = a && a.match(/^(\d+(?:\.\d+)?)(g|ml)$/);
+      if (m) {
+        Object.assign(conv, { amount: m[1].replace('.', ','), unit: m[2], ing: guide.matt.density.some(d => d.id === b) ? b : '' });
+        try { history.replaceState(history.state, '', '#/guide/matt'); } catch (e) { /* file:// */ }
+        document.documentElement.scrollTop = 0; // receptets rullning följer annars med och omräknaren hamnar ovanför skärmen
+      }
+      return head + viewMeasures();
+    }
     return head + viewTimes(sub === 'ugn' ? 'ugn' : 'sousvide', a);
   }
 
@@ -1683,7 +1712,8 @@ if (typeof document !== 'undefined') (async function () {
       if (i >= 0) timers.splice(i, 1);
       render();
     });
-    view.querySelectorAll('[data-ing]').forEach(row => row.onclick = () => {
+    view.querySelectorAll('[data-ing]').forEach(row => row.onclick = e => {
+      if (e.target.closest('a')) return; // länken till måttomvandlingen stryker inte raden
       const id = recipeIdFromHash();
       const k = row.dataset.ing;
       const cur = state.struck[id] || [];

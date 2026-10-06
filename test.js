@@ -261,6 +261,19 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   }
   for (const u of [...g.matt.volume, ...g.matt.weight]) if (!(u.ml > 0) === !(u.g > 0)) bad.push(u.id + ': enhet behöver ml eller g');
   for (const d of g.matt.density) if (!(d.gPerDl > 0)) bad.push(d.id + ': gPerDl saknas');
+  // Receptrad till densitet: exakt namn eller aka, parentes och komma bortses, aldrig delsträng
+  const { densityFor } = require('./app.js');
+  const dens = name => (densityFor(name, g.matt.density) || {}).id || null;
+  assert.strictEqual(dens('vetemjöl'), 'vetemjol');
+  assert.strictEqual(dens('ris (gärna jasmin)'), 'ris');
+  assert.strictEqual(dens('Olivolja (salsa)'), 'olja');
+  assert.strictEqual(dens('salt'), 'salt-fint');
+  assert.strictEqual(dens('flingsalt (till glaskanten)'), 'flingsalt');
+  assert.strictEqual(dens('röda linser (torkade)'), 'linser');
+  assert.strictEqual(dens('jordnötssmör'), null, 'delsträng matchar inte');
+  assert.strictEqual(dens('rött vin (eller vatten)'), null, 'alternativ i parentes matchar inte');
+  assert.strictEqual(dens('nötfärs'), null);
+  for (const d of g.matt.density) for (const a of d.aka || []) assert.strictEqual(dens(a), d.id, 'aka ' + a + ' krockar med en annan rad');
   if (new Set(g.sousvide.map(x => x.id)).size !== g.sousvide.length || new Set(g.ugn.map(x => x.id)).size !== g.ugn.length) bad.push('dubbla id i tider');
   assert.deepStrictEqual(bad, [], 'guide.json:\n' + bad.join('\n'));
 }

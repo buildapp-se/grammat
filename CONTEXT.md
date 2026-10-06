@@ -28,6 +28,9 @@ inte att vara en fullödig matportal.
   rad och avvikelser från det crowdsourcade arket ligger i `docs/guide-research/`.
   `node test.js` kontrollerar datan (svensk decimal, inga tankstreck, kopplingar
   tider ↔ delar, enheter). Höj `GUIDE_V` i `app.js` när `guide.json` ändras.
+  Receptvyn hämtar också `guide.json`: ingredienser vars namn finns i `matt.density` (`sv` utan
+  parentes, eller `aka`) länkas till omräknaren (`#/guide/matt/<mängd><g|ml>/<id>`). Exakt
+  namn, aldrig delsträng; nya stavningar läggs i `aka`.
 
 Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
 

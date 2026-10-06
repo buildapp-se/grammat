@@ -14,7 +14,7 @@ async function until(check, label) {
   const { db, sqlite } = createTestDb();
   const errors = [];
   const windows = [];
-  const recipe = (id, title) => ({ id, title, portions: 2, course: 'huvudratt', ingredients: [{name: 'pasta',amount: 200,unit: 'g',cat: 'skafferi'}],steps:['Koka.'] });
+  const recipe = (id, title) => ({ id, title, portions: 2, course: 'huvudratt', ingredients: [{name: 'pasta',amount: 200,unit: 'g',cat: 'skafferi'},{name: 'vetemjöl (special)',amount: 90,unit: 'g',cat: 'skafferi'}],steps:['Koka.'] });
   for (const [id, name, recipes] of [[1,'alice',[recipe('pasta','Alice pasta')]], [2,'bob',[recipe('pasta','Bob pasta')]], [3,'grammat',[recipe('starter','Startrecept')]]]) {
     sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(id,name,'','test-only-session-' + id);
     await worker.fetch(new Request('https://test.invalid/state', {method:'PUT',headers:{Authorization:'Bearer test-only-session-' + id},body:JSON.stringify({recipes,selections:[],extras:[],checked:[],struck:{}})}),{DB:db});
@@ -151,6 +151,21 @@ async function until(check, label) {
   await navigate(guest,'#/guide/matt','#convOut .gconv');
   const amt=guest.document.querySelector('#convAmount'); amt.value='2'; amt.dispatchEvent(new guest.Event('input'));
   assert.match(guest.document.querySelector('#convOut').textContent,/\d/,'omvandlingen ger siffror');
+  // Receptrad till måttomvandlingen: vara med känd densitet får en förifylld länk, raden stryks inte av den
+  const conv2=await open(2,'#/recept/pasta');
+  await until(() => conv2.document.querySelector('.ing-conv'),'länk till måttomvandlingen');
+  assert.deepEqual([...conv2.document.querySelectorAll('.ing-conv')].map(a => a.getAttribute('href')),['#/guide/matt/90g/vetemjol'],'bara varan med densitet länkas');
+  conv2.document.querySelector('[data-rstep="1"]').click();
+  assert.equal(conv2.document.querySelector('.ing-conv').getAttribute('href'),'#/guide/matt/135g/vetemjol','länken följer portionerna');
+  conv2.document.querySelector('.ing-conv').dispatchEvent(new conv2.MouseEvent('click',{bubbles:true,cancelable:true}));
+  await tick();
+  assert.ok(!JSON.parse(conv2.localStorage.getItem('state')).struck.pasta,'länken stryker inte raden');
+  await navigate(conv2,'#/guide/matt/135g/vetemjol','#convOut .gconv');
+  assert.equal(conv2.document.querySelector('#convAmount').value,'135');
+  assert.equal(conv2.document.querySelector('#convUnit').value,'g');
+  assert.equal(conv2.document.querySelector('#convIng').value,'vetemjol');
+  assert.match(conv2.document.querySelector('#convOut').textContent,/2,25\s*deciliter/,'135 g vetemjöl är 2,25 dl');
+  assert.equal(conv2.location.hash,'#/guide/matt','adressen städas så egna ändringar inte skrivs över');
   await tick();
   assert.deepEqual(errors,[]);
   for (const w of windows) w.close();

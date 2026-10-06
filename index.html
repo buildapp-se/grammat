@@ -133,6 +133,7 @@ h3{font-size:1rem;font-weight:600;margin:1.2rem 0 .4rem}
 .ing-table td{padding:.5rem .9rem;border-bottom:1px dashed var(--line);font-size:16px}
 .ing-table tr:last-child td{border-bottom:none}
 .ing-table .num{text-align:right;font-family:var(--mono);font-size:14px;color:#3A372F;white-space:nowrap}
+.ing-conv{display:inline-flex;align-items:center;justify-content:flex-end;min-width:var(--tap);min-height:var(--tap);margin:-14px 0 -14px 2px;color:var(--accent);font-family:var(--sans);font-size:13px;font-weight:600;text-decoration:none;vertical-align:middle}
 .ing-row[data-ing]{cursor:pointer}
 .ing-row[data-ing] td{min-height:var(--tap)}
 .ing-row.struck td{text-decoration:line-through;color:var(--muted)}
@@ -507,6 +508,6 @@ const app = initializeApp({
 window.fb = { auth: fbAuth.getAuth(app), ...fbAuth };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-<script src="app.js?v=guide6-20261002"></script>
+<script src="app.js?v=matt-20261006"></script>
 </body>
 </html>

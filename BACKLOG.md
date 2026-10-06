@@ -22,7 +22,8 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 - [ ] Guiden: värden som bara stöds av det crowdsourcade arket (vilt sous vide, julskinka,
   lammlägg, rabarber, omelett, ägg 70 °C) och ugnstider för grönsaker utom rotfrukter är
   overifierade. Lista i `docs/guide-research/SOURCES.md` under "uncertain".
-- [ ] Guiden: länka från ingredienser i recept till måttomvandlingen (dl ↔ g). Skippat i v1.
+- [x] Guiden: länka från ingredienser i recept till måttomvandlingen (dl ↔ g). Byggt 2026-10-06:
+  varor som finns i densitetstabellen får "↔ dl" eller "↔ g" på raden, omräknaren öppnas förifylld.
 
 - [ ] Rätta utkastsstegen (salsiccia, räkpasta, chili con carne, gazpacho, utkast
   skrivna 2026-08-04) så de stämmer med hur ni faktiskt lagar rätterna, och radera
