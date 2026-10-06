@@ -6,10 +6,36 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-10-02
+reviewedAt: 2026-10-06
 ---
 
 # Handoff
+
+## 2026-10-06: nattbatch på grenen `batch/2026-10-06` (inte mergad, inte deployad)
+
+Merge till main är deploy av frontend (Pages). Inga ändringar i workerkoden, ingen D1.
+
+- **Länk från receptrad till måttomvandlingen.** Varor vars namn finns i guidens
+  densitetstabell får "↔ dl" (gramrader) eller "↔ g" (ml-rader) efter mängden. Länken öppnar
+  omräknaren under Guide, Mått, förifylld med radens mängd för valda portioner. Namnet matchas
+  exakt mot `sv` utan parentes eller mot nya fältet `aka` i `guide.json` (`densityFor` i
+  `app.js`), aldrig på delsträng. Länken stryker inte raden.
+- Val tagna åt Patrik: receptvyn hämtar nu `guide.json` (98 kB okomprimerad, en gång per
+  session) i bakgrunden och ritar om raderna när den kommit, utom när ett fält har fokus.
+  `loadGuide` försöker inte igen efter ett fel förrän sidan laddas om: tidigare hämtade
+  guidefliken om i en slinga utan nät. Adressen städas till `#/guide/matt` när omräknaren
+  fyllts i, så bakåt går till receptet.
+- `worker/package-lock.json` incheckad (inga beroenden), `npm audit` ger 0 sårbarheter.
+- Versioner: `app.js?v=matt-20261006`, `GUIDE_V = '20261006'`.
+- Verifierat: `node --check app.js`, `node test.js`, `node test-ui.cjs`, `node test-friends.cjs`,
+  Playwright lokalt 375 och 1280 px (länkyta 44×44, radhöjd oförändrad 37 px, ingen sidscroll,
+  inga konsolfel). **Inte verifierat:** riktig telefon, inloggat konto i riktig webbläsare.
+- **Fynd, inte åtgärdat:** en direktlänk till ett publikt recept (`#/recept/5%7Ckottfarssas`)
+  visar "Receptet finns inte." för den som inte först öppnat Allas recept. Samma i produktion,
+  `findRecipe` i `app.js` känner bara flödet när det redan hämtats.
+- Hoppat över: guidens overifierade värden (källor saknades redan i förra researchen, och det
+  är ett livsmedelssäkerhetsval vad som ska stå kvar), taggknappar i Allas (villkorad av om
+  sökningen räcker), allt under Före lansering och Verifiering (kräver Patrik, Julia eller telefon).
 
 ## 2026-10-02: Guide v3, illustrationer och rekommendationer
 
