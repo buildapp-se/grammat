@@ -1,7 +1,7 @@
 # Projekt: Grammat (recept + inköpslista)
 
 Personlig receptsajt för Patrik + vänner. **Live:** https://buildapp.se/grammat/
-Repo: https://github.com/buildapp-se/grammat (GH Pages, branch `main`, root), lokalt i `C:\dev\recept`. Sökvägen `/grammat/` kommer av org-namnet `buildapp-se` och repo-namnet, ingen CNAME här. Gamla `orgutveckling.se/recept/` svarar 404.
+Repo: https://github.com/buildapp-se/grammat (GH Pages, branch `main`, root), lokalt i `C:\dev\grammat`. Sökvägen `/grammat/` kommer av org-namnet `buildapp-se` och repo-namnet, ingen CNAME här. Gamla `orgutveckling.se/recept/` svarar 404.
 
 ## Funktion (as built)
 - Receptbibliotek och inköpslista är UNIKA per användare. Nya konton/anonyma besökare börjar med tomt `state.recipes: []`. `starter.json` seedar INTE längre personlig state: inloggat läge visar systemkontot `grammat`s recept ur feeden (seedade från starter.json via `worker/seed-grammat.js`), utloggat läge visar starter.json direkt. Fas 2 (2026-07-08): "Allas recept" läser `GET /feed` (recipes_index, mest sparade först), varje kort har sparräknare ("sparad av N") och "Lägg till i mina recept" registrerar sparning via `POST /save`. Recept kan markeras hemliga i editorn (`private: true`), de synkas men indexeras aldrig. Recept läggs till/redigeras/tas bort i UI:t, INTE via repot.
