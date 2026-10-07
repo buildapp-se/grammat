@@ -6,14 +6,14 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-10-06
+reviewedAt: 2026-10-07
 ---
 
 # Handoff
 
-## 2026-10-06: nattbatch på grenen `batch/2026-10-06` (inte mergad, inte deployad)
+## 2026-10-06: nattbatch på grenen `batch/2026-10-06` (mergad till main och deployad 2026-10-07)
 
-Merge till main är deploy av frontend (Pages). Inga ändringar i workerkoden, ingen D1.
+Mergad till main 2026-10-07 på Patriks order, vilket är deploy av frontend (Pages). Inga ändringar i workerkoden, ingen D1.
 
 - **Länk från receptrad till måttomvandlingen.** Varor vars namn finns i guidens
   densitetstabell får "↔ dl" (gramrader) eller "↔ g" (ml-rader) efter mängden. Länken öppnar
