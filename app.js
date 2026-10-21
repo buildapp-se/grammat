@@ -98,9 +98,9 @@ function fmtItem(it) {
   return 'efter smak';
 }
 
-// Inköpslistan som rader till ICA-listan (via Metarecept, se ICA_ACCOUNTS): det som inte är bockat, i den mängd man handlar.
+// Inköpslistan som rader till ICA-listan (POST /ica, se ICA_ACCOUNTS): det som inte är bockat, i den mängd man handlar.
 // Styck när receptet har det, kryddmått för små skafferimängder, annars vikt eller volym. Bara "efter smak": ingen mängd.
-// Egna rader går som text, Metarecept tolkar "2 l mjölk" själv.
+// Egna rader går som text, workern tolkar "2 l mjölk" själv.
 function icaItems(items, extras, checked) {
   const done = new Set(checked);
   const out = [];
@@ -425,10 +425,9 @@ const fToC = f => (f - 32) * 5 / 9;
 if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
-// Patrik och Julia har en delad ICA-lista som Metarecept (recept.buildapp.se, bakom Cloudflare Access) skriver till.
-// Kontonamnen är redan publika i Grammat. Andra konton ser inte menyvalet.
+// Patrik och Julia har en delad ICA-lista, workern skriver till den (POST /ica) och släpper bara in de här kontona.
+// Kontonamnen är redan publika i Grammat. Andra konton ser inte menyvalet. Samma lista står i worker/worker.js.
 const ICA_ACCOUNTS = ['patrik', 'julia'];
-const ICA_PAGE = 'https://recept.buildapp.se/allt/ica.html';
 if (typeof document !== 'undefined') (async function () {
   const API = 'https://recept-api.buildapp.se';
   const $ = sel => document.querySelector(sel);
@@ -2222,11 +2221,13 @@ if (typeof document !== 'undefined') (async function () {
       catch (e) { toast('Kunde inte kopiera'); }
     };
     const sendIcaBtn = $('#sendIca');
-    if (sendIcaBtn) sendIcaBtn.onclick = () => {
+    if (sendIcaBtn) sendIcaBtn.onclick = async () => {
       closeSheet();
-      const rows = icaItems(aggregate(state.recipes, state.selections, state.struck), state.extras, state.checked);
-      if (!rows.length) { toast('Allt är redan bockat'); return; }
-      window.open(ICA_PAGE + '#' + encodeURIComponent(JSON.stringify(rows)), '_blank', 'noopener');
+      const items = icaItems(aggregate(state.recipes, state.selections, state.struck), state.extras, state.checked);
+      if (!items.length) { toast('Allt är redan bockat'); return; }
+      toast('Skickar till ICA …');
+      try { const { added } = await api('/ica', { method: 'POST', body: JSON.stringify({ items }) }); toast(added + ' varor på ICA-listan'); }
+      catch (e) { toast(e.message); }
     };
     const clearBtn = $('#clearList');
     if (clearBtn) clearBtn.onclick = () => {

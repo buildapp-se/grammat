@@ -1,4 +1,5 @@
 import { friendFeed, handleFriends } from './friends.js';
+import { addToIca, IcaError } from './ica.js';
 
 // API för "Grammat" (buildapp.se/grammat)
 // Auth: Firebase ID-token (JWT, verifieras mot Googles JWKS) ELLER legacy uuid-token (utfasas).
@@ -19,9 +20,12 @@ import { friendFeed, handleFriends } from './friends.js';
 // POST /save   (Bearer) {ownerId,recipeId} -> {ok,saves}   registrerar sparning
 // DELETE /save (Bearer) {ownerId,recipeId} -> {ok,saves}   tar bort sparning
 // DELETE /account (Bearer Firebase-JWT) -> {ok}  raderar D1-raden (Firebase-usern raderas client-side)
+// POST /ica    (Bearer, bara ICA_ACCOUNTS) {items:[{name,quantity?,unit?}]} -> {added}  lägger raderna på den delade ICA-listan
 const FIREBASE_PROJECT = 'grammat-78450';
 const COURSES = ['testa', 'forratt', 'huvudratt', 'efterratt', 'dryck', 'sas'];
 const LABELS = ['vegetariskt', 'veganskt', 'glutenfritt', 'laktosfritt', 'snabbt', 'vardag', 'fest', 'barnvänligt', 'frysvänligt', 'asiatiskt', 'italienskt', 'mexikanskt', 'indiskt', 'husmanskost'];
+// Patrik och Julia har en delad ICA-lista. Andra konton får 403 på /ica. Samma lista står i app.js.
+const ICA_ACCOUNTS = ['patrik', 'julia'];
 const normalizeCourse = course => COURSES.includes(course) ? course : 'huvudratt';
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -334,6 +338,25 @@ export default {
           env.DB.prepare('SELECT saves_count FROM recipes_index WHERE owner_id = ? AND id = ?').bind(ownerId, recipeId),
         ]);
         return json({ ok: true, saves: row.results[0] ? row.results[0].saves_count : 0 });
+      }
+
+      if (path === '/ica' && req.method === 'POST') {
+        const u = await userFromRequest(req, env);
+        if (!u) return json({ error: 'Inte inloggad.' }, 401);
+        if (!ICA_ACCOUNTS.includes(u.name)) return json({ error: 'ICA-listan är inte kopplad till ditt konto.' }, 403);
+        if (!env.ICA_LIST) return json({ error: 'ICA-listan är inte inkopplad.' }, 503);
+        const b = await req.json().catch(() => ({}));
+        const items = Array.isArray(b.items) && b.items.length && b.items.length <= 200 ? b.items : null;
+        const valid = items && items.every(i => i && typeof i.name === 'string' && i.name.trim() && i.name.length <= 100 &&
+          (i.quantity === undefined || (typeof i.quantity === 'number' && i.quantity > 0 && i.quantity <= 100000)) &&
+          (i.unit === undefined || (typeof i.unit === 'string' && i.unit.length <= 12)));
+        if (!valid) return json({ error: 'Ogiltig lista.' }, 400);
+        try {
+          return json({ added: await addToIca(items.map(i => ({ name: i.name.trim(), quantity: i.quantity, unit: i.unit })), env.ICA_LIST, env.DB, env) });
+        } catch (e) {
+          // Felet visas för Patrik och Julia, annars syns bara "Serverfel" när ICA ändrar något.
+          return json({ error: e instanceof IcaError ? e.message : 'ICA svarade med fel: ' + e.message }, e instanceof IcaError ? 400 : 502);
+        }
       }
 
       // GDPR: raderar all serverdata (user-rad, indexrader, sparningar åt båda håll).

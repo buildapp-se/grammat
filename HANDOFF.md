@@ -11,9 +11,9 @@ reviewedAt: 2026-10-21
 
 # Handoff
 
-## 2026-10-21: Skicka till ICA (`06b5020`, bara lokalt, inte pushad)
+## 2026-10-21: Skicka till ICA
 
-Listans meny har "Skicka till ICA" för kontona `patrik` och `julia` (`ICA_ACCOUNTS` i `app.js`). `icaItems` gör det obockade till rader med mängd och enhet: styck när receptet har det, kryddmått för små skafferimängder, annars avrundad vikt eller volym. Egna rader går som text. Sidan som öppnas är Metarecepts `https://recept.buildapp.se/allt/ica.html`, som lägger raderna på den delade ICA-listan (koden och ICA-inloggningen ligger i repot `recept`, `worker/ica.ts`). `node test.js` grönt med nytt test (10). Version `ica-20261021` i `index.html`. Torrkörning: 22 startrecept gav 144 rader, 140 fick ICA-artikel. **Inte pushad:** push publicerar för hela vänkretsen via Pages och väntar på Patriks ja. **Inte provat:** menyvalet i riktig webbläsare inloggad.
+Listans meny har "Skicka till ICA" för kontona `patrik` och `julia` (`ICA_ACCOUNTS` i `app.js` och `worker/worker.js`). `icaItems` gör det obockade till rader med mängd och enhet: styck när receptet har det, kryddmått för små skafferimängder, annars avrundad vikt eller volym. Egna rader går som text. Appen anropar `POST /ica` i workern (`worker/ica.js`), som lägger raderna på den delade ICA-listan "tjööööp" (`ICA_LIST` i `wrangler.toml`) via ICA-appens inofficiella API. Inloggning: secrets `ICA_USERNAME` (personnummer) och `ICA_PASSWORD` på workern, token och egen klient i tabellen `ica` (`migrations/0002_ica.sql`, körd remote). Workern förnyar token själv och loggar in igen när förnyelsen dör (högst 90 dagar), inget handgrepp behövs. Byter Patrik ICA-lösenord: `wrangler secret put ICA_PASSWORD` i `worker/`. Artikelindexet `worker/ica-articles.json` är kopierat från Metarecept (repot `recept`). Worker deployad version `62e2d5c3`. Tester: `test-ica.cjs` (behörighet, validering, radernas form) och test 10 i `test.js`. Full inloggning, klientregistrering och förnyelse provade skarpt i Node mot ICA. **Inte provat:** inloggningen inifrån Cloudflare (ICA kan neka deras IP) och menyvalet i inloggad webbläsare.
 
 ## 2026-10-06: nattbatch på grenen `batch/2026-10-06` (mergad till main och deployad 2026-10-07)
 
