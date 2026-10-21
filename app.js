@@ -1171,7 +1171,8 @@ if (typeof document !== 'undefined') (async function () {
         ${recipeRows}
         ${body}
         ${cartHtml}
-      </div>`}
+      </div>
+      ${left && ICA_ACCOUNTS.includes(authName) ? '<button type="button" class="btn btn-ghost btn-block ica-send" id="sendIca">Skicka till ICA-listan</button>' : ''}`}
       <form class="extra-form extra-fixed" id="extraForm">
         <input type="text" id="extraText" placeholder="Egen rad, t.ex. mjölk" maxlength="80" required aria-label="Egen rad">
         <button class="btn extra-add" type="submit" aria-label="Lägg till raden">+</button>
@@ -1703,7 +1704,7 @@ if (typeof document !== 'undefined') (async function () {
     else if (inviteMatch) { html = viewInvite(decodeURIComponent(inviteMatch[1])); lastTab = h; }
     else if (h === '#/nytt') html = viewEditor(null);
     else if (h === '#/importera') html = viewImport();
-    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + (ICA_ACCOUNTS.includes(authName) ? sheetItem('Skicka till ICA', 'id="sendIca"') : '') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
+    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
     else if (h === '#/konto') html = viewAccount();
     else if (h === '#/vanner') html = viewFriends();
     else if (h === '#/allas') html = viewAllasRecept();
@@ -2222,7 +2223,6 @@ if (typeof document !== 'undefined') (async function () {
     };
     const sendIcaBtn = $('#sendIca');
     if (sendIcaBtn) sendIcaBtn.onclick = async () => {
-      closeSheet();
       const items = icaItems(aggregate(state.recipes, state.selections, state.struck), state.extras, state.checked);
       if (!items.length) { toast('Allt är redan bockat'); return; }
       toast('Skickar till ICA …');
