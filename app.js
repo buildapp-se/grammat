@@ -1164,15 +1164,21 @@ if (typeof document !== 'undefined') (async function () {
         <summary><span><span class="tick">✓</span>I vagnen</span><span class="n">${cart.length} · ${cartOpen ? 'dölj' : 'visa'}</span></summary>
         ${cart.join('')}
       </details>` : '';
-    return `<div class="list-head"><h1>Lista</h1>${total ? `<span class="list-count">${left} kvar av ${total}</span>` : ''}</div>
+    // Verktygen syns direkt i rubrikraden (låg tidigare i ⋯-menyn och hittades inte). title ger tooltip med musen.
+    const tool = (id, label, path, extra = '') => `<button type="button" class="list-tool${extra}" id="${id}" title="${label}" aria-label="${label}"><svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg></button>`;
+    const tools = total ? `<div class="list-tools">
+        ${tool('copyList', 'Kopiera listan', '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>')}
+        ${left && ICA_ACCOUNTS.includes(authName) ? tool('sendIca', 'Skicka till ICA-listan', '<path d="M3 10h18l-2 10H5z"/><path d="M8 10l4-6 4 6"/><path d="M9 14v3M15 14v3"/>') : ''}
+        ${tool('clearList', 'Töm listan', '<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>', ' is-danger')}
+      </div>` : '';
+    return `<div class="list-head"><h1>Lista</h1>${total ? `<span class="list-count">${left} kvar av ${total}</span>` : ''}${tools}</div>
       ${syncPill(total > 0 && left === 0)}
       ${total === 0 ? '<div class="empty-state"><div class="empty-title">Listan är tom</div><p>Lägg recept i listan från Recept, eller skriv en egen rad nedan.</p></div>' : `
       <div class="list">
         ${recipeRows}
         ${body}
         ${cartHtml}
-      </div>
-      ${left && ICA_ACCOUNTS.includes(authName) ? '<button type="button" class="btn btn-ghost btn-block ica-send" id="sendIca">Skicka till ICA-listan</button>' : ''}`}
+      </div>`}
       <form class="extra-form extra-fixed" id="extraForm">
         <input type="text" id="extraText" placeholder="Egen rad, t.ex. mjölk" maxlength="80" required aria-label="Egen rad">
         <button class="btn extra-add" type="submit" aria-label="Lägg till raden">+</button>
@@ -1704,7 +1710,7 @@ if (typeof document !== 'undefined') (async function () {
     else if (inviteMatch) { html = viewInvite(decodeURIComponent(inviteMatch[1])); lastTab = h; }
     else if (h === '#/nytt') html = viewEditor(null);
     else if (h === '#/importera') html = viewImport();
-    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
+    else if (h === '#/lista') { html = viewList(); }
     else if (h === '#/konto') html = viewAccount();
     else if (h === '#/vanner') html = viewFriends();
     else if (h === '#/allas') html = viewAllasRecept();
@@ -1720,6 +1726,7 @@ if (typeof document !== 'undefined') (async function () {
   function bind() {
     const view = $('#view');
     bindGuide(view);
+    if ($('#copyList')) bindSheet(); // listans verktyg ligger i vyn, handlarna i bindSheet
 
     const q = $('#q');
     if (q) q.oninput = () => {
