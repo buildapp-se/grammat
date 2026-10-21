@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -291,3 +291,19 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   if (new Set(g.sousvide.map(x => x.id)).size !== g.sousvide.length || new Set(g.ugn.map(x => x.id)).size !== g.ugn.length) bad.push('dubbla id i tider');
   assert.deepStrictEqual(bad, [], 'guide.json:\n' + bad.join('\n'));
 }
+
+// 10. icaItems: rader till ICA-listan. Styck vinner, kryddmått för små skafferimängder, annars avrundad vikt/volym.
+// Bockade rader (även egna) skickas inte, egna rader går som text.
+assert.deepStrictEqual(icaItems([
+  { key: 'vitlök', name: 'vitlök', amount: 25, unit: 'g', count: 5, countUnit: 'klyftor', cat: 'grönt' },
+  { key: 'salt', name: 'salt', amount: 10, unit: 'g', count: 0, cat: 'skafferi' },
+  { key: 'olivolja', name: 'olivolja', amount: 172, unit: 'ml', count: 0, cat: 'skafferi' },
+  { key: 'svartpeppar', name: 'svartpeppar', amount: 0, unit: null, count: 0, toTaste: true, cat: 'skafferi' },
+  { key: 'mjölk', name: 'mjölk', amount: 1, unit: 'l', count: 0, cat: 'mejeri' },
+], [{ id: 'a', text: '2 l mjölk' }, { id: 'b', text: 'tvål' }], ['mjölk', 'extra:b']), [
+  { name: 'vitlök', quantity: 5, unit: 'klyftor' },
+  { name: 'salt', quantity: 2, unit: 'tsk' },
+  { name: 'olivolja', quantity: 170, unit: 'ml' },
+  { name: 'svartpeppar' },
+  { name: '2 l mjölk' },
+]);

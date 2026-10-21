@@ -69,9 +69,9 @@ function aggregate(recipes, selections, struck) {
 }
 
 // Svenskt talformat: decimalkomma, mellanslag som tusentalsavgränsare.
+function roundNum(n) { return n >= 100 ? Math.round(n / 5) * 5 : n >= 10 ? Math.round(n) : Math.round(n * 10) / 10; }
 function fmtNum(n) {
-  const r = n >= 100 ? Math.round(n / 5) * 5 : n >= 10 ? Math.round(n) : Math.round(n * 10) / 10;
-  const [int, dec] = String(r).split('.');
+  const [int, dec] = String(roundNum(n)).split('.');
   const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   return dec ? grouped + ',' + dec : grouped;
 }
@@ -96,6 +96,24 @@ function fmtItem(it) {
     return s;
   }
   return 'efter smak';
+}
+
+// Inköpslistan som rader till ICA-listan (via Metarecept, se ICA_ACCOUNTS): det som inte är bockat, i den mängd man handlar.
+// Styck när receptet har det, kryddmått för små skafferimängder, annars vikt eller volym. Bara "efter smak": ingen mängd.
+// Egna rader går som text, Metarecept tolkar "2 l mjölk" själv.
+function icaItems(items, extras, checked) {
+  const done = new Set(checked);
+  const out = [];
+  for (const it of items) {
+    if (done.has(it.key)) continue;
+    const hint = it.amount > 0 && !(it.count > 0) ? spiceHint(it.amount, it.unit, it.cat) : '';
+    if (!(it.amount > 0)) out.push({ name: it.name });
+    else if (it.count > 0) out.push({ name: it.name, quantity: Math.max(0.5, Math.round(it.count * 2) / 2), unit: it.countUnit || 'st' });
+    else if (hint) out.push({ name: it.name, quantity: Number(hint.split(' ')[0].replace(',', '.')), unit: hint.split(' ')[1] });
+    else out.push({ name: it.name, quantity: roundNum(it.amount), unit: it.unit });
+  }
+  for (const ex of extras) if (!done.has('extra:' + ex.id)) out.push({ name: ex.text });
+  return out;
 }
 
 function fmtIngredient(ing, f) {
@@ -404,9 +422,13 @@ function densityFor(name, density) {
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
 
 // ---------- app ----------
+// Patrik och Julia har en delad ICA-lista som Metarecept (recept.buildapp.se, bakom Cloudflare Access) skriver till.
+// Kontonamnen är redan publika i Grammat. Andra konton ser inte menyvalet.
+const ICA_ACCOUNTS = ['patrik', 'julia'];
+const ICA_PAGE = 'https://recept.buildapp.se/allt/ica.html';
 if (typeof document !== 'undefined') (async function () {
   const API = 'https://recept-api.buildapp.se';
   const $ = sel => document.querySelector(sel);
@@ -1682,7 +1704,7 @@ if (typeof document !== 'undefined') (async function () {
     else if (inviteMatch) { html = viewInvite(decodeURIComponent(inviteMatch[1])); lastTab = h; }
     else if (h === '#/nytt') html = viewEditor(null);
     else if (h === '#/importera') html = viewImport();
-    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
+    else if (h === '#/lista') { html = viewList(); if (state.selections.length || state.extras.length) setHeadMore(sheetItem('Kopiera listan', 'id="copyList"') + (ICA_ACCOUNTS.includes(authName) ? sheetItem('Skicka till ICA', 'id="sendIca"') : '') + sheetItem('Töm listan', 'id="clearList" class="sheet-item is-danger"'), 'Listan'); }
     else if (h === '#/konto') html = viewAccount();
     else if (h === '#/vanner') html = viewFriends();
     else if (h === '#/allas') html = viewAllasRecept();
@@ -2198,6 +2220,13 @@ if (typeof document !== 'undefined') (async function () {
       closeSheet();
       try { await navigator.clipboard.writeText(listAsText()); toast('Listan kopierad'); }
       catch (e) { toast('Kunde inte kopiera'); }
+    };
+    const sendIcaBtn = $('#sendIca');
+    if (sendIcaBtn) sendIcaBtn.onclick = () => {
+      closeSheet();
+      const rows = icaItems(aggregate(state.recipes, state.selections, state.struck), state.extras, state.checked);
+      if (!rows.length) { toast('Allt är redan bockat'); return; }
+      window.open(ICA_PAGE + '#' + encodeURIComponent(JSON.stringify(rows)), '_blank', 'noopener');
     };
     const clearBtn = $('#clearList');
     if (clearBtn) clearBtn.onclick = () => {
