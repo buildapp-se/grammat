@@ -6,10 +6,14 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-10-07
+reviewedAt: 2026-10-21
 ---
 
 # Handoff
+
+## 2026-10-21: Skicka till ICA (`06b5020`, bara lokalt, inte pushad)
+
+Listans meny har "Skicka till ICA" för kontona `patrik` och `julia` (`ICA_ACCOUNTS` i `app.js`). `icaItems` gör det obockade till rader med mängd och enhet: styck när receptet har det, kryddmått för små skafferimängder, annars avrundad vikt eller volym. Egna rader går som text. Sidan som öppnas är Metarecepts `https://recept.buildapp.se/allt/ica.html`, som lägger raderna på den delade ICA-listan (koden och ICA-inloggningen ligger i repot `recept`, `worker/ica.ts`). `node test.js` grönt med nytt test (10). Version `ica-20261021` i `index.html`. Torrkörning: 22 startrecept gav 144 rader, 140 fick ICA-artikel. **Inte pushad:** push publicerar för hela vänkretsen via Pages och väntar på Patriks ja. **Inte provat:** menyvalet i riktig webbläsare inloggad.
 
 ## 2026-10-06: nattbatch på grenen `batch/2026-10-06` (mergad till main och deployad 2026-10-07)
 
