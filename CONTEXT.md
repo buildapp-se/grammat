@@ -93,3 +93,5 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 - Actions (automated): 2026-10-06, n/a, no GitHub Actions workflows; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a/recept.json
 - Markup (automated): 2026-10-06, pass, 1 targets; 0 failed, 0 blocked; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a4/recept.json
 - WCAG 2.2 AA (automated): 2026-10-06, needs-review, 1 targets; 0 failed, 0 blocked; manual WCAG review outstanding; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a2/recept.json
+- OG image: 2026-10-25, pass, 1200x630 PNG, https://buildapp.se/grammat/og.png
+- Database: 2026-10-25, CF D1, `recept`
