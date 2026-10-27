@@ -83,12 +83,11 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 - Lighthouse: 2026-09-16, pass, a11y 100, best practices 100, SEO 100 (mobile, no perf)
 - Markup: 2026-09-16, warn, W3C 3 CSS errors on ::view-transition rules the validator does not know, 0 broken links
 - UX: 2026-09-16, pass, 0 targets under 44 px after the fix (logo and footer link), 5 of 6 script checks pass, no --interact
-- npm audit: 2026-09-24, n/a, no package.json
+- npm audit: 2026-10-27, n/a, no package.json
 - Secrets: 2026-09-24, pass, gitleaks 0 findings in 106 commits, 1 reviewed as public in .gitleaksignore
 - Actions: 2026-09-24, n/a, no GitHub Actions workflows
 - WCAG 2.2 AA: 2026-09-24, warn, axe 4.13.0 0 violations on buildapp.se/grammat (mobile, one page); manual keyboard pass not done
 - Headers (automated): 2026-10-06, fail, 1 targets; 1 failed, 0 blocked; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a/recept.json
-- npm audit (automated): 2026-10-06, blocked, 1 targets; 0 failed, 1 blocked; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a/recept.json
 - Secrets (automated): 2026-10-06, pass, 2 targets; 0 failed, 0 blocked; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-s/recept.json
 - Actions (automated): 2026-10-06, n/a, no GitHub Actions workflows; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a/recept.json
 - Markup (automated): 2026-10-06, pass, 1 targets; 0 failed, 0 blocked; evidence C:/dev/aifabriken/.runs/audits/2026-10-06-batch-a4/recept.json
