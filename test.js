@@ -63,6 +63,7 @@ assert.strictEqual(medHakar.id, 'hak', 'hakparenteser i prat runt ett objekt lur
 
 // 7. Backup: wrapper + rå state tolereras, trasiga/okända fält normaliseras
 assert.strictEqual(safeUrl('javascript:alert(1)'), '', 'osäkra käll-länkar stoppas');
+assert.ok(!fs.readFileSync(__dirname + '/app.js', 'utf8').includes('href="${esc(r.source)}"'), 'Källa-länken går genom safeUrl, flödets recept är främmande data');
 const backup = makeBackup({
   recipes: [{
     id: 'test',

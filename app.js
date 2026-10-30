@@ -1071,7 +1071,7 @@ if (typeof document !== 'undefined') (async function () {
         ${steps}
         ${r.steps.some(t => stepTimers(t).length) ? '<p class="hint">Tryck på en tid för att starta en timer. Den räknar ner på plats och ringer när den är klar.</p>' : ''}
       </div>
-      ${r.source ? `<p class="source"><a href="${esc(r.source)}" rel="noopener">Källa</a></p>` : ''}`;
+      ${safeUrl(r.source) ? `<p class="source"><a href="${esc(safeUrl(r.source))}" rel="noopener">Källa</a></p>` : ''}`;
   }
 
   // Köksläget: ett steg per skärm, 24 px text, ingredienserna som nämns i steget skalade

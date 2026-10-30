@@ -68,3 +68,10 @@ Fynd från cockpitens granskningskolumner (Lighthouse mobil, W3C, UX-skript, hea
 Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, npm audit, secrets, Actions, markup, axe). Mätvärdena står som `(automated)`-rader under `## Audits` i CONTEXT.md.
 
 - [x] `[P3]` npm audit kan inte köras: `worker/` saknar `package-lock.json`. Låsfil incheckad 2026-10-06, `npm audit` i `worker/` ger 0 sårbarheter (inga beroenden).
+
+## OWASP 2026-10-30 (Mistral Large, lästa mot koden av Claude)
+
+- [ ] P0 `worker/seed-grammat.sql:1` har systemkontot `grammat`s bearer-token i klartext i ett publikt repo. Workern godkänner legacy-tokens, och kontot kan skriva recept som visas i det publika flödet. Rotera tokenen i D1, generera den vid seedning, inte i git. Inte gjort: rotation kräver Patriks ja, och om tokenen fortfarande gäller i produktion är inte kontrollerat.
+- [ ] P1 `GET /allas-recept` (`worker/worker.js:244-255`) skickar `tags` från alla konton, trots beslutet att egna kategorier är privata. Stryk fälten eller ta bort endpointen och klientens fallback.
+- [ ] P2 `recipe.source` valideras inte på servern (`sanitizeIndexed`). Klienten är rättad, servern bör också köra `safeUrl`.
+- [ ] P2 CORS `*` på alla API-svar och ingen `Cache-Control: no-store` på `/state`; ingen `script-src` i zonens CSP.
