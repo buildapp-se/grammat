@@ -3,13 +3,13 @@
 //   node worker/seed-grammat.js > worker/seed-grammat.sql
 //   npx wrangler d1 execute recept --local  --file seed-grammat.sql   (i worker/)
 //   npx wrangler d1 execute recept --remote --file seed-grammat.sql
-const { randomUUID } = require('crypto');
-const starter = require('../starter.json');
+import { readFileSync } from 'node:fs';
+const starter = JSON.parse(readFileSync(new URL('../starter.json', import.meta.url), 'utf8'));
 const q = s => "'" + String(s).replace(/'/g, "''") + "'";
 const state = { recipes: starter, selections: [], extras: [], checked: [], struck: {} };
 
 const OWNER = "(SELECT id FROM users WHERE name = 'grammat')";
-let sql = `INSERT INTO users (name, pin_hash, token, state) VALUES ('grammat', '', ${q(randomUUID())}, ${q(JSON.stringify(state))})
+let sql = `INSERT INTO users (name, pin_hash, token, state) VALUES ('grammat', '', lower(hex(randomblob(16))), ${q(JSON.stringify(state))})
   ON CONFLICT(name) DO UPDATE SET state = excluded.state;
 DELETE FROM recipes_index WHERE owner_id = ${OWNER};
 `;
