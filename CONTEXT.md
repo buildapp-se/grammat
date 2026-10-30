@@ -76,7 +76,7 @@ Saknas den första svarar Google `400 redirect_uri_mismatch` och ingen kan logga
 ## Audits
 Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; conventions in elwyn-dash `docs/security.md`.
 
-- OWASP Top 10: 2026-10-30, fail, code review (Mistral Large, reviewed by Claude), no live probe; 1 high open: committed system account token, BACKLOG P0; feed XSS via source fixed in client 2026-10-30; 2 medium open
+- OWASP Top 10: 2026-10-30, warn, code review (Mistral Large, reviewed by Claude), no live probe; 0 high: feed XSS via source fixed in client, committed token did not match production and system account token rotated 2026-10-30; 2 medium open, BACKLOG
 - Headers: 2026-09-16, pass, 6 of 6 on buildapp.se via a host-scoped Transform Rule on the zone, measured after the change
 - Search Console: 2026-09-15, warn, unknown to Google, noindex removed and added to submitted sitemap
 - TLS: 2026-09-16, pass, SSL Labs A+ on buildapp.se, TLS 1.2 minimum and HSTS since today
