@@ -180,6 +180,8 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.strictEqual(hostile.course, 'huvudratt', 'okänd course normaliseras');
   assert.strictEqual(sanitizeIndexed({ portions: 6.4, ingredients: [{ unit: 'ml' }] }).portions, 6, 'giltiga portions behålls');
   assert.strictEqual(sanitizeIndexed({ tags: ['Hemligt'], ingredients: [] }).tags, undefined, 'egna kategorier når aldrig publika indexet');
+  assert.strictEqual(sanitizeIndexed({ source: 'javascript:alert(1)', ingredients: [] }).source, '', 'osäker käll-länk stoppas i publika indexet');
+  assert.strictEqual(sanitizeIndexed({ source: 'https://example.com/recept', ingredients: [] }).source, 'https://example.com/recept', 'giltig käll-länk behålls');
 // 12. Sök: titel eller ingrediens, skiftlägesokänsligt, tom fras matchar allt
 assert.ok(matchesQuery(recipes[0], ''), 'tom sökning matchar');
 assert.strictEqual(recipes.filter(r => matchesQuery(r, 'VITLÖK')).length >= 2, true, 'ingrediens-sök hittar minst köttfärssås och kebab');
@@ -308,3 +310,28 @@ assert.deepStrictEqual(icaItems([
   { name: 'svartpeppar' },
   { name: '2 l mjölk' },
 ]);
+
+// 16. Legacy-endpointen /allas-recept: egna kategorier (tags) stryks serverside även där,
+//     precis som i /feed via sanitizeIndexed (beslut 2026-09-25: egna kategorier är privata).
+import('./worker/worker.js').then(async ({ default: worker }) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(2, 'bob', '', 'tok-bob');
+  const put = (token, state) => worker.fetch(new Request('https://test.invalid/state', {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + token },
+    body: JSON.stringify(state),
+  }), { DB: db });
+  await put('tok-alice', { recipes: [{ id: 'a', title: 'A', tags: ['Hemligt'], ingredients: [{ name: 'salt' }] }] });
+  await put('tok-bob', { recipes: [{ id: 'b', title: 'B', private: true, tags: ['Hemligt'], ingredients: [{ name: 'salt' }] }] });
+  const res = await worker.fetch(new Request('https://test.invalid/allas-recept', {
+    headers: { Authorization: 'Bearer tok-alice' },
+  }), { DB: db });
+  assert.strictEqual(res.status, 200);
+  const list = await res.json();
+  assert.deepStrictEqual(list.map(r => r.id), ['a'], 'privata recept filtreras redan bort');
+  assert.strictEqual(list[0].owner, 'alice');
+  assert.strictEqual(list[0].tags, undefined, 'egna kategorier läcker inte via /allas-recept');
+  console.log('Alla test OK (allas-recept utan tags)');
+});

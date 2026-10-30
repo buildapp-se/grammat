@@ -27,6 +27,18 @@ const LABELS = ['vegetariskt', 'veganskt', 'glutenfritt', 'laktosfritt', 'snabbt
 // Patrik och Julia har en delad ICA-lista. Andra konton får 403 på /ica. Samma lista står i app.js.
 const ICA_ACCOUNTS = ['patrik', 'julia'];
 const normalizeCourse = course => COURSES.includes(course) ? course : 'huvudratt';
+
+// Samma spärr som klientens safeUrl i app.js: bara http/https släpps in i publikt index.
+const safeUrl = value => {
+  const s = typeof value === 'string' ? value.trim() : '';
+  if (!s) return '';
+  try {
+    const u = new URL(s);
+    return u.protocol === 'http:' || u.protocol === 'https:' ? u.href : '';
+  } catch (e) {
+    return '';
+  }
+};
 const cors = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -113,6 +125,7 @@ export function sanitizeIndexed(r) {
   return {
     ...pub,
     course: normalizeCourse(r.course),
+    source: safeUrl(r.source),
     labels: Array.isArray(r.labels) ? LABELS.filter(l => r.labels.includes(l)) : [],
     portions: Number.isFinite(+r.portions) && +r.portions >= 1 ? Math.round(+r.portions) : 4,
     ingredients: r.ingredients.map(i => ({ ...i, unit: i && i.unit === 'ml' ? 'ml' : 'g' })),
@@ -251,7 +264,11 @@ export default {
           let s;
           try { s = JSON.parse(row.state); } catch (e) { continue; }
           if (!s || !Array.isArray(s.recipes)) continue;
-          for (const r of s.recipes) { if (r.private !== true) out.push({ ...r, owner: row.name }); }
+          for (const r of s.recipes) {
+            if (r.private === true) continue;
+            const { tags, ...pub } = r; // egna kategorier är privata, når aldrig flöden
+            out.push({ ...pub, owner: row.name });
+          }
         }
         return json(out);
       }

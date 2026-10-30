@@ -71,6 +71,6 @@ Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, n
 
 ## OWASP 2026-10-30 (Mistral Large, lästa mot koden av Claude)
 
-- [ ] P1 `GET /allas-recept` (`worker/worker.js:244-255`) skickar `tags` från alla konton, trots beslutet att egna kategorier är privata. Stryk fälten eller ta bort endpointen och klientens fallback.
-- [ ] P2 `recipe.source` valideras inte på servern (`sanitizeIndexed`). Klienten är rättad, servern bör också köra `safeUrl`.
+- [x] (rättad 2026-10-30) P1 `GET /allas-recept` (`worker/worker.js:244-255`) skickar `tags` från alla konton, trots beslutet att egna kategorier är privata. Stryk fälten eller ta bort endpointen och klientens fallback.
+- [x] (rättad 2026-10-30) P2 `recipe.source` valideras inte på servern (`sanitizeIndexed`). Klienten är rättad, servern bör också köra `safeUrl`.
 - [ ] P2 CORS `*` på alla API-svar och ingen `Cache-Control: no-store` på `/state`; ingen `script-src` i zonens CSP.
