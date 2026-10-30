@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers, timerNotice } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -205,6 +205,12 @@ assert.deepStrictEqual(stepTimers('Sjud 10-15 minuter').map(t => t.minutes), [15
 assert.deepStrictEqual(stepTimers('Stek 2 min per sida, 2 min till').length, 1, 'dubblett bort');
 assert.deepStrictEqual(stepTimers('Vispa 30 sek'), [], 'sekunder ignoreras');
 assert.deepStrictEqual(stepTimers('Servera med 200 g ris'), [], 'gram är ingen tid');
+
+// 13b. Timer i bakgrundsflik: systemnotis när fliken är dold och tillstånd finns, annars inte
+assert.deepStrictEqual(timerNotice('20 min', 'hidden', 'granted'), { title: 'Grammat', body: '20 min är klar' }, 'dold flik + beviljad notis ger systemnotis');
+assert.strictEqual(timerNotice('20 min', 'visible', 'granted'), null, 'synlig flik: ljud och röd bricka räcker');
+assert.strictEqual(timerNotice('20 min', 'hidden', 'denied'), null, 'nekat tillstånd ger ingen notis');
+assert.strictEqual(timerNotice('20 min', 'hidden', 'default'), null, 'obesvarat tillstånd ger ingen notis');
 
   console.log('Alla test OK');
 });

@@ -279,6 +279,14 @@ function stepTimers(text) {
   return out;
 }
 
+// Timer i bakgrundsflik: webbläsaren stryper setInterval och navigator.vibrate där, så
+// larmet kan dröja och vibration uteblir. Därför skickas också en systemnotis när timern
+// går ut och fliken är dold (Notification API räcker; service worker först om det stör i köket).
+function timerNotice(label, visibilityState, permission) {
+  if (permission !== 'granted' || visibilityState === 'visible') return null;
+  return { title: 'Grammat', body: label + ' är klar' };
+}
+
 // Ingredienser som nämns i ett steg: hela namnet först, annars ett ord ur namnet (minst tre
 // tecken, med ordgräns framför så "lök" träffar "löken" men inte "vitlöken"). Parenteser och
 // småord hoppas över. Tomt svar betyder att köksläget inte visar någon ruta för steget.
@@ -422,7 +430,7 @@ function densityFor(name, density) {
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers, timerNotice }; }
 
 // ---------- app ----------
 // Patrik och Julia har en delad ICA-lista, workern skriver till den (POST /ica) och släpper bara in de här kontona.
@@ -1331,7 +1339,8 @@ if (typeof document !== 'undefined') (async function () {
 
   // ---------- timer ----------
   // Timers lever i minnet, inte i state: de ska inte synkas eller överleva omladdning.
-  // ponytail: i bakgrundsflik kan larmet dröja och vibration uteblir, Notification API om det behövs.
+  // I bakgrundsflik stryper webbläsaren timers och vibrate; när en timer går ut där skickas
+  // därför också en systemnotis (se timerNotice).
   const timers = [];
   let audioCtx = null;
   function fmtLeft(ms) {
@@ -1351,6 +1360,12 @@ if (typeof document !== 'undefined') (async function () {
       if (r && r.catch) r.catch(() => {}); // avvisat löfte får inte bli ett obehandlat fel
       if (navigator.audioSession) navigator.audioSession.type = 'playback';
     } catch (e) { /* inget ljud, den röda brickan syns ändå */ }
+    // Systemnotis vid utgång i bakgrundsflik behöver tillstånd, och tillstånd får bara
+    // frågas i ett användartryck - detta är ett sådant.
+    if (window.Notification && Notification.permission === 'default') {
+      const p = Notification.requestPermission();
+      if (p && p.catch) p.catch(() => {}); // avvisat löfte får inte bli ett obehandlat fel
+    }
     timers.push({ id: Date.now() + Math.random(), end: Date.now() + minutes * 60000, label, done: false, key: key || null });
     render();
   }
@@ -1375,10 +1390,17 @@ if (typeof document !== 'undefined') (async function () {
     if (resumed && resumed.then) resumed.then(tones).catch(() => {});
     else tones();
   }
+  function notifyDone(t) {
+    // I bakgrundsfliken är sidan tyst och vibrationen borta; systemnotisen går ändå.
+    try {
+      const n = timerNotice(t.label, document.visibilityState, window.Notification ? Notification.permission : 'denied');
+      if (n) new Notification(n.title, { body: n.body });
+    } catch (e) { /* utan Notification API räcker ljudet och den röda brickan */ }
+  }
   setInterval(() => {
     const now = Date.now();
     for (const t of timers) {
-      if (!t.done && now >= t.end) { t.done = true; alarm(); }
+      if (!t.done && now >= t.end) { t.done = true; alarm(); notifyDone(t); }
       const el = document.querySelector(`[data-timer-id="${t.id}"]`);
       if (!el) continue;
       el.classList.toggle('done', t.done);

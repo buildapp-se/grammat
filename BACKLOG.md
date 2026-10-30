@@ -47,7 +47,7 @@ avklarade punkter står i `docs/TODO.md`, som är den längre arbetsanteckningen
 
 - [ ] Service worker för offline, bara om täckningen i butiken visar sig vara dålig.
 - [ ] Fler recept ur `recept 2.mht`. Pausad på begäran.
-- [ ] Timer i bakgrundsflik: larmet kan dröja och vibration utebli när fliken inte
+- [x] (rättad 2026-10-30) Timer i bakgrundsflik: larmet kan dröja och vibration utebli när fliken inte
   är aktiv. Notification API via service worker om det visar sig störa i köket.
 
 ## Granskning 2026-09-16
