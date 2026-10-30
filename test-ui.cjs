@@ -14,8 +14,8 @@ async function until(check, label) {
   const { db, sqlite } = createTestDb();
   const errors = [];
   const windows = [];
-  const recipe = (id, title) => ({ id, title, portions: 2, course: 'huvudratt', ingredients: [{name: 'pasta',amount: 200,unit: 'g',cat: 'skafferi'},{name: 'vetemjöl (special)',amount: 90,unit: 'g',cat: 'skafferi'}],steps:['Koka.'] });
-  for (const [id, name, recipes] of [[1,'alice',[recipe('pasta','Alice pasta')]], [2,'bob',[recipe('pasta','Bob pasta')]], [3,'grammat',[recipe('starter','Startrecept')]]]) {
+  const recipe = (id, title, labels) => ({ id, title, portions: 2, course: 'huvudratt', labels, ingredients: [{name: 'pasta',amount: 200,unit: 'g',cat: 'skafferi'},{name: 'vetemjöl (special)',amount: 90,unit: 'g',cat: 'skafferi'}],steps:['Koka.'] });
+  for (const [id, name, recipes] of [[1,'alice',[recipe('pasta','Alice pasta')]], [2,'bob',[recipe('pasta','Bob pasta',['snabbt'])]], [3,'grammat',[recipe('starter','Startrecept',['vegetariskt'])]]]) {
     sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(id,name,'','test-only-session-' + id);
     await worker.fetch(new Request('https://test.invalid/state', {method:'PUT',headers:{Authorization:'Bearer test-only-session-' + id},body:JSON.stringify({recipes,selections:[],extras:[],checked:[],struck:{}})}),{DB:db});
   }
@@ -52,6 +52,14 @@ async function until(check, label) {
   await until(() => text(alice).includes('Bob pasta'), 'public feed');
   assert.ok(!text(alice).includes('Alice pasta'), 'own recipe excluded from Allas');
   assert.ok(alice.document.querySelector('[data-add-allas="2|pasta"]'), 'same slug from another owner is addable');
+  // Taggknappar överst i Allas recept: bara taggar som finns i listan, klick filtrerar, klick igen stänger av
+  assert.deepEqual([...alice.document.querySelectorAll('[data-label-filter]')].map(b => b.dataset.labelFilter), ['vegetariskt', 'snabbt'], 'taggknappar i fast ordning överst i Allas recept');
+  alice.document.querySelector('[data-label-filter="snabbt"]').click();
+  await until(() => text(alice).includes('Bob pasta') && !text(alice).includes('Startrecept'), 'taggfilter visar bara matchande recept');
+  assert.ok(alice.document.querySelector('[data-label-filter="snabbt"]').classList.contains('is-on'), 'vald tagg markeras');
+  assert.ok(!text(alice).includes('Alice pasta'), 'egna recept är fortfarande gömda');
+  alice.document.querySelector('[data-label-filter="snabbt"]').click();
+  await until(() => text(alice).includes('Startrecept'), 'klick igen stänger av taggfiltret');
   await navigate(alice, '#/recept/1%7Cpasta', '[data-rstep]');
   assert.ok(!alice.document.querySelector('[data-add-allas]'), 'public own link cannot add a duplicate');
   alice.document.querySelector('[data-rstep="1"]').click();
@@ -106,6 +114,12 @@ async function until(check, label) {
   assert.equal(wide.document.querySelectorAll('.prow, .rcard').length,0,'no mobile rows on desktop');
   await navigate(wide,'#/allas','.toc[data-filter]');
   await until(() => wide.document.querySelector('[data-toc="huvudratt"]'),'desktop Allas register');
+  // bob ser inte sitt eget recept i Allas, så bara startreceptets tagg blir knapp
+  assert.deepEqual([...wide.document.querySelectorAll('.toc-side [data-label-filter]')].map(b => b.dataset.labelFilter), ['vegetariskt'],'taggknappar överst i sidopanelen på desktop');
+  wide.document.querySelector('.toc-side [data-label-filter="vegetariskt"]').click();
+  await until(() => text(wide).includes('Startrecept') && !text(wide).includes('Alice pasta'),'taggfilter på desktop');
+  wide.document.querySelector('.toc-side [data-label-filter="vegetariskt"]').click();
+  await until(() => text(wide).includes('Alice pasta'),'taggfiltret stängs av på desktop');
   wide.document.querySelector('[data-toc="huvudratt"]').click();
   assert.deepEqual([...wide.document.querySelectorAll('.toc-h')].map(h => h.textContent),['Huvudrätt'],'register filters Allas to one section');
   assert.ok(wide.document.querySelector('[data-toc="huvudratt"]').classList.contains('is-on'));

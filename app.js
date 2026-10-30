@@ -267,6 +267,17 @@ function matchesQuery(r, q) {
   return r.title.toLowerCase().includes(q) || r.ingredients.some(i => i.name.toLowerCase().includes(q)) || (r.tags || []).concat(r.labels || []).some(t => t.toLowerCase().includes(q));
 }
 
+// Allas recept: publika taggar som filterknappar överst. labelsIn ger taggarna som finns i
+// listan i fast ordning, matchesLabel om receptet ska visas för valt filter (null = alla).
+function labelsIn(list) {
+  const present = new Set();
+  for (const r of list) for (const l of r.labels || []) if (LABELS.includes(l)) present.add(l);
+  return LABELS.filter(l => present.has(l));
+}
+function matchesLabel(r, label) {
+  return !label || (r.labels || []).includes(label);
+}
+
 // Tider i ett stegs text ("koka 20 min", "vila 1 tim") -> [{ label, minutes }].
 // ponytail: intervall som "10-15 min" ger övre gränsen, sekunder ignoreras.
 function stepTimers(text) {
@@ -430,7 +441,7 @@ function densityFor(name, density) {
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers, timerNotice }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers, timerNotice, labelsIn, matchesLabel }; }
 
 // ---------- app ----------
 // Patrik och Julia har en delad ICA-lista, workern skriver till den (POST /ica) och släpper bara in de här kontona.
@@ -559,8 +570,15 @@ if (typeof document !== 'undefined') (async function () {
   // ---------- vyer ----------
   function selFor(id) { return state.selections.find(s => s.id === id); }
   let query = ''; // sökfras, delas av Mina/Allas/Vänner och överlever omrendering
+  let labelFilter = null; // vald tagg i Allas recept, null = alla
   const searchBox = () => `<p class="search"><input type="search" id="q" value="${esc(query)}" placeholder="${desk.matches ? 'Sök recept, ingrediens' : 'Sök recept eller ingrediens'}" aria-label="Sök recept" autocomplete="off"></p>`;
   const noMatch = () => `<p class="empty">Inget recept matchar "${esc(query.trim())}".</p>`;
+  // Taggknappar överst i Allas recept: bara taggar som finns i listan, ett val åt gången.
+  const labelChips = (list, active) => {
+    const present = labelsIn(list);
+    if (!present.length) return '';
+    return `<div class="gchips" role="group" aria-label="Filtrera på tagg">${present.map(l => `<button type="button" class="gchip${l === active ? ' is-on' : ''}" data-label-filter="${esc(l)}" aria-pressed="${l === active}">${esc(l)}</button>`).join('')}</div>`;
+  };
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
   let lastTab = '#/'; // fliken man kom ifrån, ger receptvyns tillbaka-knapp sitt namn
@@ -730,6 +748,7 @@ if (typeof document !== 'undefined') (async function () {
       <aside class="toc-side">
         <div><h1>${esc(title).replace(' ', '<br>')}</h1><div class="toc-count">${count}</div></div>
         ${o.search === false ? '' : searchBox()}
+        ${o.chips || ''}
         <nav class="toc-reg" aria-label="Register">${register}</nav>
         ${o.side || ''}
       </aside>
@@ -865,10 +884,13 @@ if (typeof document !== 'undefined') (async function () {
       othersHtml = '';
     }
 
-    if (desk.matches) return tocPublic('Allas recept', starterRows, { filter: true, tail: othersHtml });
-    return `<div class="list-head"><h1>Allas recept</h1><span class="list-count">${starterRows.length} recept</span></div>
+    const activeLabel = labelsIn(starterRows).includes(labelFilter) ? labelFilter : null;
+    const shown = starterRows.filter(r => matchesLabel(r, activeLabel));
+    if (desk.matches) return tocPublic('Allas recept', shown, { filter: true, tail: othersHtml, chips: labelChips(starterRows, activeLabel) });
+    return `<div class="list-head"><h1>Allas recept</h1><span class="list-count">${shown.length} recept</span></div>
       ${searchBox()}
-      ${publicRecipeSections(starterRows)}
+      ${labelChips(starterRows, activeLabel)}
+      ${publicRecipeSections(shown)}
       ${othersHtml}`;
   }
 
@@ -1761,6 +1783,10 @@ if (typeof document !== 'undefined') (async function () {
     view.querySelectorAll('[data-toc]').forEach(b => b.onclick = () => {
       if (b.closest('.toc').dataset.filter) { tocFilter = b.dataset.toc || null; render(); }
       else document.getElementById('toc-' + b.dataset.toc).scrollIntoView();
+    });
+    view.querySelectorAll('[data-label-filter]').forEach(b => b.onclick = () => {
+      labelFilter = labelFilter === b.dataset.labelFilter ? null : b.dataset.labelFilter;
+      render();
     });
     view.querySelectorAll('[data-tag-edit]').forEach(b => b.onclick = () => openTagSheet(b.dataset.tagEdit));
     view.querySelectorAll('[data-course-pick]').forEach(s => s.onchange = () => {

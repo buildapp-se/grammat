@@ -1,7 +1,7 @@
 // ponytail: minsta möjliga check av summering/skalning - körs med: node test.js
 const assert = require('assert');
 const fs = require('fs');
-const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers, timerNotice } = require('./app.js');
+const { ingLabel, stepIngredients, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, parseImport, normalizeState, makeBackup, safeUrl, nutritionPerPortion, COURSES, normalizeCourse, normTags, normLabels, dedupeAllas, matchesQuery, stepTimers, timerNotice, labelsIn, matchesLabel } = require('./app.js');
 
 const recipes = JSON.parse(fs.readFileSync(__dirname + '/starter.json', 'utf8'));
 
@@ -224,6 +224,14 @@ assert.deepStrictEqual(normLabels(['snabbt', 'hackat', 'vegetariskt']), ['vegeta
 assert.deepStrictEqual(parseImport('{"title":"T","labels":["veganskt","x"],"ingredients":[{"name":"salt"}]}', [])[0].labels, ['veganskt'], 'import behåller kända taggar');
 assert.deepStrictEqual(normalizeState({ recipes: [{ title: 'T', ingredients: [{ name: 'salt' }], labels: ['fest'] }] }).recipes[0].labels, ['fest'], 'taggar överlever backup');
 assert.ok(matchesQuery({ title: 'x', ingredients: [], labels: ['vegetariskt'] }, 'vegetar'), 'sök hittar tagg');
+// Taggfilter överst i Allas recept: knappar för taggarna i listan i fast ordning, filtret väljer vilka recept som visas
+assert.deepStrictEqual(labelsIn([{ labels: ['snabbt'] }, { labels: ['vegetariskt', 'snabbt'] }, {}]), ['vegetariskt', 'snabbt'], 'taggar i listan i fast ordning');
+assert.deepStrictEqual(labelsIn([{ labels: ['påhittad', 'fest'] }, {}]), ['fest'], 'okända taggar ger ingen knapp');
+assert.deepStrictEqual(labelsIn([]), [], 'tom lista ger inga knappar');
+assert.ok(matchesLabel({ labels: ['snabbt'] }, null), 'inget filter visar alla');
+assert.ok(matchesLabel({ labels: ['snabbt'] }, 'snabbt'), 'träff på vald tagg');
+assert.ok(!matchesLabel({ labels: ['snabbt'] }, 'veganskt'), 'recept utan taggen visas inte');
+assert.ok(!matchesLabel({}, 'snabbt'), 'recept utan taggar visas inte vid filter');
 assert.strictEqual(COURSES[0], 'testa', 'Att testa står först');
 // Egen kategori: byta namn och ta bort i alla recept på en gång
 {
