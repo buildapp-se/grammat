@@ -31,7 +31,7 @@ Repo: https://github.com/buildapp-se/grammat (GH Pages, branch `main`, root), lo
 - Agentbackup före riskabla ändringar/deploy: `New-Item -ItemType Directory -Force backups; npx wrangler d1 export recept --remote --output backups/recept-YYYY-MM-DD-HHMMSS.sql`. Ersätt timestamp med aktuell tid. Kontrollera att filen hamnar i `backups/`, inte i repo-roten.
 - D1 Time Travel restore: `npx wrangler d1 time-travel info recept --timestamp "YYYY-MM-DDTHH:MM:SSZ"` och `npx wrangler d1 time-travel restore recept --timestamp "YYYY-MM-DDTHH:MM:SSZ"`.
 - Frontend deployas genom push till `main` (GH Pages, ~30 s).
-- Lokal test: `python -m http.server` i repo-roten (API:t är CORS-öppet).
+- Lokal test: `python -m http.server` i repo-roten (API:t tillåter CORS från localhost).
 
 ## Konventioner
 - Allt användarvänt är på svenska: decimalkomma, mellanslag som tusentalsavgränsare, aldrig tankstreck (—).

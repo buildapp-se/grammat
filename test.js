@@ -349,3 +349,55 @@ import('./worker/worker.js').then(async ({ default: worker }) => {
   assert.strictEqual(list[0].tags, undefined, 'egna kategorier läcker inte via /allas-recept');
   console.log('Alla test OK (allas-recept utan tags)');
 });
+
+// 17. CORS utan `*` och Cache-Control på /state: ACAO speglas bara för buildapp.se
+//     och localhost, alla andra origins får ingen ACAO alls; /state är alltid no-store.
+import('./worker/worker.js').then(async ({ default: worker }) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  const call = (path, opts = {}) => worker.fetch(new Request('https://test.invalid' + path, opts), { DB: db });
+
+  let res = await call('/state', { method: 'OPTIONS', headers: { Origin: 'https://buildapp.se' } });
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se', 'preflight från buildapp.se speglas');
+  res = await call('/state', { method: 'OPTIONS', headers: { Origin: 'https://evil.example' } });
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), null, 'främmande origin får ingen ACAO på preflight');
+
+  res = await call('/feed', { headers: { Origin: 'https://evil.example' } });
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), null, 'inga API-svar tillåter vilken origin som helst');
+
+  res = await call('/state', { headers: { Authorization: 'Bearer tok-alice', Origin: 'https://buildapp.se' } });
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se');
+  assert.strictEqual(res.headers.get('Cache-Control'), 'no-store', 'GET /state är no-store');
+
+  res = await call('/state', { method: 'PUT', headers: { Authorization: 'Bearer tok-alice', Origin: 'http://localhost:8000', 'Content-Type': 'application/json' }, body: JSON.stringify({ recipes: [] }) });
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'http://localhost:8000', 'lokal utveckling får CORS');
+  assert.strictEqual(res.headers.get('Cache-Control'), 'no-store', 'PUT /state är no-store');
+
+  res = await call('/friends', { headers: { Authorization: 'Bearer tok-alice', Origin: 'https://evil.example' } });
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), null, 'vän-endpoints har ingen `*` heller');
+  res = await call('/friends', { headers: { Authorization: 'Bearer tok-alice', Origin: 'https://buildapp.se' } });
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se');
+  assert.strictEqual(res.headers.get('Cache-Control'), 'no-store');
+
+  // /state är alltid no-store, även när metoden inte finns (404) eller DB kastar (500).
+  res = await call('/state', { method: 'POST', headers: { Authorization: 'Bearer tok-alice', Origin: 'https://buildapp.se' } });
+  assert.strictEqual(res.status, 404);
+  assert.strictEqual(res.headers.get('Cache-Control'), 'no-store', 'POST /state (404) är no-store');
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se');
+
+  const brokenDb = { ...db, batch: async () => { throw new Error('D1 nere'); } };
+  res = await worker.fetch(new Request('https://test.invalid/state', {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer tok-alice', Origin: 'https://buildapp.se', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipes: [] }),
+  }), { DB: brokenDb });
+  assert.strictEqual(res.status, 500);
+  assert.strictEqual(res.headers.get('Cache-Control'), 'no-store', 'PUT /state vid DB-fel (500) är no-store');
+  assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se');
+
+  console.log('Alla test OK (CORS utan `*`, /state no-store)');
+});

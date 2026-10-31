@@ -1,4 +1,5 @@
 import { friendFeed, handleFriends } from './friends.js';
+import { corsHeaders } from './cors.js';
 import { addToIca, IcaError } from './ica.js';
 
 // API för "Grammat" (buildapp.se/grammat)
@@ -39,13 +40,6 @@ const safeUrl = value => {
     return '';
   }
 };
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-const json = (d, s = 200) => Response.json(d, { status: s, headers: cors });
-
 async function sha256hex(s) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -188,8 +182,12 @@ const clearFails = (env, key) => env.DB.prepare('DELETE FROM login_attempts WHER
 
 export default {
   async fetch(req, env) {
-    if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
+    // Alla API-svar får CORS per begäran (bara tillåtna origins, se cors.js); /state lägger även till no-store.
+    const json = (d, s = 200, extra = {}) => Response.json(d, { status: s, headers: { ...corsHeaders(req), ...extra } });
+    if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders(req) });
     const path = new URL(req.url).pathname;
+    // Hela kontots data på /state: ingen cache någonstans, inte ens felmeddelanden eller 404.
+    const stateExtra = path === '/state' ? { 'Cache-Control': 'no-store' } : {};
     try {
       // /register borttaget 2026-07-25: PIN fasas ut till förmån för Firebase och
       // klienten anropade det aldrig. Kvar var ett oautentiserat konto-skapande
@@ -274,20 +272,21 @@ export default {
       }
 
       if (path === '/state') {
+        const stateJson = (d, s = 200) => json(d, s, stateExtra);
         const u = await userFromRequest(req, env);
-        if (!u) return json({ error: 'Inte inloggad.' }, 401);
-        if (req.method === 'GET') return json({ state: u.state ? JSON.parse(u.state) : null, name: u.name });
+        if (!u) return stateJson({ error: 'Inte inloggad.' }, 401);
+        if (req.method === 'GET') return stateJson({ state: u.state ? JSON.parse(u.state) : null, name: u.name });
         if (req.method === 'PUT') {
           const body = await req.text();
-          if (body.length > 262144) return json({ error: 'För mycket data (max 256 kB).' }, 413);
+          if (body.length > 262144) return stateJson({ error: 'För mycket data (max 256 kB).' }, 413);
           let s;
-          try { s = JSON.parse(body); } catch (e) { return json({ error: 'Ogiltig data.' }, 400); }
-          if (!s || typeof s !== 'object' || !Array.isArray(s.recipes)) return json({ error: 'Ogiltig data.' }, 400);
+          try { s = JSON.parse(body); } catch (e) { return stateJson({ error: 'Ogiltig data.' }, 400); }
+          if (!s || typeof s !== 'object' || !Array.isArray(s.recipes)) return stateJson({ error: 'Ogiltig data.' }, 400);
           await env.DB.batch([
             env.DB.prepare('UPDATE users SET state = ? WHERE id = ?').bind(JSON.stringify(s), u.id),
             ...reindexStmts(env, u.id, s.recipes),
           ]);
-          return json({ ok: true });
+          return stateJson({ ok: true });
         }
       }
 
@@ -396,8 +395,8 @@ export default {
         return json({ ok: true });
       }
     } catch (e) {
-      return json({ error: 'Serverfel.' }, 500);
+      return json({ error: 'Serverfel.' }, 500, stateExtra);
     }
-    return json({ error: 'Hittades inte.' }, 404);
+    return json({ error: 'Hittades inte.' }, 404, stateExtra);
   },
 };

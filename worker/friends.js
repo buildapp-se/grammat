@@ -1,7 +1,6 @@
+import { corsHeaders } from './cors.js';
+
 // One row per unordered pair. The sender stays recorded until the recipient accepts.
-const json = (data, status = 200) => Response.json(data, {
-  status, headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' },
-});
 
 export async function friendFeed(db, userId) {
   const { results } = await db.prepare(`
@@ -17,6 +16,9 @@ export async function friendFeed(db, userId) {
 }
 
 export async function handleFriends(req, db, user, path) {
+  const json = (data, status = 200) => Response.json(data, {
+    status, headers: { ...corsHeaders(req), 'Cache-Control': 'no-store' },
+  });
   if (!user) return json({ error: 'Inte inloggad.' }, 401);
   if (path === '/friends' && req.method === 'GET') {
     const { results } = await db.prepare(`
