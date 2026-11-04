@@ -585,6 +585,7 @@ if (typeof document !== 'undefined') (async function () {
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
   let lastTab = '#/'; // fliken man kom ifrån, ger receptvyns tillbaka-knapp sitt namn
+  let routedOnce = false; // false tills första hashbytet: sidan öppnades direkt på adressen
   const BACK_LABELS = { '#/': 'Mina recept', '#/lista': 'Lista', '#/vanner': 'Vänner', '#/allas': 'Allas recept' };
   // recept kan visas/öppnas innan de finns i egna state.recipes (Allas recept-fliken)
   function publicRowKey(r) { return Number.isInteger(r.ownerId) ? r.ownerId + '|' + r.id : 'starter|' + r.id; }
@@ -1036,10 +1037,17 @@ if (typeof document !== 'undefined') (async function () {
     return sel ? sel.portions : (previewPortions[id] || r.portions);
   }
 
+  // Direktlänk till någon annans recept (#/recept/5%7Cslug): flödet är inte hämtat än,
+  // så hämta det i stället för att direkt svara att receptet inte finns.
+  function missingRecipe(id) {
+    if (/^\d+\|/.test(id) && allasList === null && !allasLoadError) { loadAllas(); return '<p class="hint">Laddar receptet …</p>'; }
+    if (/^\d+\|/.test(id) && allasLoadError) return '<p class="warn">Kunde inte ladda receptet just nu.</p>';
+    return '<p class="empty">Receptet finns inte.</p>';
+  }
   function viewRecipe(id) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
     const mine = state.recipes.some(x => x.id === id);
     const sel = mine ? selFor(id) : null;
     const portions = portionsFor(r, id);
@@ -1112,7 +1120,8 @@ if (typeof document !== 'undefined') (async function () {
   function viewCook(id, n) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r || !r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
+    if (!r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
     const total = r.steps.length;
     n = Math.min(Math.max(1, n), total);
     const portions = portionsFor(r, id);
@@ -1744,7 +1753,9 @@ if (typeof document !== 'undefined') (async function () {
     let html;
     if (cook) html = viewCook(decodeURIComponent(cook[1]), Number(cook[2]));
     else if (m && m[1] === 'recept') {
-      if (!history.state || !history.state.from) { try { history.replaceState({ from: lastTab }, ''); } catch (e) { /* file:// */ } }
+      // Direktlänk till någon annans recept: tillbaka leder till Allas recept, inte Mina recept.
+      const entry = !routedOnce && /^\d+\|/.test(decodeURIComponent(m[2])) && recipeIdFromHash(h) === decodeURIComponent(m[2]) ? '#/allas' : lastTab;
+      if (!history.state || !history.state.from) { try { history.replaceState({ from: entry }, ''); } catch (e) { /* file:// */ } }
       html = viewRecipe(decodeURIComponent(m[2]));
       const id = recipeIdFromHash(h);
       const own = state.recipes.find(x => x.id === id);
@@ -2347,6 +2358,7 @@ if (typeof document !== 'undefined') (async function () {
       <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Nytt recept');
   };
   window.addEventListener('hashchange', () => {
+    routedOnce = true;
     closeSheet();
     if (location.hash === '#/vanner') refreshFriends(); else render();
   });

@@ -200,6 +200,12 @@ async function until(check, label) {
   cat.document.querySelector('[data-tag-edit="Vardag"]').click();
   cat.document.querySelector('#tagForm').dispatchEvent(new cat.Event('submit',{bubbles:true,cancelable:true}));
   assert.deepEqual(tagsOf(),[['Vardag'],['vardag']],'oförändrat namn ändrar inget');
+  // Direktlänk till någon annans recept i ett nytt fönster: flödet hämtas, inte "Receptet finns inte."
+  const direct=await open(null,'#/recept/2%7Cpasta');
+  await until(()=>text(direct).includes('Bob pasta'),'direktlänk till publikt recept');
+  assert.ok(direct.document.querySelector('.rv-top a').textContent.includes('Allas recept'),'tillbaka leder till Allas recept');
+  const directCook=await open(null,'#/recept/2%7Cpasta/laga/1');
+  await until(()=>text(directCook).includes('Koka.'),'direktlänk till köksläget');
   await tick();
   assert.deepEqual(errors,[]);
   for (const w of windows) w.close();
