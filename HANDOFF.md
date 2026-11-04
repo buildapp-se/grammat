@@ -6,11 +6,31 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-11-02
+reviewedAt: 2026-11-04
 ---
 **2026-11-02:** kontaktadressen är nu `kontakt@buildapp.se` (förut `kontakt@orgutveckling.se`). Integritetstexten version 1.4.
 
 # Handoff
+
+## 2026-11-04: förbättringsrunda på grenen `claude/forbattringar-2026-11-04` (PR #2, inte mergad)
+
+Inga nya funktioner, ingen deploy, ingen D1. PIN-inloggningen, `authhost/` och receptinnehåll orörda.
+
+- **Worker:** `null` eller dubblett-id i en rå PUT /state gav 500 och inget sparades (primärnyckeln
+  i `recipes_index`). `indexRows` hoppar över dem, `sanitizeIndexed` typar även titel, steg och
+  ingredienser så ett trasigt recept i `/feed` inte kraschar sökningen hos andra. Test 18.
+  **Kräver workerdeploy för att gälla.**
+- **`worker/reindex-all.js`** kraschade på `require` (ESM) och hade annars indexerat `tags` och
+  `src`. Nu ESM och delar `indexRows` med workern. Test 19 jämför mot PUT /state. Inte kört mot D1.
+- **Direktlänk till någon annans recept** (fyndet från 2026-10-06) hämtar nu flödet i receptvyn och
+  köksläget; tillbaka säger Allas recept när sidan öppnats direkt. Test i `test-ui.cjs`.
+- **a11y:** köksläget har `h1` och `role="progressbar"`, köttbitarnas SVG `role="group"`,
+  `integritet.html` har `<main>` och 44 px länkar utanför texten. axe 20 fynd före, 0 efter
+  (13 sidor × 390/1280 px × in/utloggad, lokal worker på SQLite).
+- **Start:** `starter.json` och `nutrients.json` hämtas parallellt, `nutrients.json` har versionsfråga.
+- Version: `app.js?v=a11y-20261104`. Hämta inte den adressen innan Pages publicerat (cachefällan 2026-09-25).
+- `test-ui.cjs` kräver `npm install --prefix backups/test-deps --no-save jsdom@29.1.1` i en ny klon.
+- **Inte verifierat:** riktig telefon, riktig Firebase-inloggning, workern i Cloudflare.
 
 ## 2026-10-21: Skicka till ICA
 

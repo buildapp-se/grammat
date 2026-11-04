@@ -74,3 +74,8 @@ Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, n
 - [x] (rättad 2026-10-30) P1 `GET /allas-recept` (`worker/worker.js:244-255`) skickar `tags` från alla konton, trots beslutet att egna kategorier är privata. Stryk fälten eller ta bort endpointen och klientens fallback.
 - [x] (rättad 2026-10-30) P2 `recipe.source` valideras inte på servern (`sanitizeIndexed`). Klienten är rättad, servern bör också köra `safeUrl`.
 - [x] (rättad 2026-10-31) P2 CORS `*` på alla API-svar och ingen `Cache-Control: no-store` på `/state`; ingen `script-src` i zonens CSP.
+
+## Förbättringsrunda 2026-11-04
+
+- [ ] Deploya workern efter merge av PR #2 (`indexRows`/`sanitizeIndexed`), annars gäller bara frontenddelen.
+- [ ] `[P3]` Länkarna i guidens tabeller är 17 px höga. Klarar WCAG 2.5.8 på avståndet men är under 44 px. Designfråga, inte ändrat.
