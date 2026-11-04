@@ -293,7 +293,7 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   for (const u of [...g.matt.volume, ...g.matt.weight]) if (!(u.ml > 0) === !(u.g > 0)) bad.push(u.id + ': enhet behöver ml eller g');
   for (const d of g.matt.density) if (!(d.gPerDl > 0)) bad.push(d.id + ': gPerDl saknas');
   // Receptrad till densitet: exakt namn eller aka, parentes och komma bortses, aldrig delsträng
-  const { densityFor } = require('./app.js');
+  const { densityFor, isUnverified } = require('./app.js');
   const dens = name => (densityFor(name, g.matt.density) || {}).id || null;
   assert.strictEqual(dens('vetemjöl'), 'vetemjol');
   assert.strictEqual(dens('ris (gärna jasmin)'), 'ris');
@@ -306,6 +306,15 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.strictEqual(dens('nötfärs'), null);
   for (const d of g.matt.density) for (const a of d.aka || []) assert.strictEqual(dens(a), d.id, 'aka ' + a + ' krockar med en annan rad');
   if (new Set(g.sousvide.map(x => x.id)).size !== g.sousvide.length || new Set(g.ugn.map(x => x.id)).size !== g.ugn.length) bad.push('dubbla id i tider');
+  // Osäkra värden enligt docs/guide-research/SOURCES.md ("Osäkert") ska vara märkta unverified i
+  // guide.json och appen ska visa dem som overifierade: vilt sous vide, julskinka, lammlägg,
+  // rabarber, omelett, ägg 70 °C samt ugnstider för grönsaker utom rotfrukter.
+  const osakraSousvide = ['vilt-algfile', 'vilt-algstek', 'vilt-hjort', 'vilt-vildsvin', 'vilt-radjurssadel', 'gris-julskinka', 'lamm-lagg', 'gronsak-rabarber', 'ovrigt-omelett'];
+  for (const id of osakraSousvide) { const x = g.sousvide.find(i => i.id === id); if (!x || !x.unverified || !isUnverified(x)) bad.push(id + ': osäkert sous vide-värde saknar unverified-markering'); }
+  for (const x of g.ugn.filter(i => i.animal === 'gronsak')) if (x.id !== 'gronsak-rotfrukter' && (!x.unverified || !isUnverified(x))) bad.push(x.id + ': osäker ugnstid saknar unverified-markering');
+  const agg70 = (g.sousvide.find(i => i.id === 'ovrigt-agg').options.find(o => o.tempC === 70) || {});
+  if (!/overifierad/i.test(agg70.note || '')) bad.push('ägg 70 °C 20 min saknar overifierad-markering');
+  if (isUnverified(g.sousvide.find(i => i.id === 'not-entrecote'))) bad.push('verifierad detalj får inte vara overifierad');
   assert.deepStrictEqual(bad, [], 'guide.json:\n' + bad.join('\n'));
 }
 
@@ -401,3 +410,10 @@ import('./worker/worker.js').then(async ({ default: worker }) => {
 
   console.log('Alla test OK (CORS utan `*`, /state no-store)');
 });
+
+{
+ const g=JSON.parse(fs.readFileSync(__dirname+'/guide.json','utf8'));
+ const option=g.sousvide.find(i=>i.id==='ovrigt-agg').options.find(o=>o.tempC===70);
+ assert.equal(require('./app.js').isUnverified(option),true,'bara äggalternativet 70 grader märks');
+ assert.equal(require('./app.js').isUnverified(g.sousvide.find(i=>i.id==='ovrigt-agg')),false,'övriga äggalternativ dras inte med');
+}
