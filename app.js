@@ -1122,8 +1122,8 @@ if (typeof document !== 'undefined') (async function () {
         <span class="rv-kicker" id="wakeNote">${wakeActive ? 'Skärmen hålls tänd' : ''}</span>
         <button class="btn btn-ghost cook-portions" type="button" id="cookPortions">${portions} port</button>
       </div>
-      <div class="cook-title">${esc(r.title)}</div>
-      <div class="progress" aria-label="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
+      <h1 class="cook-title">${esc(r.title)}</h1>
+      <div class="progress" role="progressbar" aria-label="Steg" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${n}" aria-valuetext="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
       ${ings.length ? `<div class="cook-ings"><div class="label">Till det här steget</div>${ings.map(ing => `<div><span>${esc(ing.name)}</span><span class="qty">${esc(fmtIngredient(ing, f))}</span></div>`).join('')}</div>` : ''}
       <div class="cook-step">
         <div class="cook-stepno">STEG ${n}</div>
@@ -1641,7 +1641,7 @@ if (typeof document !== 'undefined') (async function () {
     const ov = guide.ugn.filter(x => x.cutId && cut && x.cutId === cut.id);
     // Codex-bilden underst, snitten klipps mot dess kontur, etiketter och streck ovanpå (koordinater i bildpixlar).
     const g = an.svg, on = id => cut && cut.id === id;
-    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="img" aria-label="Köttbitar ${esc(an.sv)}">
+    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="group" aria-label="Köttbitar ${esc(an.sv)}">
         <defs><clipPath id="clip-${an.id}"><path d="${esc(g.body)}"/></clipPath></defs>
         <image href="${esc(g.image)}" width="${Number(g.w)}" height="${Number(g.h)}"/>
         <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => g.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${on(r.id) ? ' is-on' : ''}" d="${esc(g.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
