@@ -12,6 +12,24 @@ reviewedAt: 2026-11-04
 
 # Handoff
 
+## 2026-11-04: mutationstest på grenen `claude/mutation-2026-11-04` (staplad på samlingsgrenen)
+
+Audit-kolumnen Mutation. Stryker 9 med command runner (`node test.js`) på de rena funktionerna i
+`app.js` (rad 1-447), inte UI-delen. Kör: `npm i --no-save @stryker-mutator/core@9 && npx stryker run`,
+cirka 40 sekunder. Konfigurationen i `stryker.config.json`, rapporterna i `reports/` (ignoreras).
+
+- **57,55 % före, 92,49 % efter** (1 185 mutanter). Nya kontroller i block 20 i `test.js`: bland annat att
+  `LABELS` och `COURSES` är lika i `app.js` och `worker/worker.js`, hela utdatan från `aggregate`,
+  `normalizeState` och `parseImport`, felmeddelandena, gränserna i `spiceHint`, `stepTimers` och
+  `parseAmount`, samt måttomvandlingen.
+- Ingen produktionskod ändrad, ingen bugg hittad.
+- **89 överlevande, granskade:** stoppordlistan i köksläget (17, data), visningstexter (`CAT_LABELS`,
+  `LABEL_TEXT`, `AI_PROMPT`), kodstaketsreglerna i `parseImport` (likvärdiga: JSON plockas ut med
+  klammerindex ändå), grenordningen i `icaItems` (kryddmåttet räknas bara där det används),
+  `|| []`-reserver och gränsfall som `n >= 100` mot `n > 100` som ger samma tal.
+- Noterat utan ändring: ingrediensnormaliseringen finns i två nästan lika kopior (`normalizeState`
+  och `importRecipe`). Testerna låser båda.
+
 ## 2026-11-04: samlingsgren `claude/samlad-2026-11-04`
 
 Slår ihop PR #3 (märkning av osäkra guidevärden) och PR #2 (förbättringsrundan nedan) utan konflikter.
