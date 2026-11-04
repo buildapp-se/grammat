@@ -293,7 +293,7 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   for (const u of [...g.matt.volume, ...g.matt.weight]) if (!(u.ml > 0) === !(u.g > 0)) bad.push(u.id + ': enhet behöver ml eller g');
   for (const d of g.matt.density) if (!(d.gPerDl > 0)) bad.push(d.id + ': gPerDl saknas');
   // Receptrad till densitet: exakt namn eller aka, parentes och komma bortses, aldrig delsträng
-  const { densityFor } = require('./app.js');
+  const { densityFor, isUnverified } = require('./app.js');
   const dens = name => (densityFor(name, g.matt.density) || {}).id || null;
   assert.strictEqual(dens('vetemjöl'), 'vetemjol');
   assert.strictEqual(dens('ris (gärna jasmin)'), 'ris');
@@ -306,6 +306,15 @@ import('./worker/worker.js').then(({ sanitizeIndexed }) => {
   assert.strictEqual(dens('nötfärs'), null);
   for (const d of g.matt.density) for (const a of d.aka || []) assert.strictEqual(dens(a), d.id, 'aka ' + a + ' krockar med en annan rad');
   if (new Set(g.sousvide.map(x => x.id)).size !== g.sousvide.length || new Set(g.ugn.map(x => x.id)).size !== g.ugn.length) bad.push('dubbla id i tider');
+  // Osäkra värden enligt docs/guide-research/SOURCES.md ("Osäkert") ska vara märkta unverified i
+  // guide.json och appen ska visa dem som overifierade: vilt sous vide, julskinka, lammlägg,
+  // rabarber, omelett, ägg 70 °C samt ugnstider för grönsaker utom rotfrukter.
+  const osakraSousvide = ['vilt-algfile', 'vilt-algstek', 'vilt-hjort', 'vilt-vildsvin', 'vilt-radjurssadel', 'gris-julskinka', 'lamm-lagg', 'gronsak-rabarber', 'ovrigt-omelett'];
+  for (const id of osakraSousvide) { const x = g.sousvide.find(i => i.id === id); if (!x || !x.unverified || !isUnverified(x)) bad.push(id + ': osäkert sous vide-värde saknar unverified-markering'); }
+  for (const x of g.ugn.filter(i => i.animal === 'gronsak')) if (x.id !== 'gronsak-rotfrukter' && (!x.unverified || !isUnverified(x))) bad.push(x.id + ': osäker ugnstid saknar unverified-markering');
+  const agg70 = (g.sousvide.find(i => i.id === 'ovrigt-agg').options.find(o => o.tempC === 70) || {});
+  if (!/overifierad/i.test(agg70.note || '')) bad.push('ägg 70 °C 20 min saknar overifierad-markering');
+  if (isUnverified(g.sousvide.find(i => i.id === 'not-entrecote'))) bad.push('verifierad detalj får inte vara overifierad');
   assert.deepStrictEqual(bad, [], 'guide.json:\n' + bad.join('\n'));
 }
 
@@ -400,4 +409,58 @@ import('./worker/worker.js').then(async ({ default: worker }) => {
   assert.strictEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://buildapp.se');
 
   console.log('Alla test OK (CORS utan `*`, /state no-store)');
+});
+
+{
+ const g=JSON.parse(fs.readFileSync(__dirname+'/guide.json','utf8'));
+ const option=g.sousvide.find(i=>i.id==='ovrigt-agg').options.find(o=>o.tempC===70);
+ assert.equal(require('./app.js').isUnverified(option),true,'bara äggalternativet 70 grader märks');
+ assert.equal(require('./app.js').isUnverified(g.sousvide.find(i=>i.id==='ovrigt-agg')),false,'övriga äggalternativ dras inte med');
+}
+
+// 18. Rå PUT /state med trasiga recept: servern ska inte svara 500 (då sparas inget alls),
+//     och det som hamnar i /feed måste tåla klientens sökning och receptvy hos alla besökare.
+import('./worker/worker.js').then(async ({ default: worker }) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  const put = state => worker.fetch(new Request('https://test.invalid/state', {
+    method: 'PUT', headers: { Authorization: 'Bearer tok-alice' }, body: JSON.stringify(state),
+  }), { DB: db });
+  let res = await put({ recipes: [null, { id: 'a', title: 'A', ingredients: [{ name: 'salt' }] }] });
+  assert.strictEqual(res.status, 200, 'null i receptlistan ger inte serverfel');
+  res = await put({ recipes: [{ id: 'a', title: 'A', ingredients: [{ name: 'salt' }] }, { id: 'a', title: 'A igen', ingredients: [{ name: 'peppar' }] }] });
+  assert.strictEqual(res.status, 200, 'dubblett-id ger inte serverfel');
+  res = await put({ recipes: [{ id: 'b', title: 5, ingredients: [null, { amount: '<b>9</b>' }, { name: 'mjöl', amount: '2', unit: 'ml' }], steps: 'Koka' }] });
+  assert.strictEqual(res.status, 200);
+  const feed = await (await worker.fetch(new Request('https://test.invalid/feed'), { DB: db })).json();
+  assert.deepStrictEqual(feed.map(r => r.id), ['b']);
+  const [b] = feed;
+  assert.strictEqual(b.title, '5', 'titeln är alltid en sträng');
+  assert.deepStrictEqual(b.steps, [], 'steg är alltid en lista med text');
+  assert.deepStrictEqual(b.ingredients, [{ name: 'mjöl', unit: 'ml' }], 'ingredienser utan namn bort, mängd bara som tal');
+  assert.strictEqual(matchesQuery(b, 'mjöl'), true, 'sökningen i Allas recept kraschar inte');
+  console.log('Alla test OK (trasig PUT /state)');
+});
+
+// 19. reindex-all.js (engångsskript mot D1) ger samma index som PUT /state: egna kategorier och
+//     sparade kopior når inte det publika flödet. Körs mot SQLite, aldrig mot produktion.
+Promise.all([import('./worker/worker.js'), import('./worker/reindex-all.js')]).then(async ([{ default: worker }, { reindexSql }]) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  const state = { recipes: [
+    { id: 'a', title: 'A', tags: ['Hemligt'], ingredients: [{ name: 'salt', amount: 2, unit: 'g' }], steps: ['Koka.'] },
+    { id: 'kopia', title: 'Kopia', src: { owner: 2, id: 'x' }, ingredients: [{ name: 'salt' }] },
+    { id: 'p', title: 'P', private: true, ingredients: [{ name: 'salt' }] },
+  ] };
+  await worker.fetch(new Request('https://test.invalid/state', { method: 'PUT', headers: { Authorization: 'Bearer tok-alice' }, body: JSON.stringify(state) }), { DB: db });
+  const viaPut = sqlite.prepare('SELECT owner_id, id, title, course, data FROM recipes_index ORDER BY id').all();
+  sqlite.exec('DELETE FROM recipes_index');
+  const sql = reindexSql([{ id: 1, state: JSON.stringify(state) }]);
+  assert.ok(!sql.includes('Hemligt'), 'egna kategorier stryks i reindex-skriptet');
+  sqlite.exec(sql);
+  assert.deepStrictEqual(sqlite.prepare('SELECT owner_id, id, title, course, data FROM recipes_index ORDER BY id').all(), viaPut, 'samma index som PUT /state');
+  assert.deepStrictEqual(viaPut.map(r => r.id), ['a']);
+  console.log('Alla test OK (reindex-all = PUT /state)');
 });

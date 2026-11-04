@@ -114,31 +114,55 @@ async function createFirebaseUser(env, claims) {
 // nedan renderas hos ALLA besökare via /feed, så typerna tvingas serverside: en sträng
 // i portions/unit blev annars aktiv HTML i andras webbläsare.
 // countUnit är fri text ("klyftor", "burk") och kan inte typas, den escapas vid render.
+// Titel, steg och ingrediensnamn typas också: klientens sökning och receptvy förutsätter
+// strängar och listor, och ett trasigt recept i /feed fick annars sidan att krascha för alla.
+const posNum = v => typeof v === 'number' && Number.isFinite(v) && v > 0;
 export function sanitizeIndexed(r) {
   const { tags, ...pub } = r; // egna kategorier är privata, når aldrig flöden
   return {
     ...pub,
+    id: String(r.id),
+    title: String(r.title),
     course: normalizeCourse(r.course),
     source: safeUrl(r.source),
     labels: Array.isArray(r.labels) ? LABELS.filter(l => r.labels.includes(l)) : [],
     portions: Number.isFinite(+r.portions) && +r.portions >= 1 ? Math.round(+r.portions) : 4,
-    ingredients: r.ingredients.map(i => ({ ...i, unit: i && i.unit === 'ml' ? 'ml' : 'g' })),
+    steps: Array.isArray(r.steps) ? r.steps.filter(t => typeof t === 'string') : [],
+    ingredients: r.ingredients
+      .filter(i => i && typeof i === 'object' && typeof i.name === 'string' && i.name.trim())
+      .map(i => {
+        const { amount, count, ...rest } = i;
+        const out = { ...rest, unit: i.unit === 'ml' ? 'ml' : 'g' };
+        if (posNum(amount)) out.amount = amount;
+        if (posNum(count)) out.count = count;
+        return out;
+      }),
   };
 }
 
-function reindexStmts(env, ownerId, recipes) {
-  const stmts = [env.DB.prepare('DELETE FROM recipes_index WHERE owner_id = ?').bind(ownerId)];
+// Raderna som hör hemma i det publika indexet, sanerade. Delas med reindex-all.js.
+export function indexRows(recipes) {
+  const rows = [];
+  const seen = new Set(); // (owner_id, id) är primärnyckel: en dubblett fällde hela batchen och inget sparades
   for (const r of recipes) {
+    if (!r || typeof r !== 'object') continue;
     // r.src = sparad kopia av någon annans recept: originalägarens index har den redan
     if (r.private === true || r.src || !r.id || !r.title) continue;
-    if (!Array.isArray(r.ingredients)) continue;
-    const safe = sanitizeIndexed(r);
-    stmts.push(env.DB.prepare(
+    if (!Array.isArray(r.ingredients) || seen.has(String(r.id))) continue;
+    seen.add(String(r.id));
+    rows.push({ id: String(r.id), title: String(r.title), course: normalizeCourse(r.course), data: JSON.stringify(sanitizeIndexed(r)) });
+  }
+  return rows;
+}
+
+function reindexStmts(env, ownerId, recipes) {
+  return [
+    env.DB.prepare('DELETE FROM recipes_index WHERE owner_id = ?').bind(ownerId),
+    ...indexRows(recipes).map(row => env.DB.prepare(
       `INSERT INTO recipes_index (owner_id, id, title, course, visibility, saves_count, data)
        VALUES (?,?,?,?,'public',(SELECT COUNT(*) FROM saves WHERE owner_id = ? AND recipe_id = ?),?)`
-    ).bind(ownerId, String(r.id), String(r.title), normalizeCourse(r.course), ownerId, String(r.id), JSON.stringify(safe)));
-  }
-  return stmts;
+    ).bind(ownerId, row.id, row.title, row.course, ownerId, row.id, row.data)),
+  ];
 }
 
 function rowRecipe(r) {
