@@ -464,3 +464,246 @@ Promise.all([import('./worker/worker.js'), import('./worker/reindex-all.js')]).t
   assert.deepStrictEqual(viaPut.map(r => r.id), ['a']);
   console.log('Alla test OK (reindex-all = PUT /state)');
 });
+
+// 20. Kontroller från mutationstestet 2026-11-04 (audit-kolumnen Mutation, `npx stryker run`).
+//     Varje block låser ett beteende som en överlevande mutant visade att inget test såg.
+{
+  const app = require('./app.js');
+  const worker = fs.readFileSync(__dirname + '/worker/worker.js', 'utf8');
+  const list = name => JSON.parse(worker.match(new RegExp('const ' + name + ' = (\\[.*?\\]);'))[1].replace(/'/g, '"'));
+
+  // Listor som klient och worker delar: drar de isär stryker workern taggar eller kurser tyst.
+  assert.deepStrictEqual(list('LABELS'), app.LABELS, 'taggarna är samma i app.js och worker.js');
+  assert.deepStrictEqual(list('COURSES'), app.COURSES, 'kurserna är samma i app.js och worker.js');
+  for (const c of app.COURSES) assert.ok(app.COURSE_LABELS[c], 'kursen ' + c + ' har en rubrik');
+  for (const r of recipes) for (const i of r.ingredients) assert.ok(app.CATS.includes(i.cat), 'startpaketets avdelning ' + i.cat + ' är giltig');
+  assert.deepStrictEqual(app.normLabels(undefined), [], 'inga taggar utan lista');
+  assert.deepStrictEqual(app.normLabels(['fest', 'okänd', 'vardag']), ['vardag', 'fest'], 'okända taggar bort, fast ordning');
+
+  // aggregate: första enheten vinner, enhet och styckenhet får standardvärden, källor skalas.
+  const agg = aggregate([
+    { id: 'a', title: 'A', portions: 2, ingredients: [
+      { name: 'Lök', amount: 100, unit: 'ml', count: 1, countUnit: 'klyftor', cat: 'grönt' },
+      { name: 'salt', toTaste: true, cat: 'skafferi' },
+      { name: 'peppar', cat: 'skafferi' },
+      { name: 'vatten', amount: 1, skipList: true },
+    ] },
+    { id: 'b', title: 'B', portions: 1, ingredients: [
+      { name: 'lök ', amount: 50, unit: 'g', count: 1, cat: 'grönt' },
+      { name: 'mjöl', amount: 30, count: 2, cat: 'okänd' },
+      { name: 'salt', amount: 2, unit: 'g', cat: 'skafferi' },
+    ] },
+  ], [{ id: 'a', portions: 4 }, { id: 'saknas', portions: 2 }, { id: 'b', portions: 3 }]);
+  assert.deepStrictEqual(agg, [
+    { key: 'lök', name: 'Lök', cat: 'grönt', amount: 350, unit: 'ml', count: 5, countUnit: 'klyftor', toTaste: false,
+      sources: [{ title: 'A', amount: 200, unit: 'ml' }, { title: 'B', amount: 150, unit: 'g' }] },
+    { key: 'salt', name: 'salt', cat: 'skafferi', amount: 6, unit: 'g', count: 0, countUnit: null, toTaste: true,
+      sources: [{ title: 'A', amount: null, unit: null }, { title: 'B', amount: 6, unit: 'g' }] },
+    { key: 'peppar', name: 'peppar', cat: 'skafferi', amount: 0, unit: null, count: 0, countUnit: null, toTaste: false,
+      sources: [{ title: 'A', amount: null, unit: null }] },
+    { key: 'mjöl', name: 'mjöl', cat: 'övrigt', amount: 90, unit: 'g', count: 6, countUnit: 'st', toTaste: false,
+      sources: [{ title: 'B', amount: 90, unit: null }] },
+  ], 'summering över två recept med okänt val däremellan');
+
+  // Talformat och mängdtexter
+  assert.strictEqual(fmtNum(12.34), '12', 'från 10 heltal');
+  assert.strictEqual(fmtNum(1234567), '1 234 565', 'flera tusentalsgrupper');
+  assert.strictEqual(fmtItem({ amount: 350, unit: 'ml', count: 5, countUnit: 'klyftor' }), '350 ml (~5 klyftor)');
+  assert.strictEqual(fmtItem({ amount: 200, unit: 'g', count: 2, countUnit: null }), '200 g (~2 st)');
+  assert.strictEqual(fmtItem({ amount: 6, unit: 'g', cat: 'skafferi', count: 0, toTaste: true }), '6 g (~1 tsk) + efter smak');
+  assert.strictEqual(fmtItem({ amount: 500, unit: 'g', cat: 'grönt', count: 0, toTaste: false }), '500 g');
+  assert.strictEqual(fmtIngredient({ amount: 100 }, 1), '100 g', 'gram när enhet saknas');
+  assert.strictEqual(fmtIngredient({ amount: 100, unit: 'ml' }, 1), '100 ml');
+  assert.strictEqual(fmtIngredient({ amount: 100, count: 2, cat: 'grönt' }, 2), '200 g (~4 st)', 'styck skalas och får st');
+  assert.strictEqual(spiceHint(0, 'g', 'skafferi'), '', 'noll gram ger inget mått');
+  assert.strictEqual(spiceHint(4, 'g', 'skafferi'), '1 tsk', '4 g är tesked');
+  assert.strictEqual(spiceHint(12.5, 'g', 'skafferi'), '1 msk', '12,5 g är matsked');
+
+  // ICA: kryddmått som mängd och enhet, styck utan enhet blir st
+  assert.deepStrictEqual(icaItems([
+    { key: 's', name: 'salt', amount: 3, unit: 'g', cat: 'skafferi' },
+    { key: 'k', name: 'kanel', amount: 7.5, unit: 'g', cat: 'skafferi' },
+    { key: 'l', name: 'lök', amount: 220, unit: 'g', count: 2, cat: 'grönt' },
+  ], [], []), [
+    { name: 'salt', quantity: 3, unit: 'krm' },
+    { name: 'kanel', quantity: 1.5, unit: 'tsk' },
+    { name: 'lök', quantity: 2, unit: 'st' },
+  ]);
+
+  // recipeAsText: grupprubrik bara när gruppen byts, inga steg, utan källa
+  assert.strictEqual(recipeAsText({ title: 'T', portions: 2, source: 'https://x.se', steps: [], ingredients: [
+    { name: 'a', amount: 100 }, { name: 'b', amount: 50, group: 'Sås' }, { name: 'c', amount: 10, group: 'Sås' }, { name: 'd' },
+  ] }, 4), ['T', '', '4 portioner', '', 'Ingredienser', '- a: 200 g', '', 'Sås', '- b: 100 g', '- c: 20 g', '- d: efter smak',
+    '', 'Gör så här', 'Inga steg nedskrivna.', '', 'Källa', 'https://x.se'].join('\n'));
+  assert.ok(recipeAsText({ title: 'U', portions: 2, ingredients: [{ name: 'a', amount: 1 }] }).endsWith('Gör så här\nInga steg nedskrivna.'), 'utan källa ingen källrad');
+
+  // Näring: hela ord, längsta nyckeln, specialtecken i nyckeln, alla fyra värdena per portion
+  const nut = { 'färskost': { id: 'f' }, 'vitlök': { id: 'v' }, 'ost': { id: 'o' }, 'ost (riven)': { id: 'r' } };
+  assert.strictEqual(app.findNutrient('Färskost med vitlök', nut).id, 'f', 'längsta helordsträffen vinner');
+  assert.strictEqual(app.findNutrient('färskost', { 'ost': {} }), null, 'ost i färskost är ingen träff');
+  assert.strictEqual(app.findNutrient('ostkaka', { 'ost': {} }), null, 'ost i ostkaka är ingen träff');
+  assert.strictEqual(app.findNutrient('lagrad ost (riven)', nut).id, 'r', 'parentes i nyckeln tolkas inte som regex');
+  assert.deepStrictEqual(nutritionPerPortion({ portions: 4, ingredients: [{ name: 'x', amount: 200 }] }, { x: { kcal: 40, protein: 2, carbs: 10, fat: 4 } }),
+    { kcal: 20, protein: 1, carbs: 5, fat: 2, missing: [] });
+
+  // slugify och safeUrl
+  assert.strictEqual(app.slugify('Åsa Öl', []), 'asa-ol');
+  assert.strictEqual(app.slugify(' A  & B ', []), 'a-b', 'ett bindestreck mellan ord, inga i kanterna');
+  assert.strictEqual(app.slugify('!!!', []), 'recept');
+  assert.strictEqual(app.slugify('x', ['x', 'x-2']), 'x-3');
+  assert.strictEqual(safeUrl('https://ex.se/a'), 'https://ex.se/a');
+  assert.strictEqual(safeUrl('http://ex.se'), 'http://ex.se/');
+  assert.strictEqual(safeUrl('ftp://ex.se'), '');
+  assert.strictEqual(safeUrl('inte en länk'), '');
+
+  // normalizeState: allt som saneras, i ett svep
+  assert.throws(() => normalizeState(null), { message: 'Backupen innehåller ingen giltig state.' });
+  assert.throws(() => normalizeState('text'), { message: 'Backupen innehåller ingen giltig state.' });
+  assert.throws(() => normalizeState({ state: 'x' }), { message: 'Backupen saknar receptlista.' });
+  assert.deepStrictEqual(normalizeState({ state: { recipes: [] } }), { recipes: [], selections: [], extras: [], checked: [], struck: {} });
+  assert.deepStrictEqual(normalizeState({ recipes: [], struck: null }).struck, {});
+  assert.deepStrictEqual(normalizeState({ recipes: [], struck: ['a'] }).struck, {});
+  const bad = r => () => normalizeState({ recipes: [r] });
+  assert.throws(bad(null), { message: 'Backupen innehåller ett trasigt recept.' });
+  assert.throws(bad('text'), { message: 'Backupen innehåller ett trasigt recept.' });
+  assert.strictEqual(normalizeState({ recipes: [{ title: 'A', src: { owner: 1, id: 5 }, ingredients: [{ name: 'x' }] }] }).recipes[0].src, undefined, 'src med id som inte är text slängs');
+  assert.throws(bad({ title: 5, ingredients: [{ name: 'x' }] }), { message: 'Ett recept i backupen saknar namn.' });
+  assert.throws(bad({ title: '  ', ingredients: [{ name: 'x' }] }), { message: 'Ett recept i backupen saknar namn.' });
+  assert.throws(bad({ title: 'A' }), { message: 'Receptet "A" saknar ingredienser.' });
+  assert.throws(bad({ title: 'A', ingredients: [] }), { message: 'Receptet "A" saknar ingredienser.' });
+  for (const x of [null, 'lök', { name: 5 }, { name: '  ' }]) assert.throws(bad({ title: 'A', ingredients: [x] }), { message: 'En ingrediens i "A" saknar namn.' });
+  const ns = normalizeState({
+    recipes: [
+      { id: ' Min Gryta ', title: '  Gryta ', portions: 2.6, course: 'sas', source: ' https://ex.se/a ', tags: ['Fest', 'fest '], labels: ['fest', 'okänd'],
+        ingredients: [
+          { name: ' lök ', amount: 110, unit: 'ml', count: 1, countUnit: ' klyftor ', cat: 'grönt', skipList: true, group: ' Sås ' },
+          { name: 'salt', amount: 0, unit: 'ml', count: 0, countUnit: 'st', cat: 'skafferi', skipList: 'ja', group: '  ' },
+          { name: 'kött', amount: '5', count: '2', cat: 'kött' },
+          { name: 'mjölk', amount: 1, unit: 'l', count: 1, countUnit: '  ', cat: 'mejeri' },
+          { name: 'ägg', amount: 50, count: 1, countUnit: 5, cat: 'okänd' },
+        ],
+        steps: [' Koka. ', '', '  ', 7, 'Servera.'] },
+      { id: 'min-gryta', title: 'Dubblett', portions: 0, src: null, ingredients: [{ name: 'x', amount: -1, cat: 'fryst' }] },
+      { title: 'Åsa Öl', portions: '6', private: true, src: { owner: 0, id: 'o' }, ingredients: [{ name: 'y' }] },
+      { id: '   ', title: 'Tom Id', portions: 1, private: 'ja', src: { owner: 2.5, id: 'a' }, ingredients: [{ name: 'z' }] },
+    ],
+    selections: [{ id: 'min-gryta', portions: 2.4 }, { id: 'tom-id', portions: 0 }, { portions: 3 }, { id: 'asa-ol', portions: 'x' }],
+    extras: [{ id: 0, text: '  mjölk  ' }, { text: 'x'.repeat(100) }, { id: 5, text: '   ' }, { id: 6 }],
+    checked: [1, 'a'],
+    struck: { 'min-gryta': ['lök', '', 3], 'tom-id': [], 'okänd': ['a'] },
+  });
+  assert.deepStrictEqual(ns.recipes, [
+    { id: 'min-gryta', title: 'Gryta', portions: 3, course: 'sas', source: 'https://ex.se/a', tags: ['Fest'], labels: ['fest'],
+      ingredients: [
+        { name: 'lök', cat: 'grönt', amount: 110, unit: 'ml', count: 1, countUnit: 'klyftor', skipList: true, group: 'Sås' },
+        { name: 'salt', cat: 'skafferi', toTaste: true },
+        { name: 'kött', cat: 'kött', toTaste: true },
+        { name: 'mjölk', cat: 'mejeri', amount: 1, unit: 'g', count: 1, countUnit: 'st' },
+        { name: 'ägg', cat: 'övrigt', amount: 50, unit: 'g', count: 1, countUnit: 'st' },
+      ],
+      steps: ['Koka.', 'Servera.'] },
+    { id: 'min-gryta-2', title: 'Dubblett', portions: 4, course: 'huvudratt', source: '', ingredients: [{ name: 'x', cat: 'fryst', toTaste: true }], steps: [] },
+    { id: 'asa-ol', title: 'Åsa Öl', portions: 4, course: 'huvudratt', source: '', private: true, src: { owner: 0, id: 'o' }, ingredients: [{ name: 'y', cat: 'övrigt', toTaste: true }], steps: [] },
+    { id: 'tom-id', title: 'Tom Id', portions: 1, course: 'huvudratt', source: '', ingredients: [{ name: 'z', cat: 'övrigt', toTaste: true }], steps: [] },
+  ]);
+  assert.deepStrictEqual(ns.selections, [{ id: 'min-gryta', portions: 2 }, { id: 'tom-id', portions: 1 }, { id: 'asa-ol', portions: 1 }]);
+  assert.strictEqual(ns.extras.length, 2, 'tomma extrarader bort');
+  assert.deepStrictEqual(ns.extras[0], { id: 0, text: 'mjölk' }, 'id 0 behålls, texten trimmas');
+  assert.strictEqual(typeof ns.extras[1].id, 'number', 'saknat id får ett tal');
+  assert.strictEqual(ns.extras[1].text, 'x'.repeat(80), 'högst 80 tecken');
+  assert.deepStrictEqual(ns.checked, ['1', 'a']);
+  assert.deepStrictEqual(ns.struck, { 'min-gryta': ['lök'] });
+  const bk = makeBackup({ recipes: [] });
+  assert.strictEqual(bk.app, 'grammat');
+  assert.strictEqual(bk.version, 1);
+
+  // parseImport: objekt med en enda array, text efter arrayen, trasig JSON, felmeddelanden utan prefix för ett recept
+  const one = '{"title":"A","ingredients":[{"name":"salt"}]}';
+  assert.strictEqual(parseImport('X' + one, [])[0].title, 'A', 'objekt med en array inuti läses som objektet');
+  assert.strictEqual(parseImport('[' + one + ',' + one + '] Hoppas det smakar!', []).length, 2, 'prat efter arrayen');
+  assert.throws(() => parseImport('} bara {', []), /Hittar ingen JSON/);
+  assert.throws(() => parseImport('{trasig}', []), /^Error: Trasig JSON: /);
+  assert.throws(() => parseImport('{"portions":4}', []), { message: 'Fältet "title" saknas.' }, 'ett recept: inget nummer framför');
+  const takenBefore = ['a'];
+  assert.strictEqual(parseImport(one, takenBefore)[0].id, 'a-2');
+  assert.deepStrictEqual(takenBefore, ['a'], 'anroparens lista ändras inte');
+  const imp1 = r => () => parseImport(JSON.stringify(r), []);
+  assert.throws(imp1([null]), { message: 'Receptet är inte ett JSON-objekt.' });
+  assert.throws(imp1([5]), { message: 'Receptet är inte ett JSON-objekt.' });
+  assert.throws(imp1({ title: '  ', ingredients: [{ name: 'x' }] }), { message: 'Fältet "title" saknas.' });
+  assert.throws(imp1({ title: 'A' }), { message: 'Fältet "ingredients" saknas eller är tomt.' });
+  assert.throws(imp1({ title: 'A', ingredients: [] }), { message: 'Fältet "ingredients" saknas eller är tomt.' });
+  for (const x of [null, { name: 5 }, { name: '  ' }]) assert.throws(imp1({ title: 'A', ingredients: [x] }), { message: 'En ingrediens saknar namn.' });
+  assert.deepStrictEqual(parseImport(JSON.stringify([
+    { title: ' Gryta ', portions: 2.6, course: 'sas', labels: ['fest', 'okänd'], source: 'https://ex.se/a',
+      ingredients: [
+        { name: ' lök ', amount: 110, unit: 'ml', count: 1, countUnit: ' klyftor ', cat: 'grönt', skipList: true, group: ' Sås ' },
+        { name: 'salt', amount: 0, unit: 'ml', count: 0, cat: 'skafferi', skipList: 'ja', group: '  ' },
+        { name: 'kött', amount: '5', count: '2', cat: 'kött' },
+        { name: 'ägg', amount: 50, unit: 'l', count: 1, countUnit: '  ', cat: 'okänd' },
+      ],
+      steps: [' Koka. ', '', '  ', 7, 'Servera.'] },
+    { title: 'B', portions: 1, ingredients: [{ name: 'x' }] },
+    { title: 'C', portions: 0, ingredients: [{ name: 'x' }] },
+    { title: 'D', portions: '6', ingredients: [{ name: 'x' }] },
+  ]), []), [
+    { id: 'gryta', title: 'Gryta', portions: 3, course: 'sas', labels: ['fest'], source: 'https://ex.se/a',
+      ingredients: [
+        { name: 'lök', cat: 'grönt', amount: 110, unit: 'ml', count: 1, countUnit: 'klyftor', skipList: true, group: 'Sås' },
+        { name: 'salt', cat: 'skafferi', toTaste: true },
+        { name: 'kött', cat: 'kött', toTaste: true },
+        { name: 'ägg', cat: 'övrigt', amount: 50, unit: 'g', count: 1, countUnit: 'st' },
+      ],
+      steps: ['Koka.', 'Servera.'] },
+    { id: 'b', title: 'B', portions: 1, course: 'huvudratt', labels: [], source: '', ingredients: [{ name: 'x', cat: 'övrigt', toTaste: true }], steps: [] },
+    { id: 'c', title: 'C', portions: 4, course: 'huvudratt', labels: [], source: '', ingredients: [{ name: 'x', cat: 'övrigt', toTaste: true }], steps: [] },
+    { id: 'd', title: 'D', portions: 4, course: 'huvudratt', labels: [], source: '', ingredients: [{ name: 'x', cat: 'övrigt', toTaste: true }], steps: [] },
+  ]);
+
+  // Sök, egna kategorier
+  assert.strictEqual(matchesQuery({ title: 'Pastagratäng', ingredients: [{ name: 'ost' }] }, '  PASTA '), true, 'frasen trimmas och gemenas');
+  assert.deepStrictEqual(normTags(undefined), []);
+  assert.deepStrictEqual(normTags([' Fest ']), ['Fest']);
+  assert.deepStrictEqual(normTags(['x'.repeat(40)]), ['x'.repeat(30)], 'högst 30 tecken');
+  assert.strictEqual(normTags('a,b,c,d,e,f,g,h,i,j,k').length, 10, 'högst tio egna kategorier');
+
+  // Timrar: decimaler, utan mellanslag, noll och mer än ett dygn bort, dubbletter bort
+  assert.deepStrictEqual(stepTimers('Vila 1,25 tim').map(t => t.minutes), [75]);
+  assert.deepStrictEqual(stepTimers('Koka 20min').map(t => t.minutes), [20]);
+  assert.deepStrictEqual(stepTimers('0 min'), []);
+  assert.deepStrictEqual(stepTimers('Mörkna 24 tim, sedan 25 tim').map(t => t.minutes), [1440]);
+  assert.deepStrictEqual(stepTimers('Koka 10 min, rör, koka 10 min till').map(t => t.minutes), [10]);
+  assert.deepStrictEqual(stepTimers('Koka 10 min, vila 5 min').map(t => t.minutes), [10, 5]);
+
+  // Köksläget: ordgräns framför, hela korta namn, småord och korta ord ger ingen träff
+  assert.deepStrictEqual(stepIngredients('Fräs vitlöken', [{ name: 'lök' }]), []);
+  assert.strictEqual(stepIngredients('Häll i öl', [{ name: 'öl' }]).length, 1, 'kort namn träffar som helt namn');
+  assert.deepStrictEqual(stepIngredients('Häll i vatten.', [{ name: 'mango i bitar' }]), [], 'ord under tre tecken räknas inte');
+  assert.deepStrictEqual(stepIngredients('Strö över färsk persilja.', [{ name: 'färsk koriander' }]), [], 'färsk är ett småord');
+  assert.deepStrictEqual(stepIngredients('Skiva gul paprika.', [{ name: 'gul lök' }]), [], 'gul är ett småord');
+
+  // Guide: mängder, format och omvandling
+  const pa = app.parseAmount;
+  assert.strictEqual(pa('0'), 0, 'noll är en giltig mängd');
+  assert.throws(() => pa('-1'), { message: 'Ogiltig mängd: -1' });
+  for (const s of ['1/2 dl', 'ca 1/2']) assert.throws(() => pa(s), /Ogiltig mängd/, s);
+  assert.strictEqual(pa('10/4'), 2.5);
+  assert.strictEqual(pa('3/10'), 0.3);
+  assert.strictEqual(pa('12 1/2'), 12.5);
+  assert.strictEqual(pa('1  1/2'), 1.5, 'flera mellanslag');
+  assert.strictEqual(app.fmtAmount(1234.5), '1 235', 'heltal från 100');
+  assert.strictEqual(app.fmtAmount(1234567), '1 234 567');
+  const cu = app.convertUnit;
+  assert.strictEqual(cu(1, { g: 1000 }, { g: 1 }), 1000, 'kg till g utan ingrediens');
+  assert.strictEqual(cu(1, { g: 1000 }, { g: 100 }), 10, 'kg till hg');
+  assert.ok(app.densityFor('ingefära, riven', [{ sv: 'ingefära' }]), 'allt efter komma räknas inte');
+  assert.throws(() => cu(1, { ml: 100 }, { g: 1 }), { message: 'Volym och vikt kräver en ingrediens' });
+  assert.strictEqual(cu(2, { ml: 100 }, { g: 100 }, 60), 1.2, '2 dl mjöl i hg');
+  assert.strictEqual(cu(0.12, { g: 1000 }, { ml: 100 }, 60), 2, '0,12 kg mjöl i dl');
+  const iu = app.isUnverified;
+  assert.strictEqual(iu({}), false);
+  assert.strictEqual(iu({ sources: [] }), false, 'ingen källa är inte samma sak som bara arket');
+  assert.strictEqual(iu({ sources: ['https://docs.google.com/x'] }), true);
+  assert.strictEqual(iu({ sources: ['https://docs.google.com/x', 'https://www.livsmedelsverket.se/'] }), false);
+  console.log('Alla test OK (mutationskontroller)');
+}
