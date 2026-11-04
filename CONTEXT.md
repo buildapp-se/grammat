@@ -34,6 +34,48 @@ inte att vara en fullödig matportal.
 
 Full arkitektur står i `docs/PROJECT.md`, v2-planen i `docs/ARKITEKTUR.md`.
 
+```mermaid
+graph LR
+  USER[Webbläsare]
+
+  subgraph WEB["buildapp.se/grammat/"]
+    PAGE[index.html och app.js]
+    GUIDE[guide.json]
+  end
+
+  subgraph AUTH["Firebase"]
+    FB[Firebase Auth]
+    AH[auth.buildapp.se authDomain]
+  end
+
+  subgraph CF["Cloudflare"]
+    W[Worker recept-api]
+    D1[(D1 recept)]
+  end
+
+  JWKS[Googles JWKS]
+  ICA[ICA-appens API]
+
+  USER --> PAGE
+  PAGE --> GUIDE
+  PAGE --> FB
+  FB --> AH
+  PAGE -->|ID-token| W
+  W --> JWKS
+  W --> D1
+  W -->|/ica| ICA
+```
+
+## Stack
+
+- Inloggning: Firebase Auth med Google och lösenord, ID-token verifieras i workern; äldre PIN under avveckling
+- Backend: Cloudflare Worker `recept-api` (`worker/worker.js`) på recept-api.buildapp.se
+- Databas: Cloudflare D1 `recept` (en state-blob per konto plus härlett receptindex)
+- Frontend: statisk `index.html` och `app.js`, inget ramverk och inget byggsteg
+- Kod: JavaScript
+- Tester: `node test.js` och `test-*.cjs`
+- Hosting: GitHub Pages bakom Cloudflare, buildapp.se/grammat/
+
 ## Constraints
 
 - Sista skrivning vinner vid synk. Det är acceptabelt eftersom varje lista har en ägare.
