@@ -6,7 +6,7 @@ nextAction: Ägaren provar vänförfrågan mellan två riktiga konton på builda
 blockers:
   - OAuth-branding kräver Google Cloud Console med lösenordsinloggning, en agent kan inte göra det steget
   - Legacy-PIN kan inte rensas förrän julia och hans loggat in via Firebase
-reviewedAt: 2026-11-02
+reviewedAt: 2026-11-04
 ---
 **2026-11-02:** kontaktadressen är nu `kontakt@buildapp.se` (förut `kontakt@orgutveckling.se`). Integritetstexten version 1.4.
 
@@ -331,3 +331,9 @@ Cross-project audit run from elwyn-dash (session 5 in the daily note). Results w
 ## Automated audit batch, 2026-10-06
 
 Cross-project run from elwyn-dash with aifabriken `tools/audit-suite.ts` (headers, npm audit, secrets, Actions, markup, axe at one mobile viewport; TLS and Lighthouse not run). Results are the `(automated)` lines under `## Audits` in CONTEXT.md, findings under `## Granskning 2026-10-06` in BACKLOG.md. Markup pass and axe clean on the start page (manual review outstanding); npm audit blocked (no lockfile in `worker/`). `.gitleaksignore` gained the worktree fingerprint of the already reviewed public Firebase apiKey; secrets now pass. Headers fail is the shared buildapp.se CSP without `script-src` (zone Transform Rule, owned by elwyn-dash `docs/security.md` §Open 11), not something this repository can fix. No application code or deployment changed. `reviewedAt` was left alone: the goal and next action above were not reviewed.
+
+## Session 2026-11-04: granskad märkning i guiden
+
+Osäkra uppgifter får märkning även när en post har en blandning av källor. 14 poster får unverified och äggets alternativ 70 grader får egen flagga. Oberoende genomgång jämförde samtliga datafält: inga tider, temperaturer, säkerhetstexter, källor eller styckningsdata ändrade. Den ursprungliga kandidatens luckor i grönsakernas översikt, styckningsvyn och äggalternativets tabellcell är rättade. Båda cacheversionerna höjda till 20261104.
+
+node --check app.js, node test.js och node test-ui.cjs godkända. Riktig Edge utan externa anrop visar märkning i grönsaksöversikt, viltkort, styckningsvy och endast den osäkra äggcellen; verifierad entrecôte är omärkt och inga sidfel uppstod. Oberoende andra granskare fann äggluckan och inga andra blockerande fynd. Källvärdena är fortsatt overifierade, de har bara märkts tydligt. Ingen Worker/D1-ändring, push eller deploy.
