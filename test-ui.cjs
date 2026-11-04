@@ -32,7 +32,7 @@ async function until(check, label) {
     if (desktop) w.matchMedia = () => ({matches:true,addEventListener() {}}); // jsdom saknar matchMedia: utan den ritas mobilvyn
     w.fetch = async (url, opts) => {
       if (url.startsWith('starter.json')) return Response.json([]);
-      if (url === 'nutrients.json') return Response.json({});
+      if (url.startsWith('nutrients.json')) return Response.json({});
       if (url.startsWith('guide.json')) return Response.json(JSON.parse(fs.readFileSync('guide.json','utf8')));
       assert.ok(url.startsWith('https://recept-api.buildapp.se/'));
       return worker.fetch(new Request(url, opts),{DB:db});

@@ -461,8 +461,11 @@ if (typeof document !== 'undefined') (async function () {
   let starter = [];
   let nutrients = {};
   // versionsquery av samma skäl som app.js i index.html: Cloudflare-edgecachen har lång max-age
-  try { starter = await (await fetch('starter.json?v=steps-20260804')).json(); } catch (e) { /* offline utan cache */ }
-  try { nutrients = await (await fetch('nutrients.json')).json(); } catch (e) { /* offline utan cache */ }
+  // Hämtas parallellt: båda måste finnas före första renderingen, i följd kostade de en extra rundresa.
+  const getJson = url => fetch(url).then(r => r.json()).catch(() => null); // offline utan cache
+  const [starterJson, nutrientsJson] = await Promise.all([getJson('starter.json?v=steps-20260804'), getJson('nutrients.json?v=20261104')]);
+  if (starterJson) starter = starterJson;
+  if (nutrientsJson) nutrients = nutrientsJson;
   if (!state) state = { recipes: [], selections: [], extras: [], checked: [], struck: {} };
   try { state = normalizeState(state); } catch (e) { state = { recipes: [], selections: [], extras: [], checked: [], struck: {} }; }
 
