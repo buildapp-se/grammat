@@ -12,6 +12,32 @@ reviewedAt: 2026-11-04
 
 # Handoff
 
+## 2026-11-04: samlingsgren `claude/samlad-2026-11-04`
+
+Slår ihop PR #3 (märkning av osäkra guidevärden) och PR #2 (förbättringsrundan nedan) utan konflikter.
+Gemensam version `app.js?v=overifierat-a11y-20261104` ersätter båda grenarnas versionsfrågor; `GUIDE_V = '20261104'`
+från PR #3. Ingen deploy. Workern behöver deployas efter merge för att PR #2:s workerändringar ska gälla.
+
+## 2026-11-04: förbättringsrunda på grenen `claude/forbattringar-2026-11-04` (PR #2, inte mergad)
+
+Inga nya funktioner, ingen deploy, ingen D1. PIN-inloggningen, `authhost/` och receptinnehåll orörda.
+
+- **Worker:** `null` eller dubblett-id i en rå PUT /state gav 500 och inget sparades (primärnyckeln
+  i `recipes_index`). `indexRows` hoppar över dem, `sanitizeIndexed` typar även titel, steg och
+  ingredienser så ett trasigt recept i `/feed` inte kraschar sökningen hos andra. Test 18.
+  **Kräver workerdeploy för att gälla.**
+- **`worker/reindex-all.js`** kraschade på `require` (ESM) och hade annars indexerat `tags` och
+  `src`. Nu ESM och delar `indexRows` med workern. Test 19 jämför mot PUT /state. Inte kört mot D1.
+- **Direktlänk till någon annans recept** (fyndet från 2026-10-06) hämtar nu flödet i receptvyn och
+  köksläget; tillbaka säger Allas recept när sidan öppnats direkt. Test i `test-ui.cjs`.
+- **a11y:** köksläget har `h1` och `role="progressbar"`, köttbitarnas SVG `role="group"`,
+  `integritet.html` har `<main>` och 44 px länkar utanför texten. axe 20 fynd före, 0 efter
+  (13 sidor × 390/1280 px × in/utloggad, lokal worker på SQLite).
+- **Start:** `starter.json` och `nutrients.json` hämtas parallellt, `nutrients.json` har versionsfråga.
+- Version: `app.js?v=a11y-20261104`. Hämta inte den adressen innan Pages publicerat (cachefällan 2026-09-25).
+- `test-ui.cjs` kräver `npm install --prefix backups/test-deps --no-save jsdom@29.1.1` i en ny klon.
+- **Inte verifierat:** riktig telefon, riktig Firebase-inloggning, workern i Cloudflare.
+
 ## 2026-10-21: Skicka till ICA
 
 Listans rubrikrad har tre ikonknappar med tooltip: Kopiera, Skicka till ICA-listan och Töm listan (⋯-menyn på listan borttagen 2026-10-21, Patrik hittade inte valen där). ICA-knappen syns för kontona `patrik` och `julia` (`ICA_ACCOUNTS` i `app.js` och `worker/worker.js`). `icaItems` gör det obockade till rader med mängd och enhet: styck när receptet har det, kryddmått för små skafferimängder, annars avrundad vikt eller volym. Egna rader går som text. Appen anropar `POST /ica` i workern (`worker/ica.js`), som lägger raderna på den delade ICA-listan "tjööööp" (`ICA_LIST` i `wrangler.toml`) via ICA-appens inofficiella API. Inloggning: secrets `ICA_USERNAME` (personnummer) och `ICA_PASSWORD` på workern, token och egen klient i tabellen `ica` (`migrations/0002_ica.sql`, körd remote). Workern förnyar token själv och loggar in igen när förnyelsen dör (högst 90 dagar), inget handgrepp behövs. Byter Patrik ICA-lösenord: `wrangler secret put ICA_PASSWORD` i `worker/`. Artikelindexet `worker/ica-articles.json` är kopierat från Metarecept (repot `recept`). Worker deployad version `62e2d5c3`. Tester: `test-ica.cjs` (behörighet, validering, radernas form) och test 10 i `test.js`. Full inloggning, klientregistrering och förnyelse provade skarpt i Node mot ICA. **Inte provat:** inloggningen inifrån Cloudflare (ICA kan neka deras IP) och menyvalet i inloggad webbläsare.

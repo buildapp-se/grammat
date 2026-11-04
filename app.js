@@ -465,8 +465,11 @@ if (typeof document !== 'undefined') (async function () {
   let starter = [];
   let nutrients = {};
   // versionsquery av samma skäl som app.js i index.html: Cloudflare-edgecachen har lång max-age
-  try { starter = await (await fetch('starter.json?v=steps-20260804')).json(); } catch (e) { /* offline utan cache */ }
-  try { nutrients = await (await fetch('nutrients.json')).json(); } catch (e) { /* offline utan cache */ }
+  // Hämtas parallellt: båda måste finnas före första renderingen, i följd kostade de en extra rundresa.
+  const getJson = url => fetch(url).then(r => r.json()).catch(() => null); // offline utan cache
+  const [starterJson, nutrientsJson] = await Promise.all([getJson('starter.json?v=steps-20260804'), getJson('nutrients.json?v=20261104')]);
+  if (starterJson) starter = starterJson;
+  if (nutrientsJson) nutrients = nutrientsJson;
   if (!state) state = { recipes: [], selections: [], extras: [], checked: [], struck: {} };
   try { state = normalizeState(state); } catch (e) { state = { recipes: [], selections: [], extras: [], checked: [], struck: {} }; }
 
@@ -586,6 +589,7 @@ if (typeof document !== 'undefined') (async function () {
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
   let lastTab = '#/'; // fliken man kom ifrån, ger receptvyns tillbaka-knapp sitt namn
+  let routedOnce = false; // false tills första hashbytet: sidan öppnades direkt på adressen
   const BACK_LABELS = { '#/': 'Mina recept', '#/lista': 'Lista', '#/vanner': 'Vänner', '#/allas': 'Allas recept' };
   // recept kan visas/öppnas innan de finns i egna state.recipes (Allas recept-fliken)
   function publicRowKey(r) { return Number.isInteger(r.ownerId) ? r.ownerId + '|' + r.id : 'starter|' + r.id; }
@@ -1037,10 +1041,17 @@ if (typeof document !== 'undefined') (async function () {
     return sel ? sel.portions : (previewPortions[id] || r.portions);
   }
 
+  // Direktlänk till någon annans recept (#/recept/5%7Cslug): flödet är inte hämtat än,
+  // så hämta det i stället för att direkt svara att receptet inte finns.
+  function missingRecipe(id) {
+    if (/^\d+\|/.test(id) && allasList === null && !allasLoadError) { loadAllas(); return '<p class="hint">Laddar receptet …</p>'; }
+    if (/^\d+\|/.test(id) && allasLoadError) return '<p class="warn">Kunde inte ladda receptet just nu.</p>';
+    return '<p class="empty">Receptet finns inte.</p>';
+  }
   function viewRecipe(id) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
     const mine = state.recipes.some(x => x.id === id);
     const sel = mine ? selFor(id) : null;
     const portions = portionsFor(r, id);
@@ -1113,7 +1124,8 @@ if (typeof document !== 'undefined') (async function () {
   function viewCook(id, n) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r || !r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
+    if (!r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
     const total = r.steps.length;
     n = Math.min(Math.max(1, n), total);
     const portions = portionsFor(r, id);
@@ -1126,8 +1138,8 @@ if (typeof document !== 'undefined') (async function () {
         <span class="rv-kicker" id="wakeNote">${wakeActive ? 'Skärmen hålls tänd' : ''}</span>
         <button class="btn btn-ghost cook-portions" type="button" id="cookPortions">${portions} port</button>
       </div>
-      <div class="cook-title">${esc(r.title)}</div>
-      <div class="progress" aria-label="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
+      <h1 class="cook-title">${esc(r.title)}</h1>
+      <div class="progress" role="progressbar" aria-label="Steg" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${n}" aria-valuetext="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
       ${ings.length ? `<div class="cook-ings"><div class="label">Till det här steget</div>${ings.map(ing => `<div><span>${esc(ing.name)}</span><span class="qty">${esc(fmtIngredient(ing, f))}</span></div>`).join('')}</div>` : ''}
       <div class="cook-step">
         <div class="cook-stepno">STEG ${n}</div>
@@ -1646,7 +1658,7 @@ if (typeof document !== 'undefined') (async function () {
     const ov = guide.ugn.filter(x => x.cutId && cut && x.cutId === cut.id);
     // Codex-bilden underst, snitten klipps mot dess kontur, etiketter och streck ovanpå (koordinater i bildpixlar).
     const g = an.svg, on = id => cut && cut.id === id;
-    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="img" aria-label="Köttbitar ${esc(an.sv)}">
+    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="group" aria-label="Köttbitar ${esc(an.sv)}">
         <defs><clipPath id="clip-${an.id}"><path d="${esc(g.body)}"/></clipPath></defs>
         <image href="${esc(g.image)}" width="${Number(g.w)}" height="${Number(g.h)}"/>
         <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => g.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${on(r.id) ? ' is-on' : ''}" d="${esc(g.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
@@ -1746,7 +1758,9 @@ if (typeof document !== 'undefined') (async function () {
     let html;
     if (cook) html = viewCook(decodeURIComponent(cook[1]), Number(cook[2]));
     else if (m && m[1] === 'recept') {
-      if (!history.state || !history.state.from) { try { history.replaceState({ from: lastTab }, ''); } catch (e) { /* file:// */ } }
+      // Direktlänk till någon annans recept: tillbaka leder till Allas recept, inte Mina recept.
+      const entry = !routedOnce && /^\d+\|/.test(decodeURIComponent(m[2])) && recipeIdFromHash(h) === decodeURIComponent(m[2]) ? '#/allas' : lastTab;
+      if (!history.state || !history.state.from) { try { history.replaceState({ from: entry }, ''); } catch (e) { /* file:// */ } }
       html = viewRecipe(decodeURIComponent(m[2]));
       const id = recipeIdFromHash(h);
       const own = state.recipes.find(x => x.id === id);
@@ -2349,6 +2363,7 @@ if (typeof document !== 'undefined') (async function () {
       <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Nytt recept');
   };
   window.addEventListener('hashchange', () => {
+    routedOnce = true;
     closeSheet();
     if (location.hash === '#/vanner') refreshFriends(); else render();
   });
