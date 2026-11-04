@@ -401,3 +401,28 @@ import('./worker/worker.js').then(async ({ default: worker }) => {
 
   console.log('Alla test OK (CORS utan `*`, /state no-store)');
 });
+
+// 18. Rå PUT /state med trasiga recept: servern ska inte svara 500 (då sparas inget alls),
+//     och det som hamnar i /feed måste tåla klientens sökning och receptvy hos alla besökare.
+import('./worker/worker.js').then(async ({ default: worker }) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  const put = state => worker.fetch(new Request('https://test.invalid/state', {
+    method: 'PUT', headers: { Authorization: 'Bearer tok-alice' }, body: JSON.stringify(state),
+  }), { DB: db });
+  let res = await put({ recipes: [null, { id: 'a', title: 'A', ingredients: [{ name: 'salt' }] }] });
+  assert.strictEqual(res.status, 200, 'null i receptlistan ger inte serverfel');
+  res = await put({ recipes: [{ id: 'a', title: 'A', ingredients: [{ name: 'salt' }] }, { id: 'a', title: 'A igen', ingredients: [{ name: 'peppar' }] }] });
+  assert.strictEqual(res.status, 200, 'dubblett-id ger inte serverfel');
+  res = await put({ recipes: [{ id: 'b', title: 5, ingredients: [null, { amount: '<b>9</b>' }, { name: 'mjöl', amount: '2', unit: 'ml' }], steps: 'Koka' }] });
+  assert.strictEqual(res.status, 200);
+  const feed = await (await worker.fetch(new Request('https://test.invalid/feed'), { DB: db })).json();
+  assert.deepStrictEqual(feed.map(r => r.id), ['b']);
+  const [b] = feed;
+  assert.strictEqual(b.title, '5', 'titeln är alltid en sträng');
+  assert.deepStrictEqual(b.steps, [], 'steg är alltid en lista med text');
+  assert.deepStrictEqual(b.ingredients, [{ name: 'mjöl', unit: 'ml' }], 'ingredienser utan namn bort, mängd bara som tal');
+  assert.strictEqual(matchesQuery(b, 'mjöl'), true, 'sökningen i Allas recept kraschar inte');
+  console.log('Alla test OK (trasig PUT /state)');
+});
