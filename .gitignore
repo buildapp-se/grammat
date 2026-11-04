@@ -17,3 +17,7 @@ AGENTS.md
 # guide-art: rutnät och Codex-logg är arbetsfiler
 docs/guide-art/grid-*.png
 docs/guide-art/codex.log
+
+# Stryker: rapporter och sandlåda, regenereras av `npx stryker run`.
+reports/
+.stryker-tmp/
