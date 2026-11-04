@@ -140,8 +140,9 @@ export function sanitizeIndexed(r) {
   };
 }
 
-function reindexStmts(env, ownerId, recipes) {
-  const stmts = [env.DB.prepare('DELETE FROM recipes_index WHERE owner_id = ?').bind(ownerId)];
+// Raderna som hör hemma i det publika indexet, sanerade. Delas med reindex-all.js.
+export function indexRows(recipes) {
+  const rows = [];
   const seen = new Set(); // (owner_id, id) är primärnyckel: en dubblett fällde hela batchen och inget sparades
   for (const r of recipes) {
     if (!r || typeof r !== 'object') continue;
@@ -149,13 +150,19 @@ function reindexStmts(env, ownerId, recipes) {
     if (r.private === true || r.src || !r.id || !r.title) continue;
     if (!Array.isArray(r.ingredients) || seen.has(String(r.id))) continue;
     seen.add(String(r.id));
-    const safe = sanitizeIndexed(r);
-    stmts.push(env.DB.prepare(
+    rows.push({ id: String(r.id), title: String(r.title), course: normalizeCourse(r.course), data: JSON.stringify(sanitizeIndexed(r)) });
+  }
+  return rows;
+}
+
+function reindexStmts(env, ownerId, recipes) {
+  return [
+    env.DB.prepare('DELETE FROM recipes_index WHERE owner_id = ?').bind(ownerId),
+    ...indexRows(recipes).map(row => env.DB.prepare(
       `INSERT INTO recipes_index (owner_id, id, title, course, visibility, saves_count, data)
        VALUES (?,?,?,?,'public',(SELECT COUNT(*) FROM saves WHERE owner_id = ? AND recipe_id = ?),?)`
-    ).bind(ownerId, String(r.id), String(r.title), normalizeCourse(r.course), ownerId, String(r.id), JSON.stringify(safe)));
-  }
-  return stmts;
+    ).bind(ownerId, row.id, row.title, row.course, ownerId, row.id, row.data)),
+  ];
 }
 
 function rowRecipe(r) {

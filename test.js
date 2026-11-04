@@ -426,3 +426,25 @@ import('./worker/worker.js').then(async ({ default: worker }) => {
   assert.strictEqual(matchesQuery(b, 'mjöl'), true, 'sökningen i Allas recept kraschar inte');
   console.log('Alla test OK (trasig PUT /state)');
 });
+
+// 19. reindex-all.js (engångsskript mot D1) ger samma index som PUT /state: egna kategorier och
+//     sparade kopior når inte det publika flödet. Körs mot SQLite, aldrig mot produktion.
+Promise.all([import('./worker/worker.js'), import('./worker/reindex-all.js')]).then(async ([{ default: worker }, { reindexSql }]) => {
+  const { createTestDb } = require('./test-d1.cjs');
+  const { db, sqlite } = createTestDb();
+  sqlite.prepare('INSERT INTO users (id,name,pin_hash,token) VALUES (?,?,?,?)').run(1, 'alice', '', 'tok-alice');
+  const state = { recipes: [
+    { id: 'a', title: 'A', tags: ['Hemligt'], ingredients: [{ name: 'salt', amount: 2, unit: 'g' }], steps: ['Koka.'] },
+    { id: 'kopia', title: 'Kopia', src: { owner: 2, id: 'x' }, ingredients: [{ name: 'salt' }] },
+    { id: 'p', title: 'P', private: true, ingredients: [{ name: 'salt' }] },
+  ] };
+  await worker.fetch(new Request('https://test.invalid/state', { method: 'PUT', headers: { Authorization: 'Bearer tok-alice' }, body: JSON.stringify(state) }), { DB: db });
+  const viaPut = sqlite.prepare('SELECT owner_id, id, title, course, data FROM recipes_index ORDER BY id').all();
+  sqlite.exec('DELETE FROM recipes_index');
+  const sql = reindexSql([{ id: 1, state: JSON.stringify(state) }]);
+  assert.ok(!sql.includes('Hemligt'), 'egna kategorier stryks i reindex-skriptet');
+  sqlite.exec(sql);
+  assert.deepStrictEqual(sqlite.prepare('SELECT owner_id, id, title, course, data FROM recipes_index ORDER BY id').all(), viaPut, 'samma index som PUT /state');
+  assert.deepStrictEqual(viaPut.map(r => r.id), ['a']);
+  console.log('Alla test OK (reindex-all = PUT /state)');
+});
