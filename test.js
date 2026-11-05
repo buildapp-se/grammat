@@ -633,7 +633,7 @@ Promise.all([import('./worker/worker.js'), import('./worker/reindex-all.js')]).t
   assert.throws(imp1({ title: '  ', ingredients: [{ name: 'x' }] }), { message: 'Fältet "title" saknas.' });
   assert.throws(imp1({ title: 'A' }), { message: 'Fältet "ingredients" saknas eller är tomt.' });
   assert.throws(imp1({ title: 'A', ingredients: [] }), { message: 'Fältet "ingredients" saknas eller är tomt.' });
-  for (const x of [null, { name: 5 }, { name: '  ' }]) assert.throws(imp1({ title: 'A', ingredients: [x] }), { message: 'En ingrediens saknar namn.' });
+  for (const x of [null, 'lök', 42, { name: 5 }, { name: '  ' }]) assert.throws(imp1({ title: 'A', ingredients: [x] }), { message: 'En ingrediens saknar namn.' });
   assert.deepStrictEqual(parseImport(JSON.stringify([
     { title: ' Gryta ', portions: 2.6, course: 'sas', labels: ['fest', 'okänd'], source: 'https://ex.se/a',
       ingredients: [

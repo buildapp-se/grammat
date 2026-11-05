@@ -12,6 +12,17 @@ reviewedAt: 2026-11-04
 
 # Handoff
 
+## 2026-11-04: backloggpunkter på grenen `claude/backlog-2026-11-04` (staplad på mutationsgrenen, PR #7)
+
+Bara det som går att koda utan ägarens beslut; inga nya funktioner, ingen deploy, ingen D1.
+
+- **`normIngredient`** i `app.js` ersätter de två nästan lika kopiorna av ingrediensreglerna i
+  `normalizeState` och `importRecipe`. Bara felmeddelandet skiljer. Beteendet oförändrat, versionsfrågan
+  på `app.js` därför inte höjd. Strykers `mutate` är nu `app.js:1-442` (exporten flyttade upp).
+- `node test.js`, `test-friends.cjs`, `test-ica.cjs` och `test-ui.cjs` gröna.
+- Resten av BACKLOG väntar på ägaren (inloggade kontroller, OAuth-branding, legacy-PIN, innehåll,
+  riktig telefon) eller är designfråga (guidens 17 px-länkar).
+
 ## 2026-11-04: mutationstest på grenen `claude/mutation-2026-11-04` (staplad på samlingsgrenen)
 
 Audit-kolumnen Mutation. Stryker 9 med command runner (`node test.js`) på de rena funktionerna i
