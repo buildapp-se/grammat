@@ -194,6 +194,18 @@ function safeUrl(value) {
   }
 }
 
+// En ingrediens från backup eller import: samma regler för båda, bara felmeddelandet skiljer.
+function normIngredient(x, missingName) {
+  if (!x || typeof x !== 'object' || typeof x.name !== 'string' || !x.name.trim()) throw new Error(missingName);
+  const ing = { name: x.name.trim(), cat: CATS.includes(x.cat) ? x.cat : 'övrigt' };
+  if (typeof x.amount === 'number' && x.amount > 0) { ing.amount = x.amount; ing.unit = x.unit === 'ml' ? 'ml' : 'g'; }
+  else ing.toTaste = true;
+  if (typeof x.count === 'number' && x.count > 0) { ing.count = x.count; ing.countUnit = typeof x.countUnit === 'string' && x.countUnit.trim() ? x.countUnit.trim() : 'st'; }
+  if (x.skipList === true) ing.skipList = true;
+  if (typeof x.group === 'string' && x.group.trim()) ing.group = x.group.trim();
+  return ing;
+}
+
 function normalizeState(raw) {
   const s = raw && typeof raw === 'object' && raw.state && typeof raw.state === 'object' ? raw.state : raw;
   if (!s || typeof s !== 'object') throw new Error('Backupen innehåller ingen giltig state.');
@@ -214,16 +226,7 @@ function normalizeState(raw) {
       portions: typeof r.portions === 'number' && r.portions >= 1 ? Math.round(r.portions) : 4,
       course: normalizeCourse(r.course),
       source: safeUrl(r.source),
-      ingredients: r.ingredients.map(x => {
-        if (!x || typeof x !== 'object' || typeof x.name !== 'string' || !x.name.trim()) throw new Error('En ingrediens i "' + title + '" saknar namn.');
-        const ing = { name: x.name.trim(), cat: CATS.includes(x.cat) ? x.cat : 'övrigt' };
-        if (typeof x.amount === 'number' && x.amount > 0) { ing.amount = x.amount; ing.unit = x.unit === 'ml' ? 'ml' : 'g'; }
-        else ing.toTaste = true;
-        if (typeof x.count === 'number' && x.count > 0) { ing.count = x.count; ing.countUnit = typeof x.countUnit === 'string' && x.countUnit.trim() ? x.countUnit.trim() : 'st'; }
-        if (x.skipList === true) ing.skipList = true;
-        if (typeof x.group === 'string' && x.group.trim()) ing.group = x.group.trim();
-        return ing;
-      }),
+      ingredients: r.ingredients.map(x => normIngredient(x, 'En ingrediens i "' + title + '" saknar namn.')),
       steps: Array.isArray(r.steps) ? r.steps.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()) : [],
     };
     if (r.private === true) out.private = true; // hemligt: indexeras aldrig av servern
@@ -350,16 +353,7 @@ function importRecipe(d, takenIds) {
   if (!d || typeof d !== 'object') throw new Error('Receptet är inte ett JSON-objekt.');
   if (typeof d.title !== 'string' || !d.title.trim()) throw new Error('Fältet "title" saknas.');
   if (!Array.isArray(d.ingredients) || !d.ingredients.length) throw new Error('Fältet "ingredients" saknas eller är tomt.');
-  const ingredients = d.ingredients.map(x => {
-    if (!x || typeof x.name !== 'string' || !x.name.trim()) throw new Error('En ingrediens saknar namn.');
-    const ing = { name: x.name.trim(), cat: CATS.includes(x.cat) ? x.cat : 'övrigt' };
-    if (typeof x.amount === 'number' && x.amount > 0) { ing.amount = x.amount; ing.unit = x.unit === 'ml' ? 'ml' : 'g'; }
-    else ing.toTaste = true;
-    if (typeof x.count === 'number' && x.count > 0) { ing.count = x.count; ing.countUnit = typeof x.countUnit === 'string' && x.countUnit.trim() ? x.countUnit.trim() : 'st'; }
-    if (x.skipList === true) ing.skipList = true;
-    if (typeof x.group === 'string' && x.group.trim()) ing.group = x.group.trim();
-    return ing;
-  });
+  const ingredients = d.ingredients.map(x => normIngredient(x, 'En ingrediens saknar namn.'));
   return {
     id: slugify(d.title, takenIds),
     title: d.title.trim(),

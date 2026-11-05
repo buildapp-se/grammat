@@ -1,10 +1,10 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "Mutationstest av de rena funktionerna (audit-kolumnen Mutation). Kör: npm i --no-save @stryker-mutator/core@9 && npx stryker run. Bara rad 1-447 i app.js muteras (funktionerna som exporteras till node), inte UI-delen.",
+  "_comment": "Mutationstest av de rena funktionerna (audit-kolumnen Mutation). Kör: npm i --no-save @stryker-mutator/core@9 && npx stryker run. Bara rad 1-442 i app.js muteras (funktionerna som exporteras till node), inte UI-delen.",
   "testRunner": "command",
   "commandRunner": { "command": "node test.js" },
   "coverageAnalysis": "off",
-  "mutate": ["app.js:1-447"],
+  "mutate": ["app.js:1-442"],
   "ignorePatterns": ["backups", "docs", "guide-img", "icons", "authhost", "graft", ".repowise", "reports"],
   "reporters": ["clear-text", "progress", "html", "json"],
   "htmlReporter": { "fileName": "reports/mutation/mutation.html" },

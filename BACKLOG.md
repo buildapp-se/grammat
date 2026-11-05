@@ -79,3 +79,4 @@ Fynd från den automatiska sviten (aifabriken `tools/audit-suite.ts`: headers, n
 
 - [ ] Deploya workern efter merge av PR #2 (`indexRows`/`sanitizeIndexed`), annars gäller bara frontenddelen.
 - [ ] `[P3]` Länkarna i guidens tabeller är 17 px höga. Klarar WCAG 2.5.8 på avståndet men är under 44 px. Designfråga, inte ändrat.
+- [x] (rättad 2026-11-04) `[P3]` Ingrediensnormaliseringen fanns i två nästan lika kopior (`normalizeState` och `importRecipe`, noterat vid mutationstestet). Nu en funktion, `normIngredient`; bara felmeddelandet skiljer.
