@@ -97,3 +97,4 @@ Read by the cockpit Audits tab. One `- Label: YYYY-MM-DD, result` per check; con
 - ZAP baseline: 2026-10-27, n/a, static site on GitHub Pages with no server, cookies or forms; headers, TLS and markup are covered by their own columns, so a passive ZAP scan would repeat them
 - Dependabot: 2026-10-29, pass, 0 open alerts
 - WCAG 2.2 AA (local): 2026-11-04, pass, axe-core 4.11.0 0 violations (20 before) on 13 pages × 390/1280 px × logged in/out with a local Worker on SQLite; manual keyboard pass not done
+- Mutation: 2026-11-04, Stryker 92,49 % (57,55 % before) on the pure functions in app.js lines 1-447, 89 survivors reviewed: equivalent or display text
