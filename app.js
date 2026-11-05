@@ -440,8 +440,12 @@ function densityFor(name, density) {
 }
 const cToF = c => c * 9 / 5 + 32;
 const fToC = f => (f - 32) * 5 / 9;
+// Guidens osäkra värden: bara det crowdsourcade arket stöder dem (lista i docs/guide-research/SOURCES.md
+// under "Osäkert"), eller så saknas källa helt (ugnstider för grönsaker). De har unverified satt i
+// guide.json och märks som overifierade i guiden.
+const isUnverified = item => !!item.unverified || ((item.sources || []).length > 0 && item.sources.every(u => u.includes('docs.google.com')));
 
-if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers, timerNotice, labelsIn, matchesLabel }; }
+if (typeof module !== 'undefined') { module.exports = { parseAmount, fmtAmount, convertUnit, densityFor, cToF, fToC, ingLabel, stepIngredients, CATS, COURSES, COURSE_LABELS, normalizeCourse, normTags, renameTag, normLabels, LABELS, aggregate, fmtNum, fmtItem, icaItems, fmtIngredient, recipeAsText, spiceHint, nutritionPerPortion, findNutrient, keyOf, slugify, safeUrl, normalizeState, makeBackup, parseImport, dedupeAllas, matchesQuery, stepTimers, timerNotice, labelsIn, matchesLabel, isUnverified }; }
 
 // ---------- app ----------
 // Patrik och Julia har en delad ICA-lista, workern skriver till den (POST /ica) och släpper bara in de här kontona.
@@ -461,8 +465,11 @@ if (typeof document !== 'undefined') (async function () {
   let starter = [];
   let nutrients = {};
   // versionsquery av samma skäl som app.js i index.html: Cloudflare-edgecachen har lång max-age
-  try { starter = await (await fetch('starter.json?v=steps-20260804')).json(); } catch (e) { /* offline utan cache */ }
-  try { nutrients = await (await fetch('nutrients.json')).json(); } catch (e) { /* offline utan cache */ }
+  // Hämtas parallellt: båda måste finnas före första renderingen, i följd kostade de en extra rundresa.
+  const getJson = url => fetch(url).then(r => r.json()).catch(() => null); // offline utan cache
+  const [starterJson, nutrientsJson] = await Promise.all([getJson('starter.json?v=steps-20260804'), getJson('nutrients.json?v=20261104')]);
+  if (starterJson) starter = starterJson;
+  if (nutrientsJson) nutrients = nutrientsJson;
   if (!state) state = { recipes: [], selections: [], extras: [], checked: [], struck: {} };
   try { state = normalizeState(state); } catch (e) { state = { recipes: [], selections: [], extras: [], checked: [], struck: {} }; }
 
@@ -582,6 +589,7 @@ if (typeof document !== 'undefined') (async function () {
   const previewPortions = {}; // portionsvisning på receptsidan innan receptet lagts i listan
   const recipeIdFromHash = (h = location.hash) => { const m = h.match(/^#\/recept\/([^/]+)/); return m ? localRecipeId(decodeURIComponent(m[1])) : null; };
   let lastTab = '#/'; // fliken man kom ifrån, ger receptvyns tillbaka-knapp sitt namn
+  let routedOnce = false; // false tills första hashbytet: sidan öppnades direkt på adressen
   const BACK_LABELS = { '#/': 'Mina recept', '#/lista': 'Lista', '#/vanner': 'Vänner', '#/allas': 'Allas recept' };
   // recept kan visas/öppnas innan de finns i egna state.recipes (Allas recept-fliken)
   function publicRowKey(r) { return Number.isInteger(r.ownerId) ? r.ownerId + '|' + r.id : 'starter|' + r.id; }
@@ -1033,10 +1041,17 @@ if (typeof document !== 'undefined') (async function () {
     return sel ? sel.portions : (previewPortions[id] || r.portions);
   }
 
+  // Direktlänk till någon annans recept (#/recept/5%7Cslug): flödet är inte hämtat än,
+  // så hämta det i stället för att direkt svara att receptet inte finns.
+  function missingRecipe(id) {
+    if (/^\d+\|/.test(id) && allasList === null && !allasLoadError) { loadAllas(); return '<p class="hint">Laddar receptet …</p>'; }
+    if (/^\d+\|/.test(id) && allasLoadError) return '<p class="warn">Kunde inte ladda receptet just nu.</p>';
+    return '<p class="empty">Receptet finns inte.</p>';
+  }
   function viewRecipe(id) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
     const mine = state.recipes.some(x => x.id === id);
     const sel = mine ? selFor(id) : null;
     const portions = portionsFor(r, id);
@@ -1109,7 +1124,8 @@ if (typeof document !== 'undefined') (async function () {
   function viewCook(id, n) {
     id = localRecipeId(id);
     const r = findRecipe(id);
-    if (!r || !r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
+    if (!r) return missingRecipe(id);
+    if (!r.steps.length) return '<p class="empty">Receptet finns inte.</p>';
     const total = r.steps.length;
     n = Math.min(Math.max(1, n), total);
     const portions = portionsFor(r, id);
@@ -1122,8 +1138,8 @@ if (typeof document !== 'undefined') (async function () {
         <span class="rv-kicker" id="wakeNote">${wakeActive ? 'Skärmen hålls tänd' : ''}</span>
         <button class="btn btn-ghost cook-portions" type="button" id="cookPortions">${portions} port</button>
       </div>
-      <div class="cook-title">${esc(r.title)}</div>
-      <div class="progress" aria-label="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
+      <h1 class="cook-title">${esc(r.title)}</h1>
+      <div class="progress" role="progressbar" aria-label="Steg" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${n}" aria-valuetext="Steg ${n} av ${total}">${r.steps.map((_, i) => `<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`).join('')}</div>
       ${ings.length ? `<div class="cook-ings"><div class="label">Till det här steget</div>${ings.map(ing => `<div><span>${esc(ing.name)}</span><span class="qty">${esc(fmtIngredient(ing, f))}</span></div>`).join('')}</div>` : ''}
       <div class="cook-step">
         <div class="cook-stepno">STEG ${n}</div>
@@ -1496,7 +1512,7 @@ if (typeof document !== 'undefined') (async function () {
   }
 
   // ---------- Guide: tider, köttbitar, mått. Statisk data i guide.json, hämtas första gången. ----------
-  const GUIDE_V = '20261006'; // höj när guide.json ändras, edgen cachar annars gammal data
+  const GUIDE_V = '20261104'; // höj när guide.json ändras, edgen cachar annars gammal data
   let guide = null, guideLoading = false, guideError = false;
   let guideAnimal = '', guideQuery = '', densQuery = '';
   const conv = { amount: '1', unit: 'dl', ing: '' };
@@ -1543,7 +1559,8 @@ if (typeof document !== 'undefined') (async function () {
   const cutOf = id => { for (const an of guide.cuts.animals) { const c = an.regions.find(r => r.id === id); if (c) return { animal: an, cut: c }; } return null; };
   const cutLink = id => { const f = id && cutOf(id); return f ? `<a class="glink" href="#/guide/kottbitar/${f.animal.id}/${f.cut.id}">Var sitter den? ›</a>` : ''; };
 
-  // Källa per detalj: domänen blir ett läsbart namn. Arket är crowdsourcat och märks som overifierat.
+  // Källa per detalj: domänen blir ett läsbart namn. Arket är crowdsourcat; värden som bara stöds av
+  // arket (unverified i guide.json, se SOURCES.md "Osäkert") märks som overifierade.
   const SOURCE_NAMES = [['seriouseats.com', 'Serious Eats'], ['chefsteps', 'ChefSteps'], ['douglasbaldwin.com', 'Douglas Baldwin'], ['svensktkott.se', 'Svenskt Kött'],
     ['anovaculinary.com', 'Anova'], ['ica.se', 'ICA'], ['livsmedelsverket.se', 'Livsmedelsverket'], ['docs.google.com', 'Sous vide-arket']];
   const sourceName = u => (SOURCE_NAMES.find(([k]) => u.includes(k)) || [, new URL(u).hostname.replace(/^www\./, '')])[1];
@@ -1551,9 +1568,9 @@ if (typeof document !== 'undefined') (async function () {
     const seen = new Set();
     const links = (item.sources || []).map(safeUrl).filter(Boolean).filter(u => { const n = sourceName(u); return !seen.has(n) && seen.add(n); })
       .map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(sourceName(u))}</a>`);
-    if (!links.length) return '';
-    const onlySheet = (item.sources || []).every(u => u.includes('docs.google.com'));
-    return `<small class="gsrcs">Källa: ${links.join(', ')}${onlySheet ? ', overifierat' : ''}</small>`;
+    const unverified = isUnverified(item);
+    if (!links.length) return unverified ? '<small class="gsrcs">Ej verifierad mot källa</small>' : '';
+    return `<small class="gsrcs">Källa: ${links.join(', ')}${unverified ? ', overifierat' : ''}</small>`;
   }
 
   function timeRows(item, mode) {
@@ -1590,14 +1607,14 @@ if (typeof document !== 'undefined') (async function () {
     const name = x => { const sub = [x.en, mode === 'sousvide' ? x.thickness : x.refSize ? 'tider för ' + x.refSize : x.timeHint].filter(Boolean).join(', ');
       return `<a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${sub ? `<small>${esc(sub)}</small>` : ''}${x.safety ? `<a class="gwarn" href="#/guide/${mode}/${esc(x.id)}">Se säkerhet ›</a>` : ''}${sourceLinks(x)}`; };
     const oven = x => x.ovenC ? (typeof x.ovenC === 'number' ? fmtAmount(x.ovenC) : esc(x.ovenC)) : '';
-    const cell = (o, withLabel, x) => o ? `<td${o.rec ? ' class="is-rec"' : ''}>${o.rec ? '<i>Rekommenderas</i>' : ''}${withLabel ? `<small>${esc(o.label)}</small>` : ''}<b>${fmtAmount(temp(o))} °C${mode === 'ugn' ? ' inuti' : ''}</b>${o.time ? `<span>${mode === 'ugn' && o.ovenC && o.ovenC !== x.ovenC ? `ugn ${fmtAmount(o.ovenC)} °C, ` : ''}${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
+    const cell = (o, withLabel, x) => o ? `<td${o.rec ? ' class="is-rec"' : ''}>${o.rec ? '<i>Rekommenderas</i>' : ''}${withLabel ? `<small>${esc(o.label)}</small>` : ''}${isUnverified(o) ? '<small>Overifierat</small>' : ''}<b>${fmtAmount(temp(o))} °C${mode === 'ugn' ? ' inuti' : ''}</b>${o.time ? `<span>${mode === 'ugn' && o.ovenC && o.ovenC !== x.ovenC ? `ugn ${fmtAmount(o.ovenC)} °C, ` : ''}${esc(o.time)}</span>` : ''}</td>` : '<td class="gempty">–</td>';
     const ovenCol = mode === 'ugn';
     const table = (headCells, rows) => `<div class="gtable-wrap"><table class="gtable"><thead><tr><th>Detalj</th>${ovenCol ? '<th>Ugn</th>' : ''}${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
     const row = (x, cells) => `<tr><th>${name(x)}</th>${ovenCol ? `<td class="gnum">${oven(x)}${x.ovenC ? ' °C' : ''}</td>` : ''}${cells}</tr>`;
     return ANIMALS.filter(([k]) => k && items.some(x => x.animal === k)).map(([k, title]) => {
       const group = items.filter(x => x.animal === k);
       if (mode === 'ugn' && group.every(x => !opts(x).length)) // grönsaker: bara ugnsvärme och tid
-        return `<h2>${title}</h2><div class="gtable-wrap"><table class="gtable"><thead><tr><th>Grönsak</th><th>Ugn</th><th>Tid</th></tr></thead><tbody>${group.map(x => `<tr><th><a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${x.en ? `<small>${esc(x.en)}</small>` : ''}</th><td class="gnum">${oven(x)} °C</td><td>${esc(x.timeHint || '')}</td></tr>`).join('')}</tbody></table></div>`;
+        return `<h2>${title}</h2><div class="gtable-wrap"><table class="gtable"><thead><tr><th>Grönsak</th><th>Ugn</th><th>Tid</th></tr></thead><tbody>${group.map(x => `<tr><th><a href="#/guide/${mode}/${esc(x.id)}">${esc(x.sv)}</a>${x.en ? `<small>${esc(x.en)}</small>` : ''}${sourceLinks(x)}</th><td class="gnum">${oven(x)} °C</td><td>${esc(x.timeHint || '')}</td></tr>`).join('')}</tbody></table></div>`;
       const fits = x => { const g = opts(x).map(o => gradeOf(o.label)); return g.length && g.every(Boolean) && new Set(g).size === g.length; };
       const std = group.filter(fits), other = group.filter(x => !fits(x));
       const cols = GRADES.filter(gr => std.some(x => opts(x).some(o => gradeOf(o.label) === gr)));
@@ -1641,7 +1658,7 @@ if (typeof document !== 'undefined') (async function () {
     const ov = guide.ugn.filter(x => x.cutId && cut && x.cutId === cut.id);
     // Codex-bilden underst, snitten klipps mot dess kontur, etiketter och streck ovanpå (koordinater i bildpixlar).
     const g = an.svg, on = id => cut && cut.id === id;
-    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="img" aria-label="Köttbitar ${esc(an.sv)}">
+    const svg = g ? `<svg class="gsvg" viewBox="${esc(g.viewBox)}" style="--fs:${Number(g.fs)}px" role="group" aria-label="Köttbitar ${esc(an.sv)}">
         <defs><clipPath id="clip-${an.id}"><path d="${esc(g.body)}"/></clipPath></defs>
         <image href="${esc(g.image)}" width="${Number(g.w)}" height="${Number(g.h)}"/>
         <g clip-path="url(#clip-${an.id})">${an.regions.filter(r => g.regions[r.id]).map(r => `<a href="#/guide/kottbitar/${an.id}/${r.id}" data-greplace aria-label="${esc(r.sv)}"><path class="greg${on(r.id) ? ' is-on' : ''}" d="${esc(g.regions[r.id])}"><title>${esc(r.sv)}</title></path></a>`).join('')}</g>
@@ -1653,8 +1670,8 @@ if (typeof document !== 'undefined') (async function () {
         ${cut.aka && cut.aka.length ? `<p class="gmeta">Kallas också: ${cut.aka.map(esc).join(', ')}</p>` : ''}
         <p>${esc(cut.description)}</p>
         ${cut.bestFor && cut.bestFor.length ? `<p class="gtags">${cut.bestFor.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</p>` : ''}
-        ${sv.length ? `<h4>Sous vide</h4><table class="gtab">${sv.map(x => timeRows(x, 'sousvide')).join('')}</table>` : ''}
-        ${ov.length ? `<h4>Ugn, innertemperatur</h4><table class="gtab">${ov.map(x => timeRows(x, 'ugn')).join('')}</table>` : ''}
+        ${sv.length ? `<h4>Sous vide</h4><table class="gtab">${sv.map(x => timeRows(x, 'sousvide') + (isUnverified(x) ? '<tr class="gnote"><td colspan="3">Ej verifierad mot källa</td></tr>' : '')).join('')}</table>` : ''}
+        ${ov.length ? `<h4>Ugn, innertemperatur</h4><table class="gtab">${ov.map(x => timeRows(x, 'ugn') + (isUnverified(x) ? '<tr class="gnote"><td colspan="3">Ej verifierad mot källa</td></tr>' : '')).join('')}</table>` : ''}
         ${sv.length ? `<a class="glink" href="#/guide/sousvide/${cut.id}">Alla sous vide-detaljer ›</a>` : ''}
       </article>` : '<p class="hint">Tryck på en del av djuret, eller välj i listan.</p>';
     return `<div class="gchips" role="group" aria-label="Djur">${animals.map(x => `<a class="gchip${x.id === an.id ? ' is-on' : ''}" href="#/guide/kottbitar/${x.id}" data-greplace${x.id === an.id ? ' aria-current="page"' : ''}>${esc(x.sv)}</a>`).join('')}</div>
@@ -1741,7 +1758,9 @@ if (typeof document !== 'undefined') (async function () {
     let html;
     if (cook) html = viewCook(decodeURIComponent(cook[1]), Number(cook[2]));
     else if (m && m[1] === 'recept') {
-      if (!history.state || !history.state.from) { try { history.replaceState({ from: lastTab }, ''); } catch (e) { /* file:// */ } }
+      // Direktlänk till någon annans recept: tillbaka leder till Allas recept, inte Mina recept.
+      const entry = !routedOnce && /^\d+\|/.test(decodeURIComponent(m[2])) && recipeIdFromHash(h) === decodeURIComponent(m[2]) ? '#/allas' : lastTab;
+      if (!history.state || !history.state.from) { try { history.replaceState({ from: entry }, ''); } catch (e) { /* file:// */ } }
       html = viewRecipe(decodeURIComponent(m[2]));
       const id = recipeIdFromHash(h);
       const own = state.recipes.find(x => x.id === id);
@@ -2344,6 +2363,7 @@ if (typeof document !== 'undefined') (async function () {
       <button class="btn btn-ghost sheet-cancel" type="button" data-close>Avbryt</button>`, 'Nytt recept');
   };
   window.addEventListener('hashchange', () => {
+    routedOnce = true;
     closeSheet();
     if (location.hash === '#/vanner') refreshFriends(); else render();
   });
